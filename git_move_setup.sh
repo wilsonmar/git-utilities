@@ -14,7 +14,7 @@ now=$(date)
 user='wilsonmar'
 echo "*** User=$user at $now."
 #### Phase A:
-cd /Users/wmar/gits/wilsonmar
+cd /Users/wmar/gits/$user
 pwd # NOTE: repo must be created before running this script.
 #git remote add origin https://github.com/wilsonmar/SampleA
 # 
@@ -23,7 +23,7 @@ git clone https://github.com/$user/SampleA SampleA # Create folder from Github
 cd SampleA
 dir=`pwd` # put results of pwd command into variable dir.
 echo "*** pwd=$dir"
-# rm -rf . # remove all folders and files
+rm -rf . # remove all folders and files
 #mkdir SampleA && cd SampleA
 #git init
 mkdir folderA1 # for first time.
@@ -38,7 +38,18 @@ echo fileA2a $now >>fileA2a.txt
 echo fileA2b $now >>fileA2b.txt
 cd $dir
 pwd
-#### Phase B:
+git add . -A # including deletes
+git status
+git commit -m"Add SampleA and SampleB $now"
+
+git remote -v
+git push -u origin master
+echo "*** $now should appear in commit comment at https://github.com/$user/SampleA"
+
+
+
+
+#### Phase B: ####
 cd /Users/wmar/gits/$user
 #git remote add origin https://github.com/wilsonmar/SampleB
 rm -rf SampleB
@@ -61,11 +72,12 @@ echo fileB2a $now >>fileB2a.txt
 echo fileB2b $now >>fileB2b.txt
 cd $dir
 pwd
-
 git add . -A # including deletes
 git status
 git commit -m"Add SampleA and SampleB $now"
-# merge
+
 git remote -v
 git push -u origin master
-echo "$now FINISHED $this_module."
+echo "*** $now should appear in commit comment at https://github.com/$user/SampleB"
+
+
