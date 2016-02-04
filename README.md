@@ -4,6 +4,10 @@ I don't think I really understood the internals of git until I had to move folde
 
 Git is all about keeping the history of changes.
 
+   NOTE: When a repo is cloned, a .git file contains the history of changes.
+
+   PROTIP: When a repo is downloaded, the zip file does not contain a git folder, and thus no history.
+
 ## git_move_setup.sh
 This populates in Github two repos SampleA and SamplB with folders,
 so we can test the work on a temporary basis,
@@ -13,8 +17,8 @@ Thus, a history of changes is also populated within each repo.
 
 There are two basic methods that address folders and log history differently:
 
-1) git_move_history.sh - extracts out history log file and import that into the destination repo after 
-   moving the folders and files without history to the destination folder.
+1) git_move_history.sh - extracts out history log file and imports it into the destination repo after 
+   the folders and files are moved without history to the destination folder.
 
    This is based on https://gist.github.com/voltagex/3888364 mentioned in
    http://blog.neutrino.es/2012/git-copy-a-file-or-directory-from-another-repository-preserving-history/
