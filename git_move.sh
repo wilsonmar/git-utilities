@@ -3,8 +3,12 @@
 # At https://github.com/wilsonmar/git-utilities/git_move.git
 # (forked from https://gist.github.com/gregferrell/942639)
 
-# Usage:
-# 	./git_move.sh git@repo_site.com:/my_repo.git origin/folder/path/ /destination/repo/path/ new/folder/path/  
+# Usage: first: chmod 777 git_move.sh
+# ./git_move.sh git@repo_site.com:/my_repo.git origin/folder/path/ /destination/repo/path/ new/folder/path/  
+# Example: Move folder folderA1 from SampleA to SampleB:
+# ./git_move.sh /Users/wmar/gits/wilsonmar/SampleA folderA1  /Users/wmar/gits/wilsonmar/SampleB folderA1
+# ./git_move.sh git@github.com:wilsonmar/SampleA folderA1  git@github.com:wilsonmar/SampleB folderA1
+# NOTE: These were created using https://github.com/wilsonmar/git-utilities/git_move_setup.git
 
 # To prevent who repos being wiped out by blank options:
 if [ $# -lt 4 ] ; then
