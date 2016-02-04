@@ -12,16 +12,17 @@
 this_module='git_move_setup.sh'
 now=$(date)
 user='wilsonmar'
+localdir='/Users/wmar/gits/wilsonmar'
 repoA='SampleA'
 repoB='SampleB'
 folderA1='SampleA-folder1'
 folderA2='SampleA-folder2'
 folderB1='SampleB-folder1'
 folderB2='SampleB-folder2'
-echo "*** User=$user, repoA=$repoA, repoB=$repoB, at $now."
+echo "*** User=$user, localdir=$localdir, repoA=$repoA, repoB=$repoB, at $now."
 
 #### Phase A:
-cd /Users/wmar/gits/$user
+cd $localdir
 pwd # NOTE: repo must be created before running this script.
 #git remote add origin https://github.com/wilsonmar/$repoA
 # 
@@ -56,7 +57,7 @@ echo "*** $now should appear in commit comment at https://github.com/$user/$repo
 
 
 #### Phase B: ####
-cd /Users/wmar/gits/$user
+cd $localdir
 #git remote add origin https://github.com/wilsonmar/$repoB
 rm -rf $repoB
 git clone https://github.com/$user/$repoB $repoB # Create folder from Github
