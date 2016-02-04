@@ -3,6 +3,7 @@
 # This assumes that repos have already been setup:
 #    http://github.com/wilsonmar/SampleA
 #    http://github.com/wilsonmar/SampleB
+# TODO: Remove folders - reset the repo.
 # TODO: Generalize folder names so others can use this.
 # Sample call:
 # ./git_move_setup.sh wilsonmar
