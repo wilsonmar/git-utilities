@@ -10,21 +10,17 @@
 # Repeated runs add a line with date stamp to each file, which adds to git's update history.
 #
 now=$(date)
-echo "*** First parameter (repo) is $1 at $now"
-# To prevent who repos being wiped out by blank options:
-if [ $# -lt 1 ] ; then
-echo "**** $0 cancelled because no <user> was specified. (ie, where <user>=wilsonmar)"
-exit
-fi
+user='wilsonmar'
+echo "*** User=$user at $now."
 #### Phase A:
-cd /Users/wmar/gits/$1
+cd /Users/wmar/gits/$user
 pwd # NOTE: repo must be created before running this script.
 #git remote add origin https://github.com/wilsonmar/SampleA
 # 
 rm -rf SampleA
-git clone https://github.com/wilsonmar/SampleA SampleA # Create folder from Github
+git clone https://github.com/$user/SampleA SampleA # Create folder from Github
 cd SampleA
-dir=`pwd`
+dir=`pwd` # put results of pwd command into variable dir.
 rm -rf . # remove all folders and files
 #mkdir SampleA && cd SampleA
 #git init
