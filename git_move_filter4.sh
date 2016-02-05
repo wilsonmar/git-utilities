@@ -4,19 +4,32 @@
 # Example: after chmod 777 git_move_filter.sh
 # ./git_move_history.sh /Users/wmar/gits/wilsonmar/SampleB/folderB1 /Users/wmar/gits/wilsonmar/SampleA/folderB1 /Users/wmar/gits/wilsonmar/SampleA/folderB1.patch
 
-## My standard starter. Read: http://redsymbol.net/articles/unofficial-bash-strict-mode/
+# Before running this script:
+# This assumes that repos have already been setup:
+#    http://github.com/wilsonmar/SampleA
+#    http://github.com/wilsonmar/SampleB
+
+
+## My standard starter. 
+# Set exit logic. Read: http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail 
 IFS=$'\n\t'
 # Log to syslog:
 exec 1> >(logger -s -t $(basename $0)) 2>&1
 # Standard System Variables:
+NOW=$(date)
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 SYSTEM=${OSTYPE//[0-9.]/}
 HNAME=$(hostname)
-now=$(date)
-echo "DIR=${DIR}, SYSTEM=${SYSTEM}, HNAME=${HNAME}, NOW=${NOW}"
+SCRIPT="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
-# From Michael:
+clear
+echo "*** SYSTEM=${SYSTEM}, HNAME=${HNAME}."
+echo "*** SCRIPT=${SCRIPT}, NOW=${NOW}."
+echo "*** Run from DIR=${DIR}."
+git status # don't continue unless there is a clean slate.
+
+# To use gg command in place of git (From Michael Hill):
 function gg ()
 {
    local _gg="$1";
@@ -25,29 +38,26 @@ function gg ()
 }
 
 ## Initialize variables just for this script:
-TMP='/tmp/git_move_filter'
+echo "*** STEP 01: Get local tempory working folder ready to receive the clone:"
+TMP='/tmp/git_move_filter' # named after name of script.
+rm -Rf ${TMP}
+mkdir ${TMP}
+cd ${TMP}
+echo "*** Now at working folder TMP=${TMP}."
+
+echo "*** STEP 02: Clone the originating repo on your local machine:"
 repoA='https://github.com/wilsonmar/SampleA' # from
 branchA="master"
 clone_folder='SampleA-work-repo'
-folderA1='folderA1' # from
+folderA1='folderA1' # from git_move_setup.sh
 
 repoB_folder="SampleB"
 repoB='https://github.com/wilsonmar/SampleB' # destination
 branchB="master"
 dest_folder='SampleA-added' #destination
-git status # don't continue unless there is a clean slate.
-echo "*** User=$user, repoA=$repoA, repoB=$repoB, at $now."
+echo "*** repoA=$repoA."
+echo "*** repoB=$repoB."
 
-SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo "*** Running from script_dir=$SCRIPT_DIR"
-
-echo "*** STEP 01: Get to the local working folder ready to receive the clone:"
-cd ~
-rm -rf tmp
-mkdir tmp
-cd tmp
-
-echo "*** STEP 02: Clone the originating repo to split to your local machine:"
 git clone -b ${branchA} $repoA $clone_folder # Create folder from Github
 cd $clone_folder
 dir=`pwd` # put results of pwd command into variable dir.
@@ -89,7 +99,7 @@ ls -al
 
 echo "*** STEP 07: Commit:"
 git add .
-git commit -m"Move ${folderA1} to ${dest_folder} in repo $now."
+git commit -m"Move ${folderA1} to ${dest_folder}, ${NOW}."
 
 echo "*** STEP 08: Clone ${repoB_folder} into ${TMP}:"
 cd /
@@ -103,11 +113,11 @@ echo "*** STEP 09: Remove previously added folder in ${repoB_folder}:"
 ls ${dest_folder}
 git add . -A
 rm -rf ${dest_folder}
-ls ${dest_folder}
+ls ${dest_folder} # Should say "No such file or directory."
 
-echo "*** STEP 10: Add location to pull from ${TMP}/${dest_folder}:"
+echo "*** STEP 10: Add location to pull from ${TMP}/${repoB_folder}:"
 pwd
-cd ${TMP}/${clone_folder}/${repoB_folder}
+cd ${TMP}/${repoB_folder}
 git remote add repoA-branch ${TMP}/${clone_folder}
 git remote -v
 #mkdir ${TMP}/${dest_folder}
@@ -120,12 +130,17 @@ git reset --hard
 git pull       repoA-branch master
 # Response includes: Merge made by the 'recursive' strategy.
 git remote rm  repoA-branch
+git remote -v
 
 echo "*** STEP 12: Commit to Github:"
 pwd
 git status
 # Your branch is ahead of 'origin/master' by 23 commits.
 git add . -A
-git commit -m"Move ${repoB_folder} from ${repoA} using git_move_filter.sh $now."
+git commit -m"Move ${repoB_folder} from ${repoA} using git_move_filter.sh ${NOW}."
 git remote -v
 git push
+
+# FIXME: This is putting in github but
+# it's putting extra file fileA2a.txt and fileA2b.txt when
+# Only fileA1a.txt and fileA1b.txt are expected.
