@@ -18,7 +18,7 @@ now=$(date)
 repoA='https://github.com/wilsonmar/SampleA' # from
 branchA="master"
 clone_folder='SampleA-work-repo'
-folderA1='SampleA-folder1' # from
+folderA1='folderA1' # from
 
 repoB_folder="SampleB"
 repoB='https://github.com/wilsonmar/SampleB' # destination
@@ -80,7 +80,7 @@ ls -al
 
 echo "*** STEP 07: Commit:"
 git add .
-git commit -m"Move ${folderA1} to ${dest_folder} in repo"
+git commit -m"Move ${folderA1} to ${dest_folder} in repo $now."
 
 echo "*** STEP 08: Clone ${repoB_folder} into ${TMP}:"
 cd /
@@ -90,7 +90,13 @@ rm -rf ${repoB_folder}
 git clone -b ${branchB} ${repoB} ${repoB_folder} # Create folder from Github
 cd $repoB_folder
 
-echo "*** STEP 09: Add location to pull from ${TMP}/${dest_folder}:"
+echo "*** STEP 09: Remove previously added folder in ${repoB_folder}:"
+ls ${dest_folder}
+git add . -A
+rm -rf ${dest_folder}
+ls ${dest_folder}
+
+echo "*** STEP 10: Add location to pull from ${TMP}/${dest_folder}:"
 pwd
 cd ${TMP}/${clone_folder}/${repoB_folder}
 git remote add repoA-branch ${TMP}/${clone_folder}
@@ -98,7 +104,7 @@ git remote -v
 #mkdir ${TMP}/${dest_folder}
 #cd ${dest_folder}
 
-echo "*** STEP 10: Reset --hard to remove pendings, avoid vim coming up:"
+echo "*** STEP 11: Reset --hard to remove pendings, avoid vim coming up:"
 cd ${TMP}/${repoB_folder}
 pwd
 git reset --hard
@@ -106,11 +112,11 @@ git pull       repoA-branch master
 # Response includes: Merge made by the 'recursive' strategy.
 git remote rm  repoA-branch
 
-echo "*** STEP 11: Commit to Github:"
+echo "*** STEP 12: Commit to Github:"
 pwd
 git status
 # Your branch is ahead of 'origin/master' by 23 commits.
-git add .
-git commit -m"Move ${repoB_folder} from ${repoA} using git_move_filter.sh."
+git add . -A
+git commit -m"Move ${repoB_folder} from ${repoA} using git_move_filter.sh $now."
 git remote -v
 git push
