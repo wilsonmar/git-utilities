@@ -45,7 +45,7 @@ mkdir ${TMP}
 cd ${TMP}
 echo "*** Now at working folder TMP=${TMP}."
 
-echo "*** STEP 02: Clone the originating repo on your local machine:"
+echo "*** STEP 02: Define repos and folders:"
 repoA='https://github.com/wilsonmar/SampleA' # from
 branchA="master"
 clone_folder='SampleA-work-repo'
@@ -58,22 +58,43 @@ dest_folder='SampleA-added' #destination
 echo "*** repoA=$repoA."
 echo "*** repoB=$repoB."
 
+echo "*** STEP 03: Clone ${repoB_folder} into ${TMP}:"
+cd /
+cd ${TMP}
+pwd
+rm -rf ${repoB_folder}
+git clone -b ${branchB} ${repoB} ${repoB_folder} # Create folder from Github
+cd $repoB_folder
+
+echo "*** STEP 04: Remove folder in ${repoB_folder}:"
+# ls ${dest_folder}
+git status
+rm -rf ${dest_folder}
+#echo "*** Error out here if error handling is more strict:"
+#ls ${dest_folder} # Should say "No such file or directory."
+
+echo "*** STEP 05: Remove previously added folder in ${repoB_folder}:"
+git add . -A
+git commit -m"Remove ${repoB_folder} from ${repoA} using git_move_filter.sh ${NOW}."
+git remote -v
+git push
+
+exit 1
+
+
+echo "*** STEP 06: Clone the target repo on your local machine:"
 git clone -b ${branchA} $repoA $clone_folder # Create folder from Github
 cd $clone_folder
-dir=`pwd` # put results of pwd command into variable dir.
-echo "*** dir=$dir"
-
-
-echo "*** STEP 03: List files caz the next action promotes files in the directory up to the project root level:"
 ls -al
 
-echo "*** STEP 04: Avoid accidentally pushing changes by deleting the upstream repository definition in github:"
-git remote -v
+echo "*** STEP 07: Avoid accidentally pushing changes by deleting the upstream repository definition in github:"
 git remote rm origin
 git remote -v
 
-echo "*** After this step, the local repo must be reset again using ./git_move_setup.sh."
-echo "*** STEP 05: Filter out all files except the one you want and at the same time "
+
+
+echo "*** STEP 08: Filter out all files except the one you want and at the same time "
+cd ${TMP}/
 git filter-branch --prune-empty --subdirectory-filter $folderA1 -- --all
 #   The `--prune-empty` with `git filter-branch` brings over commits from **ONLY** the other repo which involves the directory being moved.
 #   The official doc at https://git-scm.com/docs/git-filter-branch
@@ -87,7 +108,7 @@ git filter-branch --prune-empty --subdirectory-filter $folderA1 -- --all
 # This should list just the files:
 ls -al
 
-echo "*** STEP 06: Move contents of file raised to root back into a destination directory:"
+echo "*** STEP 09: Move contents of file raised to root back into a destination directory:"
 mkdir -p $dest_folder
 # TODO: Move more than just .txt files we know:
 find . -type f -exec git mv {} ${dest_folder} \;
@@ -97,27 +118,12 @@ pwd
 ls -al
 # git remote -v returns nothing here.
 
-echo "*** STEP 07: Commit:"
+echo "*** STEP 10: Commit:"
 git add .
 git commit -m"Move ${folderA1} to ${dest_folder}, ${NOW}."
 
-echo "*** STEP 08: Clone ${repoB_folder} into ${TMP}:"
-cd /
-cd ${TMP}
-pwd
-rm -rf ${repoB_folder}
-git clone -b ${branchB} ${repoB} ${repoB_folder} # Create folder from Github
-cd $repoB_folder
 
-echo "*** STEP 09: Remove previously added folder in ${repoB_folder}:"
-# ls ${dest_folder}
-git status
-git add . -A
-rm -rf ${dest_folder}
-#echo "*** Error out here if error handling is more strict:"
-#ls ${dest_folder} # Should say "No such file or directory."
-
-echo "*** STEP 10: Add location to pull from ${TMP}/${repoB_folder}:"
+echo "*** STEP 11: Add location to pull from ${TMP}/${repoB_folder}:"
 pwd
 cd ${TMP}/${repoB_folder}
 git remote add repoA-branch ${TMP}/${clone_folder}
@@ -125,7 +131,7 @@ git remote -v
 #mkdir ${TMP}/${dest_folder}
 #cd ${dest_folder}
 
-echo "*** STEP 11: Reset --hard to remove pendings, avoid vim coming up:"
+echo "*** STEP 12: Reset --hard to remove pendings, avoid vim coming up:"
 cd ${TMP}/${repoB_folder}
 pwd
 git reset --hard
@@ -134,7 +140,7 @@ git pull       repoA-branch master
 git remote rm  repoA-branch
 git remote -v
 
-echo "*** STEP 12: Commit to Github:"
+echo "*** STEP 13: Commit to Github:"
 pwd
 git status
 # Your branch is ahead of 'origin/master' by 23 commits.
