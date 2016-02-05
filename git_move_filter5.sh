@@ -12,8 +12,8 @@
 
 ## My standard starter. 
 # Set exit logic. Read: http://redsymbol.net/articles/unofficial-bash-strict-mode/
-set -euo pipefail 
-IFS=$'\n\t'
+#set -euo pipefail 
+#IFS=$'\n\t'
 # Log to syslog:
 #exec 1> >(logger -s -t $(basename $0)) 2>&1
 # Standard System Variables:
@@ -62,27 +62,30 @@ echo "*** STEP 03: Clone ${repoB_folder} into ${TMP}:"
 cd /
 cd ${TMP}
 pwd
-rm -rf ${repoB_folder}
+rm -rf ${repoB_folder} # remove folder on local drive.
 git clone -b ${branchB} ${repoB} ${repoB_folder} # Create folder from Github
 cd $repoB_folder
 
-echo "*** STEP 04: Remove folder in ${repoB_folder}:"
+echo "*** STEP 04: Remove destination folder cloned in ${dest_folder}:"
 # ls ${dest_folder}
+ls -al
 git status
+git add .
 rm -rf ${dest_folder}
 #echo "*** Error out here if error handling is more strict:"
 #ls ${dest_folder} # Should say "No such file or directory."
 
 echo "*** STEP 05: Remove previously added folder in ${repoB_folder}:"
 git add . -A
-git commit -m"Remove ${repoB_folder} from ${repoA} using git_move_filter.sh ${NOW}."
+git commit -m"Remove ${dest_folder} from ${repoB} using git_move_filter5.sh ${NOW}."
 git remote -v
 git push
+# IF SET is on, script stops here is there is nothing to push.
 
-exit 1
 
-
-echo "*** STEP 06: Clone the target repo on your local machine:"
+echo "*** STEP 06: Clone the target repo ${repoA} onto local machine:"
+cd ${TMP}/
+pwd
 git clone -b ${branchA} $repoA $clone_folder # Create folder from Github
 cd $clone_folder
 ls -al
@@ -92,9 +95,7 @@ git remote rm origin
 git remote -v
 
 
-
 echo "*** STEP 08: Filter out all files except the one you want and at the same time "
-cd ${TMP}/
 git filter-branch --prune-empty --subdirectory-filter $folderA1 -- --all
 #   The `--prune-empty` with `git filter-branch` brings over commits from **ONLY** the other repo which involves the directory being moved.
 #   The official doc at https://git-scm.com/docs/git-filter-branch
@@ -112,8 +113,10 @@ echo "*** STEP 09: Move contents of file raised to root back into a destination 
 mkdir -p $dest_folder
 # TODO: Move more than just .txt files we know:
 find . -type f -exec git mv {} ${dest_folder} \;
-# Some fatal: not under version control
-#git mv *.txt $dest_folder # As in git mv *  SampleA-folder1 but cannot move a directory into itself.
+# FIXME: Message fatal: not under version control
+
+# Can't use: git mv * ${dest_folder}
+# or message: cannot move a directory into itself.
 pwd
 ls -al
 # git remote -v returns nothing here.
