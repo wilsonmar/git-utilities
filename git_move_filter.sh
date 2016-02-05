@@ -16,11 +16,16 @@ function gg ()
 
 now=$(date)
 repoA='https://github.com/wilsonmar/SampleA' # from
-repoB='https://github.com/wilsonmar/SampleB' # destination
-repoB_folder="SampleB"
+branchA="master"
+clone_folder='SampleA-work-repo'
 folderA1='SampleA-folder1' # from
-dest_folder='SampleA-folder3' #destination
-clone_folder='__git_clone_repo__'
+
+repoB_folder="SampleB"
+repoB='https://github.com/wilsonmar/SampleB' # destination
+branchB="master"
+dest_folder='SampleA-added' #destination
+TMP="/Users/wmar/tmp"
+#TMP="~/tmp"
 git status # don't continue unless there is a clean slate.
 echo "*** User=$user, repoA=$repoA, repoB=$repoB, at $now."
 
@@ -29,12 +34,12 @@ echo "*** Running from script_dir=$SCRIPT_DIR"
 
 echo "*** STEP 01: Get to the local working folder ready to receive the clone:"
 cd ~
-rm -rf temp
-mkdir temp
-cd temp
+rm -rf tmp
+mkdir tmp
+cd tmp
 
-echo "*** STEP 02: Clone the originating repo you want to split to your local machine, specifying the branch:"
-git clone $repoA $clone_folder # Create folder from Github
+echo "*** STEP 02: Clone the originating repo to split to your local machine:"
+git clone -b ${branchA} $repoA $clone_folder # Create folder from Github
 cd $clone_folder
 dir=`pwd` # put results of pwd command into variable dir.
 echo "*** dir=$dir"
@@ -46,51 +51,57 @@ ls -al
 echo "*** STEP 04: Avoid accidentally pushing changes by deleting the upstream repository definition in github:"
 git remote -v
 git remote rm origin
+git remote -v
 
-echo "After this step, the local repo must be reset again using ./git_move_setup.sh."
+echo "*** After this step, the local repo must be reset again using ./git_move_setup.sh."
 echo "*** STEP 05: Filter out all files except the one you want and at the same time "
 git filter-branch --prune-empty --subdirectory-filter $folderA1 -- --all
 #   The `--prune-empty` with `git filter-branch` brings over commits from **ONLY** the other repo which involves the directory being moved.
 #   The official doc at https://git-scm.com/docs/git-filter-branch
 #   describes git filter-branch as rewrite revision history what is specifically mentioned after `--subdirectory-filter`.
 #   The `–-` (two dashes) separates paths from revisions.
-#   An example of the response (where "directory 1" is replaced with your folder name):
+#   An example of the response (where "folderA1" is replaced with your folder name):
+# Sample response: 
+#           Rewrite ce91108524893c98adae9a4db9fbeebdec2affbe (21/21)
+#           Ref 'refs/heads/master' was rewritten
+#           Total 16
+# This should list just the files:
 ls -al
 
 echo "*** STEP 06: Move contents of file raised to root back into a destination directory:"
 mkdir -p $dest_folder
 # TODO: Move more than just .txt files we know:
-find . -type f -exec git mv {} $dest_folder \;
-# git mv *.txt $dest_folder # As in git mv *  SampleA-folder1 but cannot move a directory into itself.
+find . -type f -exec git mv {} ${dest_folder} \;
+# Some fatal: not under version control
+#git mv *.txt $dest_folder # As in git mv *  SampleA-folder1 but cannot move a directory into itself.
 pwd
 ls -al
 # git remote -v returns nothing here.
 
-echo "*** STEP 07: Commit to Github:"
+echo "*** STEP 07: Commit:"
 git add .
-git commit -m"Move $folderA1 to $dest_folder in repo"
+git commit -m"Move ${folderA1} to ${dest_folder} in repo"
 
-echo "*** STEP 08: Clone the destination repo into ~/temp:"
-cd ~
-cd temp
-rm -rf $repoB_folder
-git clone $repoB $repoB_folder # Create folder from Github
+echo "*** STEP 08: Clone ${repoB_folder} into ${TMP}:"
+cd /
+cd ${TMP}
+pwd
+rm -rf ${repoB_folder}
+git clone -b ${branchB} ${repoB} ${repoB_folder} # Create folder from Github
 cd $repoB_folder
+
+echo "*** STEP 09: Add location to pull from ${TMP}/${dest_folder}:"
 pwd
+cd ${TMP}/${clone_folder}/${dest_folder}
+git remote add repoA-branch ${TMP}/${clone_folder}
+git remote -v
+#mkdir ${TMP}/${dest_folder}
+#cd ${dest_folder}
 
-echo "*** STEP 09: Add _git_clone_repo_ as a location to pull from:"
-echo "${repoA}"
-git remote add repoA-branch ~/temp/${clone_folder}
-mkdir ~/temp/${repoB_folder}/${dest_folder}
-cd ${dest_folder}
-
-echo "*** STEP 10: Reset --hard to remove and avoid vim coming up:"
-cd ~/temp/${repoB_folder}
-pwd
-git reset --hard
-
-git pull       repoA-branch master
-
+echo "*** STEP 10: Reset --hard to remove pendings, avoid vim coming up:"
+cd ${TMP}/${clone_folder}
+#git reset --hard
+git fetch       repoA-branch master
 git remote rm  repoA-branch
 
 echo "*** STEP 11: Commit to Github:"
