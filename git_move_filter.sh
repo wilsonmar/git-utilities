@@ -92,19 +92,23 @@ cd $repoB_folder
 
 echo "*** STEP 09: Add location to pull from ${TMP}/${dest_folder}:"
 pwd
-cd ${TMP}/${clone_folder}/${dest_folder}
+cd ${TMP}/${clone_folder}/${repoB_folder}
 git remote add repoA-branch ${TMP}/${clone_folder}
 git remote -v
 #mkdir ${TMP}/${dest_folder}
 #cd ${dest_folder}
 
 echo "*** STEP 10: Reset --hard to remove pendings, avoid vim coming up:"
-cd ${TMP}/${clone_folder}
-#git reset --hard
-git fetch       repoA-branch master
+cd ${TMP}/${repoB_folder}
+pwd
+git reset --hard
+git pull       repoA-branch master
+# Response includes: Merge made by the 'recursive' strategy.
 git remote rm  repoA-branch
 
 echo "*** STEP 11: Commit to Github:"
+pwd
 git add .
-git commit -m"Move ${folderA1} in ${repoA} to ${repoB}."
+git commit -m"Move ${repoB_folder} in ${repoA} to ${repoB}."
 git remote -v
+git push
