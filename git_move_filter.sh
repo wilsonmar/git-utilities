@@ -108,7 +108,9 @@ git remote rm  repoA-branch
 
 echo "*** STEP 11: Commit to Github:"
 pwd
+git status
+# Your branch is ahead of 'origin/master' by 23 commits.
 git add .
-git commit -m"Move ${repoB_folder} in ${repoA} to ${repoB}."
+git commit -m"Move ${repoB_folder} from ${repoA} using git_move_filter.sh."
 git remote -v
 git push
