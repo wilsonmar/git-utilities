@@ -8,4 +8,4 @@ DOSKEY ps=tasklist $*
 
 :: If Sublime Text editor has been installed:
 set PATH=%PATH%;"C:\Program Files\Sublime Text 2\"
-DOSKEY sublime=sublime_text $*
+DOSKEY subl=sublime_text $*
