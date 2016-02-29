@@ -5,6 +5,7 @@
 DOSKEY ls=dir /X
 DOSKEY pwd=chdir
 DOSKEY ps=tasklist $*
+DOSKEY cat=type $* | more
 
 :: If Sublime Text editor has been installed:
 set PATH=%PATH%;"C:\Program Files\Sublime Text 2\"
