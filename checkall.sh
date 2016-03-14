@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# by WilsonMar@gmail.com
-# From http://github.com/wilsonmar/checkall.sh
+# checkall.sh in # From http://github.com/wilsonmar/git-utilities
 # Based on http://steve-parker.org/sh/functions.shtml
 
 # Before calling this, run: chmod a+x checkall.sh
@@ -37,6 +36,9 @@ checkone
 
 REPO="scala"
 checkone 
+
+REPO="word-processing"
+checkone
 
 # Move back down
 cd git-utilities
