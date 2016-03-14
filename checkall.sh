@@ -22,7 +22,7 @@ cd ..
 }
 
 # Move up
-cd ..
+# cd ..
 
 # Do each (alphabetically):
 REPO="git-utilities"
@@ -41,6 +41,6 @@ REPO="word-processing"
 checkone
 
 # Move back down
-cd git-utilities
+#cd git-utilities
 
 echo "******"
