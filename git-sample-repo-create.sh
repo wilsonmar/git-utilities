@@ -13,7 +13,12 @@
 # TODO: Get a version that works on Windows
 
 TMP='git-sample-repo'
-clear
+# clear
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
 # Make the beginning of run easy to find:
 echo "**********************************************************"
 echo "******** STEP Delete \"$TMP\" remnant from previous run:"
@@ -22,7 +27,9 @@ mkdir ${TMP}
 cd ${TMP}
 
 echo "******** Git version :"
+# After "brew install git" on Mac:
 git --version
+
 echo "******** STEP Init repo :"
 # init without --bare so we get a working directory:
 git init
@@ -45,12 +52,15 @@ echo $DEFAULT_BRANCH
 # git config branch.develop.remote origin
 # git config branch.develop.merge refs/heads/develop
 
-echo "******** STEP Config:"
+echo "******** STEP Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
 git config user.name "Wilson Mar"
 git config user.email "wilsonmar@gmail.com"
-# echo "$GIT_COMMITTER_EMAIL=" $GIT_COMMITTER_EMAIL
 # echo $GIT_AUTHOR_EMAIL
+# echo $GIT_COMMITTER_EMAIL
+# gpg --list-keys
+git config --global user.signingkey 2E23C648
+
 # Verify settings:
 git config core.filemode false
 
@@ -64,35 +74,38 @@ git config core.editor "~/Sublime\ Text\ 3/sublime_text -w"
 git config color.ui auto
 
 # See https://git-scm.com/docs/pretty-formats :
+# In Windows, double quotes are needed:
 git config alias.l  "log --pretty='%Cred%h%Creset %C(yellow)%d%Creset | %Cblue%s%Creset' --graph"
+
 git config alias.s  "status -s"
 #it config alias.w "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset | (%cr) %Cgreen<%ae>%Creset'"
-git config alias.w  "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset'"
+git config alias.w  "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset' %G?"
 git config alias.ca "commit -a --amend -C HEAD"
 
 # Have git diff use mnemonic prefixes (index, work tree, commit, object) instead of standard a and b notation:
 git config diff.mnemonicprefix true
+
+# Reuse recorded resolution of conflicted merges - https://git-scm.com/docs/git-rerere
 git config rerere.enabled false
 
-# Dump config file:
-# git config --list
+# git config --list   # Dump config file
 
-echo "******** STEP commit a1 - README.md :"
+echo "******** STEP commit (initial) README :"
 touch README.md
 git add .
-git commit -m "Add README.md"
+git commit -m "README.md"
 git l -1
 
-echo "******** STEP ammend commit a2 : "
+echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
 echo "some more">>README.md
 # Instead of git commit -a --amend -C HEAD
 git ca  # use this alias instead.
 git l -1
 
-echo "******** STEP ammend commit a3 : "
+echo "******** STEP amend commit 2 : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "still some more">>README.md
+echo "still more">>README.md
 # Instead of git commit -a --amend -C HEAD
 git ca  # use this alias instead.
 git l -1
@@ -106,9 +119,18 @@ git reflog
 ls -al
 cat README.md
 
-echo "******** STEP tag & commit branch F1 : --------------------------"
-git tag v1
-git checkout v1 -b F1
+echo "******** STEP tag :"
+# git tag v1 -m"v1 unsigned"
+  git tag v1 -m"v1 signed" -s
+# echo "******** STEP tag verify :"
+# git tag -v v1
+git verify-tag v1
+
+# echo "******** STEP tag show :"
+# git show v1  # Press q to exit scroll.
+
+echo "******** STEP checkout feature1 branch : --------------------------"
+git checkout v1 -b feature1
 # git branch
 ls .git/refs/heads/
 git l -1
@@ -127,34 +149,35 @@ git commit -m "Add d"
 git l -1
 ls -al
 
-echo "******** STEP Merge F1 :"
+echo "******** STEP Merge feature1 :"
 # Instead of git checkout $DEFAULT_BRANCH :
 git checkout @{-1}  # checkout previous branch (develop, master)
 
-git merge F1 --no-ff --no-commit  # to see what may happen
-# git merge F1 --no-ff <:q
-git merge F1 -m "merge F1" --no-ff  # --no-ff for "true merge".
+# git merge --no-ff (no fast forward) for "true merge":
+#git merge feature1 --no-ff --no-commit  # to see what may happen
+git merge feature1 -m "merge feature1" --verify-signatures --no-ff  
 # resolve conflicts here?
-git commit -m "commit merge F1"
+git add .
+git commit -m "commit merge feature1"
 git branch
 git l -1
 
 #echo "******** $NOW Remove merged branch ref :"
-#git branch -d F1
+#git branch -d feature1
 #git branch
 #git l -1
 
 echo "******** STEP commit: e"
 echo "e">>file-e.txt
 git add .
-git commit -m "e"
+git commit -m "Add e"
 git l -1
 
 echo "******** STEP commit: f"
 echo "f">>file-f.txt
 ls -al
 git add .
-git commit -m "f"
+git commit -m "Add f"
 git l -1
 
 
@@ -206,7 +229,7 @@ NOW=$(date +%Y-%m-%d:%H:%M:%S-MT)
 FILENAME=$(echo ${TMP}_${NOW}.zip)
 echo $FILENAME
 # Commented out to avoid creating a file from each run:
-# git archive --format zip --output ../$FILENAME  F1
+# git archive --format zip --output ../$FILENAME  feature1
 # ls -l ../$FILENAME
 
 
@@ -222,6 +245,8 @@ git checkout HEAD
 ls -al
 
 
+
+# git reset --hard feature1^
 
 # Undo last commit, preserving local changes:
 # git reset --soft HEAD~1
