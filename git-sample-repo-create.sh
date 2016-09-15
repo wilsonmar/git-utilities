@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 
 # git-sample-repo-create.sh from within http://github.com/wilsonmar/git-utilities.
-# by Wilson Mar (wilsonmar@gmail.com
-# This creates and populates a sample repo for my "Git and GitHub" tutorial,
-# Explained at https://wilsonmar.github.io/git-commands-and-statuses/)
+# by Wilson Mar (wilsonmar@gmail.com, @wilsonmar)
+
+# This script creates and populates a sample repo which is then 
+# uploaded to a new repo created using GitHub API calls
+
+# Git commands in this script are meant as examples for manual entry
+# explained during my live "Git and GitHub" tutorials and
+# explained at https://wilsonmar.github.io/git-commands-and-statuses/)
+
+# This script is designed to be "idempotent" in that repeat runs
+# begin by deleting what was created: the local repo and repo in GitHub.
 
 # Sample call in MacOS Terminal shell window:
 # chmod +x git-sample-repo-create.sh
 # ./git-sample-repo-create.sh
 
-# Tested on MacOS 10.11 (El Capitan)
-# TODO: Get a version that works on Windows
+# Last tested on MacOS 10.11 (El Capitan) 2015-09-15
+# TODO: Create a PowerShell script that works on Windows 
 
-# clear
+# Create blank lines in the log to differentiate different runs:
 echo ""
 echo ""
 echo ""
@@ -356,54 +364,52 @@ export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
    # TODO: Windows version.
    # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
 
-# Since no need to create another if one already exists:
+# The following use jq installed locally.
+
+# Since no need to create another token if one already exists:
 if [ "$GITHUB_TOKEN" = "" ]  # Not run before
 then
 	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
     GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # (using jq installed locally)
+       # Do not display token!
+       # API Token (32 character long string) is unique among all GitHub users.
+       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
        # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
 
-   # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
+    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
 else  
 	echo "******** Verifying Auth GITHUB_TOKEN to delete repo : "
 #    FIX: Commented out due to syntax error near unexpected token `|'
-    RESPONSE=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".repository_url")
-    echo "******** repository_url=$RESPONSE"
-    #curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com 
-       # API Token (32 character long string) is unique among all GitHub users.
-       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
-    # TODO: Check if RESPONSE is what's expected (URL). exit if not.
+    GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
+    echo "******** authorizations_url=$GITHUB_AVAIL"
+       # https://api.github.com/authorizations"
 fi
 
 ####
-    echo "******** Checking GITHUB_AVAIL from prior run . "
-    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME}  | jq ".full_name")
-    echo "GITHUB_AVAIL=$GITHUB_AVAIL"
+    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run. "
+    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
        # Expecting "full_name": "wilsonmar/git-sample-repo",
+       # TODO: Fix return of null.
 
 if [ "$GITHUB_AVAIL" = "${GITHUBUSER}/${REPONAME}" ]  # Not run before
 then
-	echo "******** No GITHUB repo known to delete. "
-else
 	echo "******** Deleting GITHUB_REPO created earlier : "
         # TODO: Delete repo in GitHub.com Settings if it already exists:
       # Based on https://gist.github.com/JadedEvan/5639254
       # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
-    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME}
+    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
       # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
-#    GITHUB_AVAIL = ""
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL deleted."
+else
+	echo "******** No GITHUB repo known to delete. "
 fi
 
 #### Create repo in GitHub:
-curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}"
-   # Response is a bunch of JSON with HATEOAS.
+	echo "******** Creating GITHUB repo. "
+    GITHUB_AVAIL=$(curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL created."
 
-#curl -u "$GITHUBUSER:$GITHUB_PASSWORD" --data "{\"title\":\"test-key\",\"key\":\"ssh-rsa ${RSA_PUBLIC_KEY} \"}" https://api.github.com/user/keys
-# Now go to the GitHub.com account and see the new repo there and
-# manually add your public key to your github account
-
-# if response is valid:
     # Set the freshly created repo to the origin and push
     git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
     git remote -v
@@ -415,11 +421,12 @@ curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"na
 # fi
 
 exit
-echo "********** Making change that will be duplicated oneline : "
-echo "Change locally">>README.md
-
 echo "********** DOTHIS: Manually make a change online GitHub file : "
 echo "Add to bottom of README.md \"Changed online\" and Save."
+read "Press Enter/Return to continue:"
+
+echo "********** Making change that will be duplicated online : "
+echo "Change locally">>README.md
 
 echo "********** Doing git pull to create conflict : "
 git pull
