@@ -12,7 +12,6 @@
 # Tested on MacOS 10.11 (El Capitan)
 # TODO: Get a version that works on Windows
 
-TMP='git-sample-repo'
 # clear
 echo ""
 echo ""
@@ -21,10 +20,12 @@ echo ""
 echo ""
 # Make the beginning of run easy to find:
 echo "**********************************************************"
-echo "******** STEP Delete \"$TMP\" remnant from previous run:"
-rm -rf ${TMP}
-mkdir ${TMP}
-cd ${TMP}
+echo "******** STEP Delete \"$REPONAME\" remnant from previous run:"
+REPONAME='git-sample-repo'
+rm -rf ${REPONAME}
+mkdir ${REPONAME}
+cd ${REPONAME}
+CURRENTDIR=${PWD##*/}
 
 echo "******** Git version :"
 # After "brew install git" on Mac:
@@ -48,19 +49,18 @@ git branch
 DEFAULT_BRANCH="develop"
 echo $DEFAULT_BRANCH
 
-# When remote is used :
-# git remote set-head origin develop
-# git config branch.develop.remote origin
-# git config branch.develop.merge refs/heads/develop
-
 echo "******** STEP Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
-git config user.name "Wilson Mar"
 git config user.email "wilsonmar@gmail.com"
+git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
+git config user.user "wilsonmar" # Username (not email) in GitHub.com cloud.
+#GITHUBUSER=$(git config github.email)  # Username (not email) in GitHub.com cloud.
 # echo $GIT_AUTHOR_EMAIL
 # echo $GIT_COMMITTER_EMAIL
+GITHUBUSER="wilsonmar"
+echo "******** GITHUBUSER=$GITHUBUSER "
 
-# Install gpg
+# After gpg is installed:
 # gpg --list-keys
 # gpg --gen-key
 git config --global user.signingkey 2E23C648
@@ -77,9 +77,9 @@ git config core.editor "~/Sublime\ Text\ 3/sublime_text -w"
 # Allow all Git commands to use colored output, if possible:
 git config color.ui auto
 
-# See https://git-scm.com/docs/pretty-formats :
+# See https://git-scm.com/docs/pretty-formats : Add "| %G?" for signing
 # In Windows, double quotes are needed:
-git config alias.l  "log --pretty='%Cred%h%Creset %C(yellow)%d%Creset | %Cblue%s%Creset | %G?' --graph"
+git config alias.l  "log --pretty='%Cred%h%Creset %C(yellow)%d%Creset | %Cblue%s%Creset' --graph"
 
 git config alias.s  "status -s"
 #it config alias.w "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset | (%cr) %Cgreen<%ae>%Creset'"
@@ -102,39 +102,41 @@ git l -1
 
 echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "some more">>README.md
-# Instead of git commit -a --amend -C HEAD
-git ca  # use this alias instead.
+echo "some more\n">>README.md
+git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
 echo "******** STEP amend commit 2 : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "still more">>README.md
+echo "still more\n">>README.md
 git ca  # alias for git commit -a --amend -C HEAD
 git l -1
 
-echo "******** STEP commit b - .gitignore :"
+echo "******** STEP commit .DS_Store in .gitignore :"
 echo ".DS_Store">>.gitignore
 git add .
 git commit -m "Add .gitignore"
 git l -1
+
+echo "******** STEP commit --amend .passwords in .gitignore :"
+echo ".passwords">>.gitignore
+git add .
+git ca  # use this alias instead of git commit -a --amend -C HEAD
+git l -1
+
 git reflog
 ls -al
+
 cat README.md
 
-echo "******** STEP tag :"
-# git tag v0.0.1 -m"v1 unsigned"
-  git tag v0.0.1 -m"v1 signed" -s
-   # For numbering, see http://semver.org/
-# echo "******** STEP tag verify :"
-# git tag -v v1  # calls verify-tag.
-git verify-tag v0.0.1
+# echo "******** rebase squash : "
 
-# echo "******** STEP tag show :"
-# git show v1  # Press q to exit scroll.
 
-echo "******** STEP checkout create feature1 branch : --------------------------"
-git checkout v0.0.1 -b feature1
+echo "******** STEP lightweight tag :"
+git tag "v1"  # lightweight tag
+
+echo "******** STEP checkout HEAD to create feature1 branch : --------------------------"
+git checkout HEAD -b feature1
 # git branch
 ls .git/refs/heads/
 git l -1
@@ -188,6 +190,17 @@ git add .
 git commit -m "Add f"
 git l -1
 
+echo "******** STEP heavyeight tag (a commit) :"
+#  git tag -a v0.0.1 -m"v1 unsigned"
+   git tag -a v0.0.1 -m"v1 signed" -s  # signed "heavyweight" tag
+   # For numbering, see http://semver.org/
+# echo "******** STEP tag verify :"
+# git tag -v v1  # calls verify-tag.
+git verify-tag v0.0.1
+
+# echo "******** STEP tag show :"
+# git show v1  # Press q to exit scroll.
+
 
 echo "Copy this and paste to a text edit for reference: --------------"
 git l
@@ -230,20 +243,19 @@ echo "******** show HEAD~2^2 :"
 git w HEAD~2^2
 echo "******** show HEAD~2^3 :"
 git w HEAD~2^3
-
-echo "******** show HEAD@{5} :"
-git w HEAD@{5}
-
+ls -al
 
 # exit
 
 echo "******** Reflog: ---------------------------------------"
 git reflog
-ls -al
+echo "******** show HEAD@{5} :"
+git w HEAD@{5}
+
 
 echo "******** Create archive file, excluding .git directory :"
 NOW=$(date +%Y-%m-%d:%H:%M:%S-MT)
-FILENAME=$(echo ${TMP}_${NOW}.zip)
+FILENAME=$(echo ${REPONAME}_${NOW}.zip)
 echo $FILENAME
 # Commented out to avoid creating a file from each run:
 # git archive --format zip --output ../$FILENAME  feature1
@@ -255,16 +267,20 @@ ls -al
 git show HEAD@{5}
 git checkout HEAD@{5}
 ls -al
-git reflog
 
-echo "******** checkout previous HEAD :"
-git checkout HEAD
+echo "******** Go back to HEAD --hard :"
+git reset --hard HEAD
+# git checkout HEAD
 ls -al
 
 
+echo "******** Garbage Collect (gc) what Git can't reach :"
+git gc
+git reflog
+ls -al
+echo "******** Compare against previous reflog."
 
 # git stash save "text message here"
-# git reset --hard ... 
 
 # git stash list /* shows whats in stash */
 # git stash show -p stash@{0} /* Show the diff in the stash */
@@ -274,8 +290,6 @@ ls -al
 # git stash drop stash@{0}
 # git stash clear /*  removes all stash */
 
-
-# git reset --hard feature1^
 
 # Undo last commit, preserving local changes:
 # git reset --soft HEAD~1
@@ -321,8 +335,99 @@ ls -al
 # Move the branch pointer back to the previous HEAD:
 # git reset --soft HEAD@{1}
 
+# See https://gist.github.com/caspyin/2288960 about GitHub API
+# From https://gist.github.com/robwierzbowski/5430952 on Windows
+# From https://gist.github.com/jerrykrinock/6618003 on Mac
+# read "REPONAME?New repo name (enter for ${PWD##*/}):"
+
+# read "USER?Git Username (enter for ${GITHUBUSER}):"
+# read "DESCRIPTION?Repo Description:"
+DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
+#echo "Enter <return> to make the new repo public, 'x' for private"
+
+echo "****** GITHUBUSER=$GITHUBUSER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
+echo "****** DESCRIPTION=$DESCRIPTION"
+
+# Invoke file defined manually containing definition of GITHUB_PASSWORD:
+source ~/.passwords  # but don't ECHO "GITHUB_PASSWORD=$GITHUB_PASSWORD"
+
+   # Bash command to load contents of file into env. variable:
+export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
+   # TODO: Windows version.
+   # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
+
+# Since no need to create another if one already exists:
+if [ "$GITHUB_TOKEN" = "" ]  # Not run before
+then
+	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
+    GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
+       # (using jq installed locally)
+       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+
+   # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
+else  
+	echo "******** Verifying Auth GITHUB_TOKEN to delete repo : "
+#    FIX: Commented out due to syntax error near unexpected token `|'
+    RESPONSE=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".repository_url")
+    echo "******** repository_url=$RESPONSE"
+    #curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com 
+       # API Token (32 character long string) is unique among all GitHub users.
+       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
+    # TODO: Check if RESPONSE is what's expected (URL). exit if not.
+fi
+
+####
+    echo "******** Checking GITHUB_AVAIL from prior run . "
+    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME}  | jq ".full_name")
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL"
+       # Expecting "full_name": "wilsonmar/git-sample-repo",
+
+if [ "$GITHUB_AVAIL" = "${GITHUBUSER}/${REPONAME}" ]  # Not run before
+then
+	echo "******** No GITHUB repo known to delete. "
+else
+	echo "******** Deleting GITHUB_REPO created earlier : "
+        # TODO: Delete repo in GitHub.com Settings if it already exists:
+      # Based on https://gist.github.com/JadedEvan/5639254
+      # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
+    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME}
+      # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
+#    GITHUB_AVAIL = ""
+fi
+
+#### Create repo in GitHub:
+curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}"
+   # Response is a bunch of JSON with HATEOAS.
+
+#curl -u "$GITHUBUSER:$GITHUB_PASSWORD" --data "{\"title\":\"test-key\",\"key\":\"ssh-rsa ${RSA_PUBLIC_KEY} \"}" https://api.github.com/user/keys
+# Now go to the GitHub.com account and see the new repo there and
+# manually add your public key to your github account
+
+# if response is valid:
+    # Set the freshly created repo to the origin and push
+    git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
+    git remote -v
+    git push --set-upstream origin develop
+
+#    git remote set-url origin git@github.com:${GITHUBUSER}/${REPONAME}.git
+#    git remote set-head origin develop
+#    git config branch.develop.remote origin
+# fi
+
+exit
+echo "********** Making change that will be duplicated oneline : "
+echo "Change locally">>README.md
+
+echo "********** DOTHIS: Manually make a change online GitHub file : "
+echo "Add to bottom of README.md \"Changed online\" and Save."
+
+echo "********** Doing git pull to create conflict : "
+git pull
+
+
+
 # Commented out for cleanup at start of next run:
 # cd ..
-# rm -rf ${TMP}
+# rm -rf ${REPONAME}
 
 echo "******** $NOW end."
