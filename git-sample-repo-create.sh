@@ -201,8 +201,6 @@ git add .
 git commit -m "Add f"
 git l -1
 
-exit
-
 echo "******** STEP heavyeight tag (a commit) :"
 #  git tag -a v0.0.1 -m"v1 unsigned"
    git tag -a v0.0.1 -m"v1 signed" -s  # signed "heavyweight" tag
@@ -425,17 +423,17 @@ fi
 #    git config branch.develop.remote origin
 # fi
 
-exit
 echo "********** DOTHIS: Manually make a change online GitHub file : "
 echo "Add to bottom of README.md \"Changed online\" and Save."
-read "Press Enter/Return to continue:"
+read "WAITING FOR RESPONSE: Press Enter/Return to continue:"
 
 echo "********** Making change that will be duplicated online : "
 echo -e "Change locally\r\n">>README.md
 
-echo "********** Doing git pull to create conflict : "
-git pull
-
+#echo "********** Doing git pull to create conflict : "
+# git pull
+echo "********** Doing git fetch a conflict : "
+git fetch
 
 
 # Commented out for cleanup at start of next run:
