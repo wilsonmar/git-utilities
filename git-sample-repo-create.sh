@@ -21,7 +21,7 @@
 
 # Last tested on MacOS 10.11 (El Capitan) 2015-09-15
 # TODO: Create a PowerShell script that works on Windows:
-# git-sample-repo-create.ps
+# git-sample-repo-create.ps1
 
 # Create blank lines in the log to differentiate different runs:
 echo ""
