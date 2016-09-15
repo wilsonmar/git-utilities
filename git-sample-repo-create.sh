@@ -3,12 +3,14 @@
 # git-sample-repo-create.sh from within http://github.com/wilsonmar/git-utilities.
 # by Wilson Mar (wilsonmar@gmail.com, @wilsonmar)
 
-# This script creates and populates a sample repo which is then 
-# uploaded to a new repo created using GitHub API calls
-
+# This script was created for experiementing and learning Git.
 # Git commands in this script are meant as examples for manual entry
 # explained during my live "Git and GitHub" tutorials and
-# explained at https://wilsonmar.github.io/git-commands-and-statuses/)
+# explained at https://wilsonmar.github.io/git-commands-and-statuses/).
+# Most of the regularly used Git commands are covered here.
+
+# This script creates and populates a sample repo which is then 
+# uploaded to a new repo created using GitHub API calls
 
 # This script is designed to be "idempotent" in that repeat runs
 # begin by deleting what was created: the local repo and repo in GitHub.
@@ -18,7 +20,8 @@
 # ./git-sample-repo-create.sh
 
 # Last tested on MacOS 10.11 (El Capitan) 2015-09-15
-# TODO: Create a PowerShell script that works on Windows 
+# TODO: Create a PowerShell script that works on Windows:
+# git-sample-repo-create.ps
 
 # Create blank lines in the log to differentiate different runs:
 echo ""
@@ -110,13 +113,13 @@ git l -1
 
 echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "some more\n">>README.md
+echo -e "some more\r\n">>README.md
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
 echo "******** STEP amend commit 2 : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "still more\n">>README.md
+echo -e "still more\r\n">>README.md
 git ca  # alias for git commit -a --amend -C HEAD
 git l -1
 
@@ -150,14 +153,14 @@ ls .git/refs/heads/
 git l -1
 
 echo "******** STEP commit c - LICENSE.md : "
-echo "MIT">>LICENSE.md
+echo -e "MIT\r\n">>LICENSE.md
 git add .
 git commit -m "Add c"
 git l -1
 ls -al
 
 echo "******** STEP commit: d"
-echo "free!">>LICENSE.md
+echo -e "free!">>LICENSE.md
 echo "d">>file-d.txt
 git add .
 git commit -m "Add d in feature1"
@@ -186,17 +189,19 @@ git fsck --dangling --no-progress
 git l -1
 
 echo "******** STEP commit: e"
-echo "e">>file-e.txt
+echo -e "e">>file-e.txt
 git add .
 git commit -m "Add e"
 git l -1
 
 echo "******** STEP commit: f"
-echo "f">>file-f.txt
+echo -e "f">>file-f.txt
 ls -al
 git add .
 git commit -m "Add f"
 git l -1
+
+exit
 
 echo "******** STEP heavyeight tag (a commit) :"
 #  git tag -a v0.0.1 -m"v1 unsigned"
@@ -426,7 +431,7 @@ echo "Add to bottom of README.md \"Changed online\" and Save."
 read "Press Enter/Return to continue:"
 
 echo "********** Making change that will be duplicated online : "
-echo "Change locally">>README.md
+echo -e "Change locally\r\n">>README.md
 
 echo "********** Doing git pull to create conflict : "
 git pull
