@@ -29,18 +29,57 @@ echo ""
 echo ""
 echo ""
 echo ""
+if [ "$IsWindows" ]; then
+   $NOW = Get-Date -Format "yyyy-MM-dd HH:mmzzz"
+                          # 2016-09-16T05:26-06:00 vs UTC
+else
+   TZ=":UTC" date +%z
+   NOW=$(date +%Y-%m-%d:%H:%M:%S%z)
+           # 2016-09-16T05:26-06:00 vs UTC
+fi
+
+echo "******** $NOW Versions :"
+if [ "$IsWindows" ]; then
+   $psversiontable
+   echo "IsWindows=$IsWindows"
+   echo "IsOSX=$IsOSX"
+   echo "IsLinux=$IsLinux"
+fi
+# After "brew install git" on Mac:
+git --version
+
+if [ "$IsWindows" ]; then
+   $REPONAME='git-sample-repo'
+   $GITHUBUSER="wilsonmar"
+   $DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
+else
+   REPONAME='git-sample-repo'
+   GITHUBUSER="wilsonmar"
+   DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
+fi
+echo "******** GITHUBUSER=$GITHUBUSER "
+
 # Make the beginning of run easy to find:
 echo "**********************************************************"
 echo "******** STEP Delete \"$REPONAME\" remnant from previous run:"
-REPONAME='git-sample-repo'
-rm -rf ${REPONAME}
+if [ "$IsWindows" ]; then
+   # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
+   Remove-Item -path ${REPONAME} -Recurse -Force #rm -rf ${REPONAME}  # PowerShell specific
+else
+   set -x  # xtrace command echo on (with ++ prefix). http://www.faqs.org/docs/abs/HTML/options.html
+   rm -rf ${REPONAME}
+fi
+
 mkdir ${REPONAME}
 cd ${REPONAME}
-CURRENTDIR=${PWD##*/}
 
-echo "******** Git version :"
-# After "brew install git" on Mac:
-git --version
+if [ "$IsWindows" ]; then
+   $CURRENTDIR = $PSScriptRoot    # PowerShell specific
+else
+   CURRENTDIR=${PWD##*/}
+fi
+echo "CURRENTDIR=$CURRENTDIR"
+
 
 echo "******** STEP Init repo :"
 # init without --bare so we get a working directory:
@@ -48,6 +87,7 @@ git init
 # return the .git path of the current project::
 git rev-parse --git-dir
 ls .git/
+
 
 echo "******** STEP Make develop the default branch instead of master :"
 # The contents of HEAD is stored in this file:
@@ -60,7 +100,7 @@ git branch
 DEFAULT_BRANCH="develop"
 echo $DEFAULT_BRANCH
 
-echo "******** STEP Config (not --global):"
+echo "******** STEP Attribution & Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
 git config user.email "wilsonmar@gmail.com"
 git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
@@ -68,8 +108,6 @@ git config user.user "wilsonmar" # Username (not email) in GitHub.com cloud.
 #GITHUBUSER=$(git config github.email)  # Username (not email) in GitHub.com cloud.
 # echo $GIT_AUTHOR_EMAIL
 # echo $GIT_COMMITTER_EMAIL
-GITHUBUSER="wilsonmar"
-echo "******** GITHUBUSER=$GITHUBUSER "
 
 # After gpg is installed:
 # gpg --list-keys
@@ -79,11 +117,18 @@ git config --global user.signingkey 2E23C648
 # Verify settings:
 git config core.filemode false
 
+git config core.autocrlf input
+git config core.safecrlf true
+
 # On Unix systems, ignore ^M symbols created by Windows:
 # git config core.whitespace cr-at-eol
 
 # Change default commit message editor program to Sublime Text (instead of vi):
-git config core.editor "~/Sublime\ Text\ 3/sublime_text -w"
+if [ "$IsWindows" ]; then
+   git config core.editor "$home/Sublime\ Text\ 3/sublime_text -w"
+else
+   git config core.editor "~/Sublime\ Text\ 3/sublime_text -w"
+fi
 
 # Allow all Git commands to use colored output, if possible:
 git config color.ui auto
@@ -113,6 +158,7 @@ git l -1
 
 echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
+# See http://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
 echo -e "some more\r\n">>README.md
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
@@ -129,8 +175,8 @@ git add .
 git commit -m "Add .gitignore"
 git l -1
 
-echo "******** STEP commit --amend .passwords in .gitignore :"
-echo ".passwords">>.gitignore
+echo "******** STEP commit --amend .secrets in .gitignore :"
+echo ".secrets">>.gitignore
 git add .
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
@@ -169,7 +215,12 @@ ls -al
 
 echo "******** STEP Merge feature1 :"
 # Instead of git checkout $DEFAULT_BRANCH :
-git checkout @{-1}  # checkout previous branch (develop, master)
+if [ "$IsWindows" ]; then
+   # git checkout @{-1}  # doesn't work in PowerShell.
+   git checkout $DEFAULT_BRANCH
+else
+   git checkout @{-1}  # checkout previous branch (develop, master)
+fi
 
 # Alternately, use git-m.sh to merge and delete in one step.
 # git merge --no-ff (no fast forward) for "true merge":
@@ -189,13 +240,13 @@ git fsck --dangling --no-progress
 git l -1
 
 echo "******** STEP commit: e"
-echo -e "e">>file-e.txt
+echo "e">>file-e.txt
 git add .
 git commit -m "Add e"
 git l -1
 
 echo "******** STEP commit: f"
-echo -e "f">>file-f.txt
+echo "f">>file-f.txt
 ls -al
 git add .
 git commit -m "Add f"
@@ -264,16 +315,26 @@ echo "******** show HEAD@{5} :"
 git w HEAD@{5}
 
 
-echo "******** Create archive file, excluding .git directory :"
-NOW=$(date +%Y-%m-%d:%H:%M:%S-MT)
-FILENAME=$(echo ${REPONAME}_${NOW}.zip)
-echo $FILENAME
-# Commented out to avoid creating a file from each run:
+echo "******** STEP Create archive file, excluding .git directory :"
+if [ "$IsWindows" ]; then
+   $NOW = Get-Date -Format "yyyy-MM-dd HH:mmzzz"
+                          # 2016-09-16T05:26-06:00 vs UTC
+   $FILENAME="$REPONAME_$NOW.zip"  
+else
+   TZ=":UTC" date +%z
+   NOW=$(date +%Y-%m-%d:%H:%M:%S%z)
+           # 2016-09-16T05:26-06:00 vs UTC
+   FILENAME=$(echo ${REPONAME}_${NOW}.zip)
+fi
+echo "FILENAME=$FILENAME"
+
+#echo "******** STEP Creating a zip file :"
+   # Commented out to avoid creating a file from each run:
 # git archive --format zip --output ../$FILENAME  feature1
-# ls -l ../$FILENAME
+   # ls -l ../$FILENAME
 
 
-echo "******** checkout c :"
+echo "******** STEP checkout c :"
 ls -al
 git show HEAD@{5}
 git checkout HEAD@{5}
@@ -290,6 +351,105 @@ git gc
 git reflog
 ls -al
 echo "******** Compare against previous reflog."
+
+
+# See https://gist.github.com/caspyin/2288960 about GitHub API
+# From https://gist.github.com/robwierzbowski/5430952 on Windows
+# From https://gist.github.com/jerrykrinock/6618003 on Mac
+
+echo "****** GITHUBUSER=$GITHUBUSER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
+echo "****** DESCRIPTION=$DESCRIPTION"
+if [ "$IsWindows" ]; then
+   $RSA_PUBLIC_KEY = Get-Content "~/.ssh/id_rsa.pub"
+else
+   # Bash command to load contents of file into env. variable:
+   export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
+   # TODO: Windows version.
+   # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
+fi
+
+# Invoke file defined manually containing definition of GITHUB_PASSWORD:
+if [ "$IsWindows" ]; then
+   $SECRETS = Get-Content "~/.secrets" | ConvertFrom-StringData
+   # don't echo $SECRETS.GITHUB_PASSWORD
+   # don't echo $SECRETS.GITHUB_TOKEN
+   # echo $TWITTER_APIKEY
+
+   Import-module "../MyTwitter.psm1"
+   Send-Tweet -Message '@adbertram Thanks for the Powershell Twitter module'
+else
+   source ~/.secrets  # but don't ECHO "GITHUB_PASSWORD=$GITHUB_PASSWORD"
+fi
+exit
+
+# The following use jq installed locally.
+
+# Since no need to create another token if one already exists:
+if [ "$GITHUB_TOKEN" = "" ]; then  # Not run before
+	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
+    GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
+       # Do not display token!
+       # API Token (32 character long string) is unique among all GitHub users.
+       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
+       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+
+    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
+else  
+	echo "******** Verifying Auth GITHUB_TOKEN to delete repo : "
+#    FIX: Commented out due to syntax error near unexpected token `|'
+    GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
+    echo "******** authorizations_url=$GITHUB_AVAIL"
+       # https://api.github.com/authorizations"
+fi
+
+####
+    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run. "
+    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
+       # Expecting "full_name": "wilsonmar/git-sample-repo",
+       # TODO: Fix return of null.
+
+if [ "$GITHUB_AVAIL" = "${GITHUBUSER}/${REPONAME}" ]; then  # Not run before
+	echo "******** Deleting GITHUB_REPO created earlier : "
+        # TODO: Delete repo in GitHub.com Settings if it already exists:
+      # Based on https://gist.github.com/JadedEvan/5639254
+      # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
+    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
+      # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL deleted."
+else
+	echo "******** No GITHUB repo known to delete. "
+fi
+
+#### Create repo in GitHub:
+	echo "******** Creating GITHUB repo. "
+    GITHUB_AVAIL=$(curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
+    echo "GITHUB_AVAIL=$GITHUB_AVAIL created."
+       GITHUB_PASSWORD=""  # No longer needed.
+
+    # Set the freshly created repo to the origin and push
+    git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
+    git remote -v
+    git push --set-upstream origin develop
+
+#    git remote set-url origin git@github.com:${GITHUBUSER}/${REPONAME}.git
+#    git remote set-head origin develop
+#    git config branch.develop.remote origin
+# fi
+
+echo "********** DOTHIS: Manually make a change online GitHub file : "
+echo "Add to bottom of README.md \"Changed online\" and Save."
+read "WAITING FOR RESPONSE: Press Enter/Return to continue:"
+
+echo "********** Making change that will be duplicated online : "
+echo -e "Change locally\r\n">>README.md
+
+#echo "********** Doing git pull to create conflict : "
+# git pull
+echo "********** Doing git fetch a conflict : "
+git fetch
+
+
 
 # git stash save "text message here"
 
@@ -345,95 +505,6 @@ echo "******** Compare against previous reflog."
 
 # Move the branch pointer back to the previous HEAD:
 # git reset --soft HEAD@{1}
-
-# See https://gist.github.com/caspyin/2288960 about GitHub API
-# From https://gist.github.com/robwierzbowski/5430952 on Windows
-# From https://gist.github.com/jerrykrinock/6618003 on Mac
-# read "REPONAME?New repo name (enter for ${PWD##*/}):"
-
-# read "USER?Git Username (enter for ${GITHUBUSER}):"
-# read "DESCRIPTION?Repo Description:"
-DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
-#echo "Enter <return> to make the new repo public, 'x' for private"
-
-echo "****** GITHUBUSER=$GITHUBUSER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
-echo "****** DESCRIPTION=$DESCRIPTION"
-
-# Invoke file defined manually containing definition of GITHUB_PASSWORD:
-source ~/.passwords  # but don't ECHO "GITHUB_PASSWORD=$GITHUB_PASSWORD"
-
-   # Bash command to load contents of file into env. variable:
-export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
-   # TODO: Windows version.
-   # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
-
-# The following use jq installed locally.
-
-# Since no need to create another token if one already exists:
-if [ "$GITHUB_TOKEN" = "" ]  # Not run before
-then
-	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
-    GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # Do not display token!
-       # API Token (32 character long string) is unique among all GitHub users.
-       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
-       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
-
-    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
-else  
-	echo "******** Verifying Auth GITHUB_TOKEN to delete repo : "
-#    FIX: Commented out due to syntax error near unexpected token `|'
-    GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
-    echo "******** authorizations_url=$GITHUB_AVAIL"
-       # https://api.github.com/authorizations"
-fi
-
-####
-    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run. "
-    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
-    echo "GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
-       # Expecting "full_name": "wilsonmar/git-sample-repo",
-       # TODO: Fix return of null.
-
-if [ "$GITHUB_AVAIL" = "${GITHUBUSER}/${REPONAME}" ]  # Not run before
-then
-	echo "******** Deleting GITHUB_REPO created earlier : "
-        # TODO: Delete repo in GitHub.com Settings if it already exists:
-      # Based on https://gist.github.com/JadedEvan/5639254
-      # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
-    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
-      # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
-    echo "GITHUB_AVAIL=$GITHUB_AVAIL deleted."
-else
-	echo "******** No GITHUB repo known to delete. "
-fi
-
-#### Create repo in GitHub:
-	echo "******** Creating GITHUB repo. "
-    GITHUB_AVAIL=$(curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
-    echo "GITHUB_AVAIL=$GITHUB_AVAIL created."
-
-    # Set the freshly created repo to the origin and push
-    git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
-    git remote -v
-    git push --set-upstream origin develop
-
-#    git remote set-url origin git@github.com:${GITHUBUSER}/${REPONAME}.git
-#    git remote set-head origin develop
-#    git config branch.develop.remote origin
-# fi
-
-echo "********** DOTHIS: Manually make a change online GitHub file : "
-echo "Add to bottom of README.md \"Changed online\" and Save."
-read "WAITING FOR RESPONSE: Press Enter/Return to continue:"
-
-echo "********** Making change that will be duplicated online : "
-echo -e "Change locally\r\n">>README.md
-
-#echo "********** Doing git pull to create conflict : "
-# git pull
-echo "********** Doing git fetch a conflict : "
-git fetch
 
 
 # Commented out for cleanup at start of next run:
