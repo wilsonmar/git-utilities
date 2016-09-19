@@ -41,13 +41,13 @@ git --version
 echo "**********************************************************"
 $REPONAME='git-sample-repo'
 echo "******** STEP Delete $REPONAME remnant from previous run:"
-#if ((Test-Path $REPONAME) -eq True ){
+$FileExists = Test-Path $REPONAME
+if ($FileExists -eq $True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
    Remove-Item -path ${REPONAME} -Recurse -Force #rm -rf ${REPONAME}  # PowerShell specific
    # Ignore error about path not being there.
-   New-item ${REPONAME}  # mkdir ${REPONAME}
-   echo "Ignore error about path does not exit.
-#}
+}
+New-item ${REPONAME}  # mkdir ${REPONAME}
 exit
 cd ${REPONAME}
 #$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
