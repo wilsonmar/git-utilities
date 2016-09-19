@@ -19,6 +19,7 @@
 # ./git-sample-repo-create.sh
 
 # Last tested on MacOS 10.11 (El Capitan) 2015-09-15
+# http://skimfeed.com/blog/windows-command-prompt-ls-equivalent-dir/
 
 # Create blank lines in the log to differentiate different runs:
 echo ""
@@ -40,10 +41,14 @@ git --version
 echo "**********************************************************"
 $REPONAME='git-sample-repo'
 echo "******** STEP Delete $REPONAME remnant from previous run:"
+#if ((Test-Path $REPONAME) -eq True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
    Remove-Item -path ${REPONAME} -Recurse -Force #rm -rf ${REPONAME}  # PowerShell specific
    # Ignore error about path not being there.
-mkdir ${REPONAME}
+   New-item ${REPONAME}  # mkdir ${REPONAME}
+   echo "Ignore error about path does not exit.
+#}
+exit
 cd ${REPONAME}
 #$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
 $CURRENTDIR = $PSScriptRoot    # PowerShell specific
@@ -115,7 +120,7 @@ git config rerere.enabled false
 # git config --list   # Dump config file
 
 echo "******** STEP commit (initial) README :"
-touch README.md
+echo "hello" > README.md  # no touch command on Windows.
 git add .
 git commit -m "README.md"
 git l -1
@@ -147,7 +152,7 @@ git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
 git reflog
-ls -al
+Get-ChildItem  # ps for ls -al
 
 cat README.md
 
@@ -165,7 +170,7 @@ echo "MIT\r\n">>LICENSE.md
 git add .
 git commit -m "Add c"
 git l -1
-ls -al
+Get-ChildItem  # ls -al
 
 echo "******** STEP commit: d"
 echo "free!">>LICENSE.md
@@ -173,7 +178,7 @@ echo "d">>file-d.txt
 git add .
 git commit -m "Add d in feature1"
 git l -1
-ls -al
+Get-ChildItem  # ls -al
 
 
 echo "******** STEP Merge feature1 :"
@@ -209,7 +214,7 @@ git l -1
 
 echo "******** STEP commit f : "
 echo "f">>file-f.txt
-ls -al
+Get-ChildItem
 git add .
 git commit -m "Add f"
 git l -1
@@ -268,15 +273,21 @@ echo "******** show HEAD~2^2 :"
 git w HEAD~2^2
 echo "******** show HEAD~2^3 :"
 git w HEAD~2^3
-ls -al
+Get-ChildItem  # ls -al
 
 echo "******** Reflog: ---------------------------------------"
 git reflog
+
+exit
+
 echo "******** show HEAD@{5} :"
 # FIX: git w HEAD@{5}
 
 echo "******** Create archive file, excluding .git directory :"
 $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
+# WARNING: The DateTime string format returned by Get-Date contains characters that can't be used for file names. Try something like this:
+# new-item -path .\desktop\testfolder -name "$NOW.txt" `
+#        -value (get-date).toString() -itemtype file
 $FILENAME="$REPONAME_$NOW.zip"
 #NOW=$(date +%Y-%m-%d:%H:%M:%S)
 #FILENAME=$(echo ${REPONAME}_${NOW}.zip)
@@ -290,21 +301,21 @@ echo "FILENAME=$FILENAME"
 
 
 echo "******** STEP checkout c :"
-ls -al
+Get-ChildItem  # ls -al
 git show HEAD@{5}
 git checkout HEAD@{5}
-ls -al
+Get-ChildItem
 
 echo "******** Go back to HEAD --hard :"
 git reset --hard HEAD
 # git checkout HEAD
-ls -al
+Get-ChildItem
 
 
 echo "******** Garbage Collect (gc) what Git can't reach :"
 git gc
 git reflog
-ls -al
+Get-ChildItem
 echo "******** Compare against previous reflog."
 
 
