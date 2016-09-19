@@ -431,7 +431,7 @@ fi
     git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
     git remote -v
     git push --set-upstream origin develop
-
+    git remote show origin
 #    git remote set-url origin git@github.com:${GITHUBUSER}/${REPONAME}.git
 #    git remote set-head origin develop
 #    git config branch.develop.remote origin
@@ -448,8 +448,8 @@ echo -e "Change locally\r\n">>README.md
 # git pull
 echo "********** Doing git fetch a conflict : "
 git fetch
-
-
+git merge origin/develop
+exit
 
 # git stash save "text message here"
 

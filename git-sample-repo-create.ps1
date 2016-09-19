@@ -1,12 +1,4 @@
-If ($IsWindows -eq True) {"IsWindows"}
-   echo "Windows"
-   # use "C:/Users/%USERNAME%/.ssh/id_rsa.pub"
-ElseIf ($IsOSX -eq True) {"IsOSX"}
-   echo "OSX"
-   # use "~/.ssh/id_rsa.pub"
-Else {"Something else"}
 
-exit
 # git-sample-repo-create.ps1 from within http://github.com/wilsonmar/git-utilities.
 # by Wilson Mar (wilsonmar@gmail.com, @wilsonmar)
 
@@ -109,7 +101,6 @@ git config color.ui auto
 # See https://git-scm.com/docs/pretty-formats : Add "| %G?" for signing
 # In Windows, double quotes are needed:
 git config alias.l  "log --pretty='%Cred%h%Creset %C(yellow)%d%Creset | %Cblue%s%Creset' --graph"
-
 git config alias.s  "status -s"
 #it config alias.w "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset | (%cr) %Cgreen<%ae>%Creset'"
 git config alias.w  "show -s --quiet --pretty=format:'%Cred%h%Creset | %Cblue%s%Creset'"
@@ -141,6 +132,7 @@ echo "******** STEP amend commit 2 : "
 echo "still more\r\n">>README.md
 git ca  # alias for git commit -a --amend -C HEAD
 git l -1
+git diff
 
 echo "******** STEP commit .DS_Store in .gitignore :"
 echo ".DS_Store">>.gitignore
