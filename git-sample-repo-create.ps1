@@ -44,23 +44,22 @@ echo "******** STEP Delete $REPONAME remnant from previous run:"
 $FileExists = Test-Path $REPONAME
 if ($FileExists -eq $True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
-   Remove-Item -path ${REPONAME} -Recurse -Force #rm -rf ${REPONAME}  # PowerShell specific
-   # Ignore error about path not being there.
+   Remove-Item -path ${REPONAME} -Recurse -Force # instead of rm -rf ${REPONAME}
 }
-New-item ${REPONAME}  # mkdir ${REPONAME}
-exit
+New-item ${REPONAME} -ItemType "directory" >$null  # instead of mkdir ${REPONAME}
+   # >$null suporesses several lines being printing out by PS to confirm.
 cd ${REPONAME}
+
 #$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
 $CURRENTDIR = $PSScriptRoot    # PowerShell specific
 echo "CURRENTDIR=$CURRENTDIR"
 
-
 echo "******** STEP Init repo :"
-# init without --bare so we get a working directory:
-git init
-# return the .git path of the current project::
+git init  # init without --bare so we get a working directory:
+
+echo "         return the .git path of the current project:"
 git rev-parse --git-dir
-ls .git/
+  # No files yet for Get-ChildItem -Recurse | ?{ $_.PSIsContainer }
 
 echo "******** STEP Make develop the default branch instead of master :"
 # The contents of HEAD is stored in this file:
@@ -72,7 +71,6 @@ cat .git/HEAD
 git branch
 $DEFAULT_BRANCH="develop"
 echo "DEFAULT_BRANCH=$DEFAULT_BRANCH"
-
 
 echo "******** STEP Attribution & Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
@@ -152,7 +150,7 @@ git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
 git reflog
-Get-ChildItem  # ps for ls -al
+dir | format-table # Get-ChildItem  # ps for ls -al
 
 cat README.md
 
@@ -170,7 +168,7 @@ echo "MIT\r\n">>LICENSE.md
 git add .
 git commit -m "Add c"
 git l -1
-Get-ChildItem  # ls -al
+dir | format-table 
 
 echo "******** STEP commit: d"
 echo "free!">>LICENSE.md
@@ -178,7 +176,7 @@ echo "d">>file-d.txt
 git add .
 git commit -m "Add d in feature1"
 git l -1
-Get-ChildItem  # ls -al
+dir | format-table 
 
 
 echo "******** STEP Merge feature1 :"
@@ -214,7 +212,7 @@ git l -1
 
 echo "******** STEP commit f : "
 echo "f">>file-f.txt
-Get-ChildItem
+dir | format-table 
 git add .
 git commit -m "Add f"
 git l -1
@@ -273,7 +271,7 @@ echo "******** show HEAD~2^2 :"
 git w HEAD~2^2
 echo "******** show HEAD~2^3 :"
 git w HEAD~2^3
-Get-ChildItem  # ls -al
+dir | format-table 
 
 echo "******** Reflog: ---------------------------------------"
 git reflog
