@@ -76,8 +76,8 @@ echo "******** STEP Attribution & Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
 git config user.email "wilsonmar@gmail.com"
 git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
-$GITHUBUSER="wilsonmar"
-echo "******** GITHUBUSER=$GITHUBUSER "
+$GITHUB_USER="wilsonmar"
+echo "******** GITHUB_USER=$GITHUB_USER "
 
 
 # WORKFLOW: After gpg is installed, find:
@@ -126,13 +126,13 @@ git l -1
 
 echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "some more\r\n">>README.md
+echo "color">>README.md
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
 echo "******** STEP amend commit 2 : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "still more\r\n">>README.md
+echo "still more">>README.md
 git ca  # alias for git commit -a --amend -C HEAD
 git l -1
 git diff
@@ -144,7 +144,9 @@ git commit -m "Add .gitignore"
 git l -1
 
 echo "******** STEP commit --amend .secrets in .gitignore :"
+echo "secrets/">>.gitignore
 echo ".secrets">>.gitignore
+echo "*.log">>.gitignore
 git add .
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
@@ -163,10 +165,10 @@ git checkout HEAD -b feature1
 ls .git/refs/heads/
 git l -1
 
-echo "******** STEP commit c - LICENSE.md : "
-echo "MIT\r\n">>LICENSE.md
+echo "******** STEP commit .secrets : "
+echo "shessh!">>.secrets
 git add .
-git commit -m "Add c"
+git commit -m "Add .secrets"
 git l -1
 dir | format-table 
 
@@ -205,13 +207,13 @@ echo "******** $NOW What's dangling? "
 git fsck --dangling --no-progress
 
 echo "******** STEP commit: e"
-echo "e">>file-e.txt
+echo "e money">>file-e.txt
 git add .
 git commit -m "Add e"
 git l -1
 
 echo "******** STEP commit f : "
-echo "f">>file-f.txt
+echo "f money">>file-f.txt
 dir | format-table 
 git add .
 git commit -m "Add f"
@@ -276,7 +278,7 @@ dir | format-table
 echo "******** Reflog: ---------------------------------------"
 git reflog
 
-exit
+#exit
 
 echo "******** show HEAD@{5} :"
 # FIX: git w HEAD@{5}
@@ -309,7 +311,6 @@ git reset --hard HEAD
 # git checkout HEAD
 Get-ChildItem
 
-
 echo "******** Garbage Collect (gc) what Git can't reach :"
 git gc
 git reflog
@@ -318,33 +319,95 @@ echo "******** Compare against previous reflog."
 
 
 
-
 # See https://gist.github.com/caspyin/2288960 about GitHub API
 # From https://gist.github.com/robwierzbowski/5430952 on Windows
 # From https://gist.github.com/jerrykrinock/6618003 on Mac
 
-echo "****** GITHUBUSER=$GITHUBUSER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
+echo "****** GITHUB_USER=$GITHUB_USER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
 echo "****** DESCRIPTION=$DESCRIPTION"
 
 # Invoke file defined manually containing definition of GITHUB_PASSWORD:
 # Dot is cross-platform whereas source command is only for Bash:
-   $RSA_PUBLIC_KEY = Get-Content "~/.ssh/id_rsa.pub"
+   $RSA_PUBLIC_KEY = Get-Content "$home/.ssh/id_rsa.pub"
    # echo "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
       # Bash command to load contents of file into env. variable:
 #   export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
-   # TODO: Windows version.
    # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
 
-   $SECRETS = Get-Content "~/.secrets" | ConvertFrom-StringData
-   echo $SECRETS.TWITTER_TOKEN
+   # Ignore SSL errors:
+   # http://connect.microsoft.com/PowerShell/feedback/details/419466/new-webserviceproxy-needs-force-parameter-to-ignore-ssl-errors
+   $SECRETS = Get-Content "$home/.secrets" | ConvertFrom-StringData
+   # Please don't echo $SECRETS.GITHUB_TOKEN.Substring(0,8)
    # err: echo "SECRETS.TWITTER_TOKEN=${SECRETS.TWITTER_TOKEN}"
 
-   Import-module "../MyTwitter.psm1"
-   Send-Tweet -Message '@adbertram Thanks for the Powershell Twitter module'
 
-   $body = @{
-    Name = "So long and thanks for all the fish"
-   }
-   Invoke-RestMethod -Method Post -Uri "$resource\new" -Body (ConvertTo-Json $body) -Header @{"X-ApiKey"=$apiKey}
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
-    #GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
+#Install from the PowerShell Gallery (requires PowerShell 5.0+)
+#Copy-install the module to your $env:PSModulePath
+#Extract the module anywhere on the filesystem, and import it explicitly, using Import-Module
+#   Import-module "../MyTwitter.psm1"
+#   Send-Tweet -Message '@adbertram Thanks for the Powershell Twitter module'
+#   $body = @{
+#    Name = "So long and thanks for all the fish"
+#   }
+
+
+# $GITHUB_TOKEN is not defined before this point so code can test if
+# one needs to be created:
+If ("$GITHUB_TOKEN" -eq "") {
+  echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
+   # Based on http://douglastarr.com/using-powershell-3-invoke-restmethod-with-basic-authentication-and-json
+
+   $secpasswd = ConvertTo-SecureString $GITHUB_USER -AsPlainText -Force
+   $cred = New-Object System.Management.Automation.PSCredential ($SECRETS.GITHUB_PASSWORD, $secpasswd)
+      # CAUTION: which sends passwords through the internet here.
+      # You may instead manually obtain a token on GitHub.com.
+
+  #$Body_JSON = '{"scopes":["delete_repo"],"note":"token with delete repo scope"}'
+   $BODY_JSON = "{""scopes"":[""delete_repo""], ""note"":""token with delete repo scope""}"
+       echo "Body_JSON=$Body_JSON"  # DEBUGGING
+
+   $response = Invoke-RestMethod -Method Post `
+     -Credential $cred `
+     -Body $Body_JSON `
+     -Uri "https://api.github.com/authorizations"
+   $GITHUB_TOKEN = $response.Stuffs | where { $_.Name -eq "token" }
+       # Do not display token secret!
+       # API Token (32 character long string) is unique among all GitHub users.
+       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
+       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+
+   # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
+} Else {
+   echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
+
+   $Headers = @{
+      Authorization = 'Basic ' + ${GITHUB_TOKEN}
+      };
+      # -f is for substitution of (0).
+      # See https://technet.microsoft.com/en-us/library/ee692795.aspx
+      # Write-Host ("Headers="+$Headers.Authorization)
+
+   $response = Invoke-RestMethod -Method Get `
+    -Headers $Headers `
+    -ContentType 'application/json' `
+    -Uri https://api.github.com
+
+   # Expect HTTP 404 Not Found if valid to avoid disclosing valid data with 401 response as RFC 2617 defines.
+    $GITHUB_AVAIL = $response.Stuffs | where { $_.Name -eq "authorizations_url" }
+   echo "******** authorizations_url=$GITHUB_AVAIL.Substring(0,8)"  # DEBUGGING
+}
+
+    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run: "
+   $response = Invoke-WebMethod -Method Put `
+    -Headers $Headers `
+    -ContentType 'application/json' `
+    -Uri https://api.github.com/repos/${GITHUB_USER}/${REPONAME}
+    $GITHUB_AVAIL = $response.Stuffs | where { $_.Name -eq "full_name" }
+   echo "******** authorizations_url=$GITHUB_AVAIL"  # DEBUGGING
+
+
+# 15:49 into https://channel9.msdn.com/Blogs/trevor-powershell/Automating-the-GitHub-REST-API-Using-PowerShell
+# https://developer.github.com/v3/users/
+# https://github.com/pcgeek86/PSGitHub

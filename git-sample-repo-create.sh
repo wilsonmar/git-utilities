@@ -50,14 +50,14 @@ git --version
 
 if [ "$IsWindows" ]; then
    $REPONAME='git-sample-repo'
-   $GITHUBUSER="wilsonmar"
+   $GITHUB_USER="wilsonmar"
    $DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
 else
    REPONAME='git-sample-repo'
-   GITHUBUSER="wilsonmar"
+   GITHUB_USER="wilsonmar"
    DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
 fi
-echo "******** GITHUBUSER=$GITHUBUSER "
+echo "******** GITHUB_USER=$GITHUB_USER "
 
 # Make the beginning of run easy to find:
 echo "**********************************************************"
@@ -105,7 +105,7 @@ echo "******** STEP Attribution & Config (not --global):"
 git config user.email "wilsonmar@gmail.com"
 git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
 git config user.user "wilsonmar" # Username (not email) in GitHub.com cloud.
-#GITHUBUSER=$(git config github.email)  # Username (not email) in GitHub.com cloud.
+#GITHUB_USER=$(git config github.email)  # Username (not email) in GitHub.com cloud.
 # echo $GIT_AUTHOR_EMAIL
 # echo $GIT_COMMITTER_EMAIL
 
@@ -159,7 +159,7 @@ git l -1
 echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
 # See http://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
-echo -e "some more\r\n">>README.md
+echo -e "color">>README.md
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
@@ -176,6 +176,7 @@ git commit -m "Add .gitignore"
 git l -1
 
 echo "******** STEP commit --amend .secrets in .gitignore :"
+echo "secrets">>.gitignore
 echo ".secrets">>.gitignore
 git add .
 git ca  # use this alias instead of git commit -a --amend -C HEAD
@@ -240,13 +241,13 @@ git fsck --dangling --no-progress
 git l -1
 
 echo "******** STEP commit: e"
-echo "e">>file-e.txt
+echo "e money">>file-e.txt
 git add .
 git commit -m "Add e"
 git l -1
 
 echo "******** STEP commit: f"
-echo "f">>file-f.txt
+echo "f money">>file-f.txt
 ls -al
 git add .
 git commit -m "Add f"
@@ -357,7 +358,7 @@ echo "******** Compare against previous reflog."
 # From https://gist.github.com/robwierzbowski/5430952 on Windows
 # From https://gist.github.com/jerrykrinock/6618003 on Mac
 
-echo "****** GITHUBUSER=$GITHUBUSER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
+echo "****** GITHUB_USER=$GITHUB_USER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
 echo "****** DESCRIPTION=$DESCRIPTION"
 if [ "$IsWindows" ]; then
    $RSA_PUBLIC_KEY = Get-Content "~/.ssh/id_rsa.pub"
@@ -387,15 +388,15 @@ exit
 # Since no need to create another token if one already exists:
 if [ "$GITHUB_TOKEN" = "" ]; then  # Not run before
 	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
-    GITHUB_TOKEN=$(curl -v -u "$GITHUBUSER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # Do not display token!
+    GITHUB_TOKEN=$(curl -v -u "$GITHUB_USER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
+       # Do not echo GITHUB_TOKEN=$GITHUB_TOKEN # secret 
        # API Token (32 character long string) is unique among all GitHub users.
        # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
        # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
 
     # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
 else  
-	echo "******** Verifying Auth GITHUB_TOKEN to delete repo : "
+	echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
 #    FIX: Commented out due to syntax error near unexpected token `|'
     GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
     echo "******** authorizations_url=$GITHUB_AVAIL"
@@ -403,18 +404,18 @@ else
 fi
 
 ####
-    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run. "
-    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
+    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run: "
+    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${GITHUB_USER}/${REPONAME} | jq ".full_name")
     echo "GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
        # Expecting "full_name": "wilsonmar/git-sample-repo",
        # TODO: Fix return of null.
 
-if [ "$GITHUB_AVAIL" = "${GITHUBUSER}/${REPONAME}" ]; then  # Not run before
+if [ "$GITHUB_AVAIL" = "${GITHUB_USER}/${REPONAME}" ]; then  # Not run before
 	echo "******** Deleting GITHUB_REPO created earlier : "
         # TODO: Delete repo in GitHub.com Settings if it already exists:
       # Based on https://gist.github.com/JadedEvan/5639254
       # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
-    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUBUSER}/${REPONAME} | jq ".full_name")
+    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${GITHUB_USER}/${REPONAME} | jq ".full_name")
       # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
     echo "GITHUB_AVAIL=$GITHUB_AVAIL deleted."
 else
@@ -423,16 +424,16 @@ fi
 
 #### Create repo in GitHub:
 	echo "******** Creating GITHUB repo. "
-    GITHUB_AVAIL=$(curl -u $GITHUBUSER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
+    GITHUB_AVAIL=$(curl -u $GITHUB_USER:$GITHUB_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
     echo "GITHUB_AVAIL=$GITHUB_AVAIL created."
        GITHUB_PASSWORD=""  # No longer needed.
 
     # Set the freshly created repo to the origin and push
-    git remote add origin "https://github.com/$GITHUBUSER/$REPONAME.git"
+    git remote add origin "https://github.com/$GITHUB_USER/$REPONAME.git"
     git remote -v
     git push --set-upstream origin develop
     git remote show origin
-#    git remote set-url origin git@github.com:${GITHUBUSER}/${REPONAME}.git
+#    git remote set-url origin git@github.com:${GITHUB_USER}/${REPONAME}.git
 #    git remote set-head origin develop
 #    git config branch.develop.remote origin
 # fi
