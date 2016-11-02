@@ -9,7 +9,7 @@
 # explained at https://wilsonmar.github.io/git-commands-and-statuses/).
 # Most of the regularly used Git commands are covered here.
 
-# This script creates and populates a sample repo which is then 
+# This script creates and populates a sample repo which is then
 # uploaded to a new repo created using GitHub API calls
 
 # This script is designed to be "idempotent" in that repeat runs
@@ -29,57 +29,33 @@ echo ""
 echo ""
 echo ""
 echo ""
-if [ "$IsWindows" ]; then
-   $NOW = Get-Date -Format "yyyy-MM-dd HH:mmzzz"
-                          # 2016-09-16T05:26-06:00 vs UTC
-else
    TZ=":UTC" date +%z
    NOW=$(date +%Y-%m-%d:%H:%M:%S%z)
            # 2016-09-16T05:26-06:00 vs UTC
-fi
 
 echo "******** $NOW Versions :"
-if [ "$IsWindows" ]; then
-   $psversiontable
-   echo "IsWindows=$IsWindows"
-   echo "IsOSX=$IsOSX"
-   echo "IsLinux=$IsLinux"
-fi
 # After "brew install git" on Mac:
 git --version
 
-if [ "$IsWindows" ]; then
-   $REPONAME='git-sample-repo'
-   $GITHUB_USER="wilsonmar"
-   $DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
-else
    REPONAME='git-sample-repo'
    GITHUB_USER="wilsonmar"
    DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
-fi
+
 echo "******** GITHUB_USER=$GITHUB_USER "
+
 
 # Make the beginning of run easy to find:
 echo "**********************************************************"
 echo "******** STEP Delete \"$REPONAME\" remnant from previous run:"
-if [ "$IsWindows" ]; then
-   # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
-   Remove-Item -path ${REPONAME} -Recurse -Force #rm -rf ${REPONAME}  # PowerShell specific
-else
-   set -x  # xtrace command echo on (with ++ prefix). http://www.faqs.org/docs/abs/HTML/options.html
+#   set -x  # xtrace command echo on (with ++ prefix). http://www.faqs.org/docs/abs/HTML/options.html
    rm -rf ${REPONAME}
-fi
 
 mkdir ${REPONAME}
 cd ${REPONAME}
 
-if [ "$IsWindows" ]; then
-   $CURRENTDIR = $PSScriptRoot    # PowerShell specific
-else
    CURRENTDIR=${PWD##*/}
-fi
-echo "CURRENTDIR=$CURRENTDIR"
 
+echo "CURRENTDIR=$CURRENTDIR"
 
 echo "******** STEP Init repo :"
 # init without --bare so we get a working directory:
@@ -92,31 +68,35 @@ ls .git/
 echo "******** STEP Make develop the default branch instead of master :"
 # The contents of HEAD is stored in this file:
 cat .git/HEAD
+
 # Change from default "ref: refs/heads/master" :
     # See http://www.kernel.org/pub/software/scm/git/docs/git-symbolic-ref.html
-git symbolic-ref HEAD refs/heads/develop
-cat .git/HEAD
-git branch
 DEFAULT_BRANCH="develop"
-echo $DEFAULT_BRANCH
+git symbolic-ref HEAD refs/heads/$DEFAULT_BRANCH
+cat .git/HEAD
+git branch -avv
+# echo $DEFAULT_BRANCH
 
 echo "******** STEP Attribution & Config (not --global):"
+# Invoke file defined manually containing definition of GITHUB_PASSWORD:
+source ~/.secrets  # but don't ECHO "GITHUB_PASSWORD=$GITHUB_PASSWORD"
+
 # See https://git-scm.com/docs/pretty-formats :
-git config user.email "wilsonmar@gmail.com"
-git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
-git config user.user "wilsonmar" # Username (not email) in GitHub.com cloud.
+git config user.email $GITHUB_USER_EMAIL # "wilsonmar@gmail.com"
+git config user.name  $GITHUB_USER_NAME # "Wilson Mar" # Username (not email) in GitHub.com cloud.
+git config user.user  $GITHUB_USER # "wilsonmar" # Username (not email) in GitHub.com cloud.
 #GITHUB_USER=$(git config github.email)  # Username (not email) in GitHub.com cloud.
+echo "GITHUB_USER_EMAIL= $GITHUB_USER_EMAIL"
 # echo $GIT_AUTHOR_EMAIL
 # echo $GIT_COMMITTER_EMAIL
 
-# After gpg is installed:
-# gpg --list-keys
-# gpg --gen-key
-git config --global user.signingkey 2E23C648
+# After gpg is installed and # gpg --gen-key:
+git config --global user.signingkey $GITHUB_SIGNING_KEY
+gpg --list-keys
+
 
 # Verify settings:
 git config core.filemode false
-
 git config core.autocrlf input
 git config core.safecrlf true
 
@@ -124,11 +104,7 @@ git config core.safecrlf true
 # git config core.whitespace cr-at-eol
 
 # Change default commit message editor program to Sublime Text (instead of vi):
-if [ "$IsWindows" ]; then
-   git config core.editor "$home/Sublime\ Text\ 3/sublime_text -w"
-else
    git config core.editor "~/Sublime\ Text\ 3/sublime_text -w"
-fi
 
 # Allow all Git commands to use colored output, if possible:
 git config color.ui auto
@@ -151,7 +127,7 @@ git config rerere.enabled false
 # git config --list   # Dump config file
 
 echo "******** STEP commit (initial) README :"
-touch README.md
+echo -e "Hello" >>README.md
 git add .
 git commit -m "README.md"
 git l -1
@@ -185,13 +161,16 @@ git l -1
 git reflog
 ls -al
 
-cat README.md
+# cat README.md
 
 # echo "******** rebase squash : "
 
-
 echo "******** STEP lightweight tag :"
 git tag "v1"  # lightweight tag
+git l
+
+exit
+
 
 echo "******** STEP checkout HEAD to create feature1 branch : --------------------------"
 git checkout HEAD -b feature1
@@ -216,17 +195,12 @@ ls -al
 
 echo "******** STEP Merge feature1 :"
 # Instead of git checkout $DEFAULT_BRANCH :
-if [ "$IsWindows" ]; then
-   # git checkout @{-1}  # doesn't work in PowerShell.
-   git checkout $DEFAULT_BRANCH
-else
    git checkout @{-1}  # checkout previous branch (develop, master)
-fi
 
 # Alternately, use git-m.sh to merge and delete in one step.
 # git merge --no-ff (no fast forward) for "true merge":
 #git merge feature1 --no-ff --no-commit  # to see what may happen
-git merge feature1 -m "merge feature1" --no-ff  # --verify-signatures 
+git merge feature1 -m "merge feature1" --no-ff  # --verify-signatures
 # resolve conflicts here?
 git add .
 # git commit -m "commit merge feature1"
@@ -317,16 +291,11 @@ git w HEAD@{5}
 
 
 echo "******** STEP Create archive file, excluding .git directory :"
-if [ "$IsWindows" ]; then
-   $NOW = Get-Date -Format "yyyy-MM-dd HH:mmzzz"
-                          # 2016-09-16T05:26-06:00 vs UTC
-   $FILENAME="$REPONAME_$NOW.zip"  
-else
    TZ=":UTC" date +%z
    NOW=$(date +%Y-%m-%d:%H:%M:%S%z)
            # 2016-09-16T05:26-06:00 vs UTC
    FILENAME=$(echo ${REPONAME}_${NOW}.zip)
-fi
+
 echo "FILENAME=$FILENAME"
 
 #echo "******** STEP Creating a zip file :"
@@ -360,27 +329,11 @@ echo "******** Compare against previous reflog."
 
 echo "****** GITHUB_USER=$GITHUB_USER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
 echo "****** DESCRIPTION=$DESCRIPTION"
-if [ "$IsWindows" ]; then
-   $RSA_PUBLIC_KEY = Get-Content "~/.ssh/id_rsa.pub"
-else
    # Bash command to load contents of file into env. variable:
    export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
    # TODO: Windows version.
    # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
-fi
 
-# Invoke file defined manually containing definition of GITHUB_PASSWORD:
-if [ "$IsWindows" ]; then
-   $SECRETS = Get-Content "~/.secrets" | ConvertFrom-StringData
-   # don't echo $SECRETS.GITHUB_PASSWORD
-   # don't echo $SECRETS.GITHUB_TOKEN
-   # echo $TWITTER_APIKEY
-
-   Import-module "../MyTwitter.psm1"
-   Send-Tweet -Message '@adbertram Thanks for the Powershell Twitter module'
-else
-   source ~/.secrets  # but don't ECHO "GITHUB_PASSWORD=$GITHUB_PASSWORD"
-fi
 exit
 
 # The following use jq installed locally.
@@ -389,13 +342,13 @@ exit
 if [ "$GITHUB_TOKEN" = "" ]; then  # Not run before
 	echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
     GITHUB_TOKEN=$(curl -v -u "$GITHUB_USER:$GITHUB_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # Do not echo GITHUB_TOKEN=$GITHUB_TOKEN # secret 
+       # Do not echo GITHUB_TOKEN=$GITHUB_TOKEN # secret
        # API Token (32 character long string) is unique among all GitHub users.
        # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
        # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
 
-    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
-else  
+    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information
+else
 	echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
 #    FIX: Commented out due to syntax error near unexpected token `|'
     GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
