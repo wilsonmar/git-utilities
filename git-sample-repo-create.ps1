@@ -22,25 +22,27 @@
 # http://skimfeed.com/blog/windows-command-prompt-ls-equivalent-dir/
 
 # Create blank lines in the log to differentiate different runs:
-echo ""
-echo ""
-echo ""
-echo ""
-echo ""
+        echo ""
+        echo ""
+        echo ""
+        echo ""
+        echo ""
+   # Make the beginning of run easy to find:
+        echo "**********************************************************"
 
-echo "******** Version :"
-#if [ "$IsWindows" ]; then
-   $psversiontable
-   echo "IsWindows=$IsWindows"
-   echo "IsOSX=$IsOSX"
-   echo "IsLinux=$IsLinux"
-#fi
+        echo "******** Version :"
+    $psversiontable
+           echo "IsWindows=$IsWindows"
+           echo "IsOSX=$IsOSX"
+           echo "IsLinux=$IsLinux"
+    #if [ "$IsWindows" ]; then
+    #fi
 git --version
 
-# Make the beginning of run easy to find:
-echo "**********************************************************"
-$REPONAME='git-sample-repo'
-echo "******** STEP Delete $REPONAME remnant from previous run:"
+    # Make the beginning of run easy to find: TODO: Parameterize:
+    $REPONAME='git-sample-repo'
+
+        echo "******** STEP Delete $REPONAME remnant from previous run:"
 $FileExists = Test-Path $REPONAME
 if ($FileExists -eq $True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
@@ -52,16 +54,16 @@ cd ${REPONAME}
 
 #$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
 $CURRENTDIR = $PSScriptRoot    # PowerShell specific
-echo "CURRENTDIR=$CURRENTDIR"
+        echo "CURRENTDIR=$CURRENTDIR"
 
-echo "******** STEP Init repo :"
+        echo "******** STEP Init repo :"
 git init  # init without --bare so we get a working directory:
 
-echo "         return the .git path of the current project:"
+        echo "         return the .git path of the current project:"
 git rev-parse --git-dir
   # No files yet for Get-ChildItem -Recurse | ?{ $_.PSIsContainer }
 
-echo "******** STEP Make develop the default branch instead of master :"
+        echo "******** STEP Make develop the default branch instead of master :"
 # The contents of HEAD is stored in this file:
 cat .git/HEAD
 # Change from default "ref: refs/heads/master" :
@@ -70,14 +72,14 @@ git symbolic-ref HEAD refs/heads/develop
 cat .git/HEAD
 git branch
 $DEFAULT_BRANCH="develop"
-echo "DEFAULT_BRANCH=$DEFAULT_BRANCH"
+        echo "DEFAULT_BRANCH=$DEFAULT_BRANCH"
 
-echo "******** STEP Attribution & Config (not --global):"
+        echo "******** STEP Attribution & Config (not --global):"
 # See https://git-scm.com/docs/pretty-formats :
 git config user.email "wilsonmar@gmail.com"
 git config user.name "Wilson Mar" # Username (not email) in GitHub.com cloud.
 $GITHUB_USER="wilsonmar"
-echo "******** GITHUB_USER=$GITHUB_USER "
+        echo "******** GITHUB_USER=$GITHUB_USER "
 
 
 # WORKFLOW: After gpg is installed, find:
@@ -117,36 +119,36 @@ git config rerere.enabled false
 
 # git config --list   # Dump config file
 
-echo "******** STEP commit (initial) README :"
-echo "hello" > README.md  # no touch command on Windows.
+        echo "******** STEP commit (initial) README :"
+        echo "hello" > README.md  # no touch command on Windows.
 git add .
 git commit -m "README.md"
 git l -1
 
 
-echo "******** STEP amend commit README : "
+        echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "color">>README.md
+        echo "color">>README.md
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
 
-echo "******** STEP amend commit 2 : "
+        echo "******** STEP amend commit 2 : "
 # ammend last commit with all uncommitted and un-staged changes:
-echo "still more">>README.md
+        echo "still more">>README.md
 git ca  # alias for git commit -a --amend -C HEAD
 git l -1
 git diff
 
-echo "******** STEP commit .DS_Store in .gitignore :"
-echo ".DS_Store">>.gitignore
+        echo "******** STEP commit .DS_Store in .gitignore :"
+        echo ".DS_Store">>.gitignore
 git add .
 git commit -m "Add .gitignore"
 git l -1
 
-echo "******** STEP commit --amend .secrets in .gitignore :"
-echo "secrets/">>.gitignore
-echo ".secrets">>.gitignore
-echo "*.log">>.gitignore
+        echo "******** STEP commit --amend .secrets in .gitignore :"
+        echo "secrets/">>.gitignore
+        echo ".secrets">>.gitignore
+        echo "*.log">>.gitignore
 git add .
 git ca  # use this alias instead of git commit -a --amend -C HEAD
 git l -1
@@ -156,32 +158,36 @@ dir | format-table # Get-ChildItem  # ps for ls -al
 
 cat README.md
 
-echo "******** STEP lightweight tag :"
+        echo "******** STEP lightweight tag :"
 git tag "v1"  # lightweight tag
 
-echo "******** STEP checkout HEAD to create feature1 branch : --------------------------"
+        echo "******** STEP checkout HEAD to create feature1 branch : --------------------------"
 git checkout HEAD -b feature1
 # git branch
 ls .git/refs/heads/
 git l -1
 
-echo "******** STEP commit .secrets : "
-echo "shessh!">>.secrets
+        echo "******** STEP commit .secrets : "
+        echo "shessh!">>.secrets
 git add .
 git commit -m "Add .secrets"
 git l -1
 dir | format-table 
 
-echo "******** STEP commit: d"
-echo "free!">>LICENSE.md
-echo "d">>file-d.txt
+        echo "******** STEP commit: empty-folder"
+mkdir empty-folder
+
+        echo "******** STEP commit: d"
+        echo "free!">>LICENSE.md
+        echo "d">>file-d.txt
 git add .
 git commit -m "Add d in feature1"
 git l -1
 dir | format-table 
 
+exit
 
-echo "******** STEP Merge feature1 :"
+        echo "******** STEP Merge feature1 :"
 # Instead of git checkout $DEFAULT_BRANCH :
 # git checkout @{-1}  # doesn't work in PowerShell.
 git checkout $DEFAULT_BRANCH
@@ -198,124 +204,124 @@ git branch
 git l -1
 
 
-echo "******** STEP Remove merged branch ref :"
+        echo "******** STEP Remove merged branch ref :"
 git branch -D feature1
 git branch
 git l -1
 
-echo "******** $NOW What's dangling? "
+        echo "******** $NOW What's dangling? "
 git fsck --dangling --no-progress
 
-echo "******** STEP commit: e"
-echo "e money">>file-e.txt
+        echo "******** STEP commit: e"
+        echo "e money">>file-e.txt
 git add .
 git commit -m "Add e"
 git l -1
 
-echo "******** STEP commit f : "
-echo "f money">>file-f.txt
+        echo "******** STEP commit f : "
+        echo "f money">>file-f.txt
 dir | format-table 
 git add .
 git commit -m "Add f"
 git l -1
 
 
-echo "******** STEP heavyeight tag (a commit) :"
+        echo "******** STEP heavyeight tag (a commit) :"
 #  git tag -a v0.0.1 -m"v1 unsigned"
    git tag -a v0.0.1 -m"v1 signed" -s  # signed "heavyweight" tag
    # For numbering, see http://semver.org/
-# echo "******** STEP tag verify :"
+#         echo "******** STEP tag verify :"
 # git tag -v v1  # calls verify-tag.
 git verify-tag v0.0.1
 
-# echo "******** STEP tag show :"
+#         echo "******** STEP tag show :"
 # git show v1  # Press q to exit scroll.
 
 
-echo "Copy this and paste to a text edit for reference: --------------"
+        echo "Copy this and paste to a text edit for reference: --------------"
 git l
-echo "******** show HEAD : ---------------------------------------"
+        echo "******** show HEAD : ---------------------------------------"
 git w HEAD
-echo "******** show HEAD~1 :"
+        echo "******** show HEAD~1 :"
 git w HEAD~1
-echo "******** show HEAD~2 :"
+        echo "******** show HEAD~2 :"
 git w HEAD~2
-echo "******** show HEAD~3 :"
+        echo "******** show HEAD~3 :"
 git w HEAD~3
-echo "******** show HEAD~4 :"
+        echo "******** show HEAD~4 :"
 git w HEAD~4
 
-echo "******** show HEAD^ :"
+        echo "******** show HEAD^ :"
 git w HEAD^
-echo "******** show HEAD^^ :"
+        echo "******** show HEAD^^ :"
 git w HEAD^^
-echo "******** show HEAD^^^ :"
+        echo "******** show HEAD^^^ :"
 git w HEAD^^^
-echo "******** show HEAD^^^^ :"
+        echo "******** show HEAD^^^^ :"
 git w HEAD^^^^
 
-echo "******** show HEAD^1 :"
+        echo "******** show HEAD^1 :"
 git w HEAD^1
-echo "******** show HEAD^2 :"
+        echo "******** show HEAD^2 :"
 git w HEAD^2
 
-echo "******** show HEAD~1^1 :"
+        echo "******** show HEAD~1^1 :"
 git w HEAD~1^1
-echo "******** show HEAD~2^1 :"
+        echo "******** show HEAD~2^1 :"
 git w HEAD~2^1
-echo "******** show HEAD~3^1 :"
+        echo "******** show HEAD~3^1 :"
 git w HEAD~3^1
 
-echo "******** show HEAD~1^2 :"
+        echo "******** show HEAD~1^2 :"
 git w HEAD~1^2
 
-echo "******** show HEAD~2^2 :"
+        echo "******** show HEAD~2^2 :"
 git w HEAD~2^2
-echo "******** show HEAD~2^3 :"
+        echo "******** show HEAD~2^3 :"
 git w HEAD~2^3
 dir | format-table 
 
-echo "******** Reflog: ---------------------------------------"
+        echo "******** Reflog: ---------------------------------------"
 git reflog
 
 #exit
 
-echo "******** show HEAD@{5} :"
+        echo "******** show HEAD@{5} :"
 # FIX: git w HEAD@{5}
 
-echo "******** Create archive file, excluding .git directory :"
+        echo "******** Create archive file, excluding .git directory :"
 $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
 # WARNING: The DateTime string format returned by Get-Date contains characters that can't be used for file names. Try something like this:
 # new-item -path .\desktop\testfolder -name "$NOW.txt" `
 #        -value (get-date).toString() -itemtype file
 $FILENAME="$REPONAME_$NOW.zip"
 #NOW=$(date +%Y-%m-%d:%H:%M:%S)
-#FILENAME=$(echo ${REPONAME}_${NOW}.zip)
+#FILENAME=$(        echo ${REPONAME}_${NOW}.zip)
    # See https://gallery.technet.microsoft.com/scriptcenter/Get-TimeZone-PowerShell-4f1a34e6
 
-echo "FILENAME=$FILENAME"
+        echo "FILENAME=$FILENAME"
 
 # Commented out to avoid creating a file from each run:
 # git archive --format zip --output ../$FILENAME  feature1
 # ls -l ../$FILENAME
 
 
-echo "******** STEP checkout c :"
+        echo "******** STEP checkout c :"
 Get-ChildItem  # ls -al
 git show HEAD@{5}
 git checkout HEAD@{5}
 Get-ChildItem
 
-echo "******** Go back to HEAD --hard :"
+        echo "******** Go back to HEAD --hard :"
 git reset --hard HEAD
 # git checkout HEAD
 Get-ChildItem
 
-echo "******** Garbage Collect (gc) what Git can't reach :"
+        echo "******** Garbage Collect (gc) what Git can't reach :"
 git gc
 git reflog
 Get-ChildItem
-echo "******** Compare against previous reflog."
+        echo "******** Compare against previous reflog."
 
 
 
@@ -323,22 +329,22 @@ echo "******** Compare against previous reflog."
 # From https://gist.github.com/robwierzbowski/5430952 on Windows
 # From https://gist.github.com/jerrykrinock/6618003 on Mac
 
-echo "****** GITHUB_USER=$GITHUB_USER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
-echo "****** DESCRIPTION=$DESCRIPTION"
+        echo "****** GITHUB_USER=$GITHUB_USER, CURRENTDIR=$CURRENTDIR, REPONAME=$REPONAME"
+        echo "****** DESCRIPTION=$DESCRIPTION"
 
 # Invoke file defined manually containing definition of GITHUB_PASSWORD:
 # Dot is cross-platform whereas source command is only for Bash:
    $RSA_PUBLIC_KEY = Get-Content "$home/.ssh/id_rsa.pub"
-   # echo "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
+   #         echo "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
       # Bash command to load contents of file into env. variable:
 #   export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
-   # ECHO "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
+   #         echo "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
 
    # Ignore SSL errors:
    # http://connect.microsoft.com/PowerShell/feedback/details/419466/new-webserviceproxy-needs-force-parameter-to-ignore-ssl-errors
    $SECRETS = Get-Content "$home/.secrets" | ConvertFrom-StringData
-   # Please don't echo $SECRETS.GITHUB_TOKEN.Substring(0,8)
-   # err: echo "SECRETS.TWITTER_TOKEN=${SECRETS.TWITTER_TOKEN}"
+   # Please don't         echo $SECRETS.GITHUB_TOKEN.Substring(0,8)
+   # err:         echo "SECRETS.TWITTER_TOKEN=${SECRETS.TWITTER_TOKEN}"
 
 
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
@@ -356,7 +362,7 @@ echo "****** DESCRIPTION=$DESCRIPTION"
 # $GITHUB_TOKEN is not defined before this point so code can test if
 # one needs to be created:
 If ("$GITHUB_TOKEN" -eq "") {
-  echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
+          echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
    # Based on http://douglastarr.com/using-powershell-3-invoke-restmethod-with-basic-authentication-and-json
 
    $secpasswd = ConvertTo-SecureString $GITHUB_USER -AsPlainText -Force
@@ -366,7 +372,7 @@ If ("$GITHUB_TOKEN" -eq "") {
 
   #$Body_JSON = '{"scopes":["delete_repo"],"note":"token with delete repo scope"}'
    $BODY_JSON = "{""scopes"":[""delete_repo""], ""note"":""token with delete repo scope""}"
-       echo "Body_JSON=$Body_JSON"  # DEBUGGING
+               echo "Body_JSON=$Body_JSON"  # DEBUGGING
 
    $response = Invoke-RestMethod -Method Post `
      -Credential $cred `
@@ -380,7 +386,7 @@ If ("$GITHUB_TOKEN" -eq "") {
 
    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information 
 } Else {
-   echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
+           echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
 
    $Headers = @{
       Authorization = 'Basic ' + ${GITHUB_TOKEN}
@@ -396,16 +402,16 @@ If ("$GITHUB_TOKEN" -eq "") {
 
    # Expect HTTP 404 Not Found if valid to avoid disclosing valid data with 401 response as RFC 2617 defines.
     $GITHUB_AVAIL = $response.Stuffs | where { $_.Name -eq "authorizations_url" }
-   echo "******** authorizations_url=$GITHUB_AVAIL.Substring(0,8)"  # DEBUGGING
+           echo "******** authorizations_url=$GITHUB_AVAIL.Substring(0,8)"  # DEBUGGING
 }
 
-    echo "******** Checking GITHUB repo exists (_AVAIL) from prior run: "
+            echo "******** Checking GITHUB repo exists (_AVAIL) from prior run: "
    $response = Invoke-WebMethod -Method Put `
     -Headers $Headers `
     -ContentType 'application/json' `
     -Uri https://api.github.com/repos/${GITHUB_USER}/${REPONAME}
     $GITHUB_AVAIL = $response.Stuffs | where { $_.Name -eq "full_name" }
-   echo "******** authorizations_url=$GITHUB_AVAIL"  # DEBUGGING
+           echo "******** authorizations_url=$GITHUB_AVAIL"  # DEBUGGING
 
 
 # 15:49 into https://channel9.msdn.com/Blogs/trevor-powershell/Automating-the-GitHub-REST-API-Using-PowerShell
