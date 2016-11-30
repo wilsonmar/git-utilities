@@ -75,6 +75,14 @@ git config $GIT_GLOBAL diff.mnemonicprefix true
 git config $GIT_GLOBAL rerere.enabled false
     # See https://chuva-inc.com/blog/fast-tip-enable-git-rerere-right-now
 
+# Disable “how to stage/unstage/add” hints given by git status:
+git config $GIT_GLOBAL advice.statusHints false
+
+# Allow git diff to do basic rename and copy detection:
+git config $GIT_GLOBAL diff.renames copies
+
+#Always show a diffstat at the end of a merge:
+git config $GIT_GLOBAL merge.stat true
 
 # git config $GIT_GLOBAL --list   # Dump config $GIT_GLOBAL file
 
