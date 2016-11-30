@@ -33,49 +33,13 @@
   NOW=$(date +%Y-%m-%d:%H:%M:%S%z)
            # 2016-09-16T05:26-06:00 vs UTC
 
+    # Make the beginning of run easy to find:
+        echo "**********************************************************"
         echo "******** $NOW Versions :"
 # After "brew install git" on Mac:
 git --version
 
-  REPONAME='git-sample-repo'
-  GITHUB_USER="wilsonmar"
-  DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
-
-        echo "******** GITHUB_USER=$GITHUB_USER "
-
-
-    # Make the beginning of run easy to find:
-        echo "**********************************************************"
-        echo "******** STEP Delete \"$REPONAME\" remnant from previous run:"
-#   set -x  # xtrace command         echo on (with ++ prefix). http://www.faqs.org/docs/abs/HTML/options.html
-  rm -rf ${REPONAME}
-
-mkdir ${REPONAME}
-cd ${REPONAME}
-
-  CURRENTDIR=${PWD##*/}
-
-        echo "CURRENTDIR=$CURRENTDIR"
-
-        echo "******** STEP Init repo :"
-# init without --bare so we get a working directory:
-git init
-# return the .git path of the current project::
-git rev-parse --git-dir
-ls .git/
-
-
-        echo "******** STEP Make develop the default branch instead of master :"
-# The contents of HEAD is stored in this file:
-cat .git/HEAD
-
-# Change from default "ref: refs/heads/master" :
-    # See http://www.kernel.org/pub/software/scm/git/docs/git-symbolic-ref.html
-DEFAULT_BRANCH="develop"
-git symbolic-ref HEAD refs/heads/$DEFAULT_BRANCH
-cat .git/HEAD
-git branch -avv
-#         echo $DEFAULT_BRANCH
+# exit #1
 
         echo "******** STEP .secret Attribution & Config (not --global):"
 # Invoke file defined manually containing definition of GITHUB_PASSWORD:
@@ -94,6 +58,69 @@ git config user.user  $GITHUB_USER # "wilsonmar" # Username (not email) in GitHu
 git config --global user.signingkey $GITHUB_SIGNING_KEY
 # gpg --list-keys
 
+
+
+  REPONAME='git-sample-repo'
+  GITHUB_USER="wilsonmar"
+  DESCRIPTION="Automated Git repo from run using $REPONAME in https://github.com/wilsonmar/git-utilities."
+
+        echo "******** GITHUB_USER=$GITHUB_USER "
+
+# exit #2
+
+        echo "******** STEP Delete \"$REPONAME\" remnant from previous run:"
+#   set -x  # xtrace command         echo on (with ++ prefix). http://www.faqs.org/docs/abs/HTML/options.html
+    # Remove folder if exists (no symbolic links are used here):
+if [ -d ${REPONAME} ]; then
+   rm -rf ${REPONAME}
+fi
+
+# Remove folder because files are built (not cloned in):
+mkdir ${REPONAME}
+cd ${REPONAME}
+
+  CURRENTDIR=${PWD##*/}
+
+        echo "CURRENTDIR=$CURRENTDIR"
+
+# exit #3
+
+
+        echo "******** Ensure \"$REPONAME\" folder is in .gitignore file:"
+   # -F for fixed-strings, -x to match whole line, -q for quiet (not show text sought)
+if grep -Fxq "${REPONAME}" .gitignore ; then
+   echo "FOUND within .gitignore file."
+else
+   echo ${REPONAME}>>.gitignore
+    #  sed 's/fields/fields\nNew Inserted Line/' .gitignore
+   echo "Added to bottom of .gitignore file."
+fi
+
+# exit #4
+
+
+        echo "******** STEP Init repo :"
+# init without --bare so we get a working directory:
+git init
+# return the .git path of the current project::
+git rev-parse --git-dir
+ls .git/
+
+        echo "******** STEP Make develop the default branch instead of master :"
+# The contents of HEAD is stored in this file:
+cat .git/HEAD
+
+# Change from default "ref: refs/heads/master" :
+    # See http://www.kernel.org/pub/software/scm/git/docs/git-symbolic-ref.html
+DEFAULT_BRANCH="develop"
+git symbolic-ref HEAD refs/heads/$DEFAULT_BRANCH
+cat .git/HEAD
+git branch -avv
+#         echo $DEFAULT_BRANCH
+
+# exit #5
+
+         echo "******** Configure git aliases : "
 
 # Verify settings:
 git config core.filemode false
@@ -126,11 +153,23 @@ git config rerere.enabled false
 
 # git config --list   # Dump config file
 
+         echo "******** git count-objects -v : baseline "
+# Get the size of what was transmitted on the current repo folder:
+git count-objects -v
+
+         echo "******** git remote show origin : "
+git remote show origin
+
+# exit #6
+
+
         echo "******** STEP commit (initial) README :"
         echo -e "Hello" >>README.md
 git add .
 git commit -m "README.md"
 git l -1
+
+ exit #11
 
         echo "******** STEP amend commit README : "
 # ammend last commit with all uncommitted and un-staged changes:
@@ -169,7 +208,7 @@ ls -al
 git tag "v1"  # lightweight tag
 git l
 
-exit
+ exit #15
 
 
         echo "******** STEP checkout HEAD to create feature1 branch : --------------------------"
@@ -240,6 +279,8 @@ git verify-tag v0.0.1
 #         echo "******** STEP tag show :"
 # git show v1  # Press q to exit scroll.
 
+ exit #21
+
 
         echo "Copy this and paste to a text edit for reference: --------------"
 git l
@@ -284,7 +325,7 @@ git w HEAD~2^2
 git w HEAD~2^3
 ls -al
 
-# exit
+  exit #31
 
         echo "******** Reflog: ---------------------------------------"
 git reflog
@@ -336,7 +377,7 @@ ls -al
    # TODO: Windows version.
    #         echo "RSA_PUBLIC_KEY=$RSA_PUBLIC_KEY"
 
-exit
+  exit #41
 
 # The following use jq installed locally.
 
@@ -405,7 +446,8 @@ read "WAITING FOR RESPONSE: Press Enter/Return to continue:"
         echo "********** Doing git fetch a conflict : "
 git fetch
 git merge origin/develop
-exit
+
+exit #51
 
 # git stash save "text message here"
 

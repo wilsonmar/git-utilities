@@ -1,5 +1,15 @@
-Function Touch-File
-{
+# wm-ps-utils.psm1 in https://github.com/wilsonmar/git-utilities
+# .psm1 = PowerShell module
+# .ps1 files using this needs to have this at the top of the file:
+#      Import-Module wm-ps-utils.psm1
+# See https://msdn.microsoft.com/en-us/library/dd878284(v=vs.85).aspx
+
+<# 
+ .Synopsis
+  Provides utilities for use with PowerShell.
+#>
+
+Function Touch-File {
     $file = $args[0]
     if($file -eq $null) {
         throw "No filename supplied"
@@ -30,3 +40,5 @@ Function Color-All-Black {
 #     }
   }
 }
+
+export-modulemember -function Touch-File 

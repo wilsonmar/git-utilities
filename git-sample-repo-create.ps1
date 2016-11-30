@@ -15,8 +15,8 @@
 # begin by deleting what was created: the local repo and repo in GitHub.
 
 # Sample call in Win10 running within MacOS:
-# chmod +x git-sample-repo-create.sh
-# ./git-sample-repo-create.sh
+# Set-ExecutionPolicy Unrestricted
+# ./git-sample-repo-create.ps1
 
 # Last tested on MacOS 10.11 (El Capitan) 2015-09-15
 # http://skimfeed.com/blog/windows-command-prompt-ls-equivalent-dir/
@@ -29,8 +29,9 @@
         echo ""
    # Make the beginning of run easy to find:
         echo "**********************************************************"
+$NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
 
-        echo "******** Version :"
+        echo "******** NOW=$NOW :"
     $psversiontable
            echo "IsWindows=$IsWindows"
            echo "IsOSX=$IsOSX"
@@ -38,6 +39,8 @@
     #if [ "$IsWindows" ]; then
     #fi
 git --version
+
+ exit #1
 
     # Make the beginning of run easy to find: TODO: Parameterize:
     $REPONAME='git-sample-repo'
