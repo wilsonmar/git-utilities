@@ -218,7 +218,11 @@ git branch -avv
 git l
          echo "******** tree of folders in working area:"
     #tree
-    ls -al
+    ls
+    $invocation = (Get-Variable MyInvocation).Value
+    $directorypath = Split-Path $invocation.MyCommand.Path
+    Get-ChildItem $directorypath -Force -Recurse –File
+exit
          echo "******** git reflog (showing only what occurred locally):"
 git reflog
 
