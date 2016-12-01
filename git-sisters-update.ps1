@@ -183,7 +183,7 @@ if (Test-Path ".gitignore"){
         # Alternately, use . to run scripts in child scope that will be thrown away: 
         # . "../git_client-config.ps1 global" #
 
-  exit #5
+#  exit #5
 
 cd ${REPONAME}
 $CurrentDir = $(get-location).Path;
@@ -253,16 +253,17 @@ git l -10
         echo "******** git checkout master branch:"
 git checkout master
 
-    # Default is local:
-    if( $args[0] -eq "" ) {
+    # PS TRICK: Check for no arguments specified with invocation command:
+    if( $($args.Count) -eq 0 ) {
        $CURRENT_BRANCH="feature1"
     }else{
        $CURRENT_BRANCH=$args[0]
     } 
-        echo "******** git checkout new branch $CURRENT_BRANCH from master branch :"
+        echo "******** git checkout new branch ""$CURRENT_BRANCH"" from master branch :"
 git checkout -b $CURRENT_BRANCH 
     git branch -avv
-        echo "******** git reflog at $CURRENT_BRANCH :"
+        # PS TRICK: Double-quotes to display words in quotes: 
+        echo "******** git reflog at ""$CURRENT_BRANCH"" :"
     git reflog
 
     $CURRENT_YEAR = "1979"
