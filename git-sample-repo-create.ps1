@@ -36,8 +36,6 @@ $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
            echo "IsWindows=$IsWindows"
            echo "IsOSX=$IsOSX"
            echo "IsLinux=$IsLinux"
-    #if [ "$IsWindows" ]; then
-    #fi
 git --version
 
  exit #1
@@ -46,7 +44,7 @@ git --version
     $REPONAME='git-sample-repo'
 
         echo "******** STEP Delete $REPONAME remnant from previous run:"
-$FileExists = Test-Path $REPONAME
+    $FileExists = Test-Path $REPONAME
 if ($FileExists -eq $True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
    Remove-Item -path ${REPONAME} -Recurse -Force # instead of rm -rf ${REPONAME}

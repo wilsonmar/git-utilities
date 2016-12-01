@@ -2,14 +2,21 @@
 # for running under PowerShell on Mac or Windows
 # See https://www.develves.net/blogs/asd/articles/using-git-with-powershell-on-windows-10/
 
+# Default is local:
+if( $args[0] -eq "global" ) {
+   $GIT_GLOBAL = "--global"
+}else{
+   $GIT_GLOBAL = "" # local 
+} 
+
         echo "******** Running script file git_client-config.ps1"
 # Change string from "" to "--global" 
-$GIT_GLOBAL = "" # "--global" 
 if( $GIT_GLOBAL -eq "--global" ) {
-        echo "******** Updating $GIT_GLOBAL repo using git config commands"
+        echo "******** Creating $GIT_GLOBAL repo in $HOME home dir using git config commands"
 }else{
-        echo "******** Updating local ../.git/config file using git config commands"
+        echo "******** Creating local ../.git/config file using git config commands"
 }
+
 
 # TODO: Create separate shell file to define git aliases for repo.
 # Verify settings:

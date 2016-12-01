@@ -1,7 +1,7 @@
 # git-sisters-update.ps1 from within http://github.com/wilsonmar/git-utilities.
 # by Wilson Mar (wilsonmar@gmail.com, @wilsonmar)
 
-# This script was created for experiementing and learning Git.
+# This script was created for experiementing and learning Git with GitHub.
 # Git commands in this script are meant as examples for manual entry
 # explained during my live "Git and GitHub" tutorials and
 # explained at https://wilsonmar.github.io/git-commands-and-statuses/).
@@ -21,6 +21,8 @@
 # Sample call in MacOS running PowerShell for Mac: 
 #     chmod +x git-sisters-update.ps1
 #     ./git-sisters-update.ps1
+# results in "Add " as branch name. Alternately, run script with your own branch:
+#     ./git-sisters-update.ps1 "Add year 1979"
 
 # Last tested on MacOS 10.12 (Sierra) 2015-11-29
 # http://skimfeed.com/blog/windows-command-prompt-ls-equivalent-dir/
@@ -171,10 +173,17 @@ if (Test-Path ".gitignore"){
 #  exit #4
 
 
-# Run another script file to define git configuration at the repo level:
-Invoke-Expression "./git_client-config.ps1"
+        echo "******** Run PowerShell file for Git configurations at the repo level:"
+        $ScriptPath = Split-Path $MyInvocation.InvocationName
+        Write-Host "Path:" $MyInvocation.MyCommand.Path
+        # NOTE: PowerShell accepts both forward and backward slashes:
+        & ((Split-Path $MyInvocation.InvocationName) + '/git_client-config.ps1') 
+        # Alternately, use & to run scripts in same scope: 
+        # & "../git_client-config.ps1 global" #
+        # Alternately, use . to run scripts in child scope that will be thrown away: 
+        # . "../git_client-config.ps1 global" #
 
-#  exit #5
+  exit #5
 
 cd ${REPONAME}
 $CurrentDir = $(get-location).Path;
@@ -244,7 +253,12 @@ git l -10
         echo "******** git checkout master branch:"
 git checkout master
 
-    $CURRENT_BRANCH="feature1"
+    # Default is local:
+    if( $args[0] -eq "" ) {
+       $CURRENT_BRANCH="feature1"
+    }else{
+       $CURRENT_BRANCH=$args[0]
+    } 
         echo "******** git checkout new branch $CURRENT_BRANCH from master branch :"
 git checkout -b $CURRENT_BRANCH 
     git branch -avv
@@ -265,7 +279,7 @@ sisters_new_meta_file  Mimi     true   "boots"
         echo "******** git status : before git add :"
     git status
         echo "******** git add :"
-git add photo-info.md  bebe.md  heather.md  laurie.md  mimi.md
+git add .  # photo-info.md  bebe.md  heather.md  laurie.md  mimi.md
         echo "******** git status : after git add "
     git status
         echo "******** git commit of $CURRENT_YEAR (new commit SHA) :"
