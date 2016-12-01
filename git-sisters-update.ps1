@@ -217,11 +217,12 @@ git branch -avv
          # add -10 to list 10 lines using l for log alias:
 git l
          echo "******** tree of folders in working area:"
-    #tree
-    ls
-    $invocation = (Get-Variable MyInvocation).Value
-    $directorypath = Split-Path $invocation.MyCommand.Path
-    Get-ChildItem $directorypath -Force -Recurse –File
+    # PS TRICK: Different commands to list folders with properties:
+    if( "$IsWindows" -eq $True ) {
+        dir /X
+    }else{ # Mac / Linux:
+        ls -al
+    }            #tree
 exit
          echo "******** git reflog (showing only what occurred locally):"
 git reflog
