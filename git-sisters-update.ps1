@@ -219,11 +219,11 @@ git l
          echo "******** tree of folders in working area:"
     # PS TRICK: Different commands to list folders with properties:
     if( "$IsWindows" -eq $True ) {
-        dir /X
+        dir
     }else{ # Mac / Linux:
-        ls -al
-    }            #tree
-exit
+        ls # -al
+    }            
+    #tree
          echo "******** git reflog (showing only what occurred locally):"
 git reflog
 
