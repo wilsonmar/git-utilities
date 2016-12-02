@@ -173,6 +173,18 @@ if (Test-Path ".gitignore"){
 #  exit #4
 
 
+cd ${REPONAME}
+$CurrentDir = $(get-location).Path;
+# This outputs the parent folder, not the current folder:
+#$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
+#$CURRENTDIR = $PSScriptRoot    # PowerShell specific
+#        echo "CURRENTDIR=$CURRENTDIR"
+        echo "******** Now in $REPONAME folder! - cd .. before re-run!"
+        echo $CURRENTDIR
+
+# exit #5
+
+
         echo "******** Run PowerShell file for Git configurations at the repo level:"
         $ScriptPath = Split-Path $MyInvocation.InvocationName
         Write-Host "Path:" $MyInvocation.MyCommand.Path
@@ -183,19 +195,7 @@ if (Test-Path ".gitignore"){
         # Alternately, use . to run scripts in child scope that will be thrown away: 
         # . "../git_client-config.ps1 global" #
 
-#  exit #5
-
-cd ${REPONAME}
-$CurrentDir = $(get-location).Path;
-# This outputs the parent folder, not the current folder:
-#$CURRENTDIR = (Get-Item -Path ".\" -Verbose).FullName   # Get-Location cmdlet
-#$CURRENTDIR = $PSScriptRoot    # PowerShell specific
-#        echo "CURRENTDIR=$CURRENTDIR"
-        echo "******** Now in $REPONAME folder! - cd .. before re-run!"
-        echo $CURRENTDIR
-
-# exit #6
-
+#  exit #6
 
          echo "******** git remote add upstream $UPSTREAM :"
 git remote add upstream ${UPSTREAM} 
