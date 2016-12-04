@@ -110,8 +110,18 @@ function sisters_replace_meta_file
     cat $FILE_CONTEXT
 }
 
+function ls-al {
+}
+
+function du-hs {
+    # Size of bytes in folder: instead of Linux command): du -hs ${REPONAME}
+    # (7 files in 1475 bytes) https://blogs.technet.microsoft.com/heyscriptingguy/2012/05/25/getting-directory-sizes-in-powershell/
+    Get-ChildItem $REPONAME | Measure-Object -Sum Length | Select-Object Count, Sum
+}
+##############################
 
 # Create blank lines in the log to differentiate different runs:
+        clear
         echo ""
         echo ""
         echo ""
@@ -120,13 +130,11 @@ function sisters_replace_meta_file
    # Make the beginning of run easy to find:
         echo "**********************************************************"
 $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
-        echo "******** NOW=$NOW :"
-    $psversiontable
-           echo "IsWindows=$IsWindows"
-           echo "IsOSX=$IsOSX"
-           echo "IsLinux=$IsLinux"
+        echo "******** NOW=$NOW $PSUICULTURE PID=$PID :"
+    $PSHOME #$psversiontable
+        echo "IsWindows=$IsWindows IsOSX=$IsOSX IsLinux=$IsLinux"
     #[System.Environment]::OSVersion.Version
-
+    $PSSCRIPTROOT
 git --version
 
 # exit #1
@@ -152,9 +160,10 @@ if ($FileExists -eq $True ){
          # Notice the string concatenation format:
 git clone "$($GITHUB_REPO).git" # $REPONAME # --depth=1
 
-    # Size of bytes in folder: instead of Linux command): du -hs ${REPONAME}
-    # (7 files in 1475 bytes) https://blogs.technet.microsoft.com/heyscriptingguy/2012/05/25/getting-directory-sizes-in-powershell/
-    Get-ChildItem $REPONAME | Measure-Object -Sum Length | Select-Object Count, Sum
+        echo "******** git tag ""cloned"" # lightweight tag for private temp use :"  
+git tag -l "cloned"
+        echo "******** git log :"  
+git l -3
 
 #  exit #3
 
@@ -186,22 +195,26 @@ $CurrentDir = $(get-location).Path;
 
 
         echo "******** Run PowerShell file for Git configurations at the repo level:"
-        $ScriptPath = Split-Path $MyInvocation.InvocationName
-        Write-Host "Path:" $MyInvocation.MyCommand.Path
+        # PS TRICK: Get parent folder path using the $MyInvocation built-in PS variable:
+        # See http://stackoverflow.com/questions/7377981/how-do-i-call-another-powershell-script-with-a-relative-path
+        $ScriptPath = Split-Path -Parent $MyInvocation.InvocationName 
+        $UtilPath  = Join-Path -Path $ScriptPath -ChildPath ..\
+        #Write-Host "Path:" $UtilPath 
         # NOTE: PowerShell accepts both forward and backward slashes:
-        & ((Split-Path $MyInvocation.InvocationName) + '/git_client-config.ps1') 
+    & "$UtilPath/git-client-config.ps1"
         # Alternately, use & to run scripts in same scope: 
         # & "../git_client-config.ps1 global" #
         # Alternately, use . to run scripts in child scope that will be thrown away: 
         # . "../git_client-config.ps1 global" #
-
+        #echo "******** Present Working Directory :"
+    #pwd
 #  exit #6
 
-         echo "******** git remote add upstream $UPSTREAM :"
+         Write-Host "******** git remote add upstream $UPSTREAM :"
 git remote add upstream ${UPSTREAM} 
-         echo "******** git remote -v :"
+         Write-Host "******** git remote -v :"
 git remote -v
-         echo "******** git remote show origin :"
+         Write-Host "******** git remote show origin :"
 git remote show origin
 
          echo "******** cat .git/HEAD to show internal current branch:"
@@ -275,16 +288,32 @@ git checkout -b $CURRENT_BRANCH
         echo "******** Make changes to $CURRENT_YEAR files and stage it at $CURRENT_COMMIT :"
 sisters_new_photo-info  $CURRENT_YEAR  "Hartford, Connecticut"
     # Notice the person name is upper/lower case:
-sisters_new_meta_file  BeBe     false  "Whatever that is"
-sisters_new_meta_file  Heather  false  "boots"
-sisters_new_meta_file  Laurie   false  "boots"
-sisters_new_meta_file  Mimi     true   "boots"
+sisters_new_meta_file  BeBe     false  "White buttoned shirt"
+sisters_new_meta_file  Heather  true   "Plaid shirt"
+sisters_new_meta_file  Laurie   false  "Cable-knit sweater"
+sisters_new_meta_file  Mimi     false  "French sailor shirt"
 
-#  exit #10
 
+        echo "******** git stash :"
+git stash
+        # Response:
+        # Saved working directory and index state WIP on feature1: ea2db2c Snapshot for 1978
+        # HEAD is now at ea2db2c Snapshot for 1978
+        echo "******** git stash list :"
+git stash list
+        # Response: stash@{0}: WIP on feature1: ea2db2c Snapshot for 1978
+
+        echo "******** git status (after git stash) :"
+    git status
+
+        echo "******** git stash pop :"
+git stash pop
         echo "******** git status : before git add :"
     git status
-        echo "******** git add :"
+    
+  exit #10
+
+        echo "******** git add . :"
 git add .  # photo-info.md  bebe.md  heather.md  laurie.md  mimi.md
         echo "******** git status : after git add "
     git status
@@ -292,9 +321,14 @@ git add .  # photo-info.md  bebe.md  heather.md  laurie.md  mimi.md
 git commit -m"Snapshot for $CURRENT_YEAR"
         echo "******** git status : after git add "
     git status
-        echo "******** Note nothing listed after git commit."
+        echo "******** git reflog at ""$CURRENT_BRANCH"" :"
+    git reflog
         echo "******** git l = git log of commits in repo:"
     git l
+
+ exit #11 --- major checkpoint here.
+
+
 
  exit #11
 
@@ -339,5 +373,5 @@ git reset --hard $CURRENT_COMMIT
 
    exit #15
 
-        echo "******** $NOW end."
+        echo "******** $NOW ends."
 
