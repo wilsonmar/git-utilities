@@ -22,7 +22,8 @@ if( $GIT_GLOBAL -eq "--global" ) {
 # Verify settings:
     git config $GIT_GLOBAL core.filemode false
 
-# Using variables built into PowerShell:
+# Using variables built into PowerShell: See https://help.github.com/articles/dealing-with-line-endings/
+# See https://www.jetbrains.com/help/idea/2016.2/handling-lf-and-crlf-line-endings.html
 if( $IsWindows -eq $True ) {
         echo "******** Configuring git core.autocrlf for Windows!"
     git config $GIT_GLOBAL core.autocrlf true
@@ -51,6 +52,7 @@ if ( $IsOSX  -eq $True){
 
 # Allow all Git commands to use colored output, if possible:
 git config $GIT_GLOBAL color.ui auto
+git config $GIT_GLOBAL color.status always
 #color.branch.current=green bold
 #color.branch.remote=red bold
 #color.status.add=green bold

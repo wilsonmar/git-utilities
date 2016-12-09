@@ -18,3 +18,9 @@ Set-Alias exist Test-Path -Option "Constant, AllScope"
 #    and
 #    if (not-exist $path)) { ... }
 #    if (!exist $path)) { ... }
+
+function Get-MacOsXsysteminformation {
+    [xml]$infos = system_profiler -xml
+
+    return $infos
+}
