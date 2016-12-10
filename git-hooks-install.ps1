@@ -24,7 +24,7 @@ Foreach-Object {
        # attrib to set file permissions
        # icacls to set ownership in Access Control Lists
     }
-    if ( $IsOSX  -eq $True){
+    if ( $IsOSX -eq $True){
        chmod +x $SUBDIR$content
     }
 }
