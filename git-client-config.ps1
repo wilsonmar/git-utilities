@@ -17,9 +17,7 @@ if( $GIT_GLOBAL -eq "--global" ) {
         echo "******** Creating local ../.git/config file using git config commands"
 }
 
-
-# TODO: Create separate shell file to define git aliases for repo.
-# Verify settings:
+    # Verify settings:
     git config $GIT_GLOBAL core.filemode false
 
 # Using variables built into PowerShell: See https://help.github.com/articles/dealing-with-line-endings/
@@ -48,6 +46,9 @@ if ( $IsOSX  -eq $True){
 if ( $IsOSX  -eq $True){
     git config $GIT_GLOBAL core.editor "~/Sublime\ Text\ 3/sublime_text -w"
     #git config $GIT_GLOBAL core.editor=subl -w
+
+    # On Unix systems, ignore ^M symbols created by Windows:
+    git config core.whitespace cr-at-eol
 }
 
 # Allow all Git commands to use colored output, if possible:
