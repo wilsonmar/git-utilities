@@ -28,6 +28,6 @@ chmod +x .git/hooks/git-push
 cp hooks/git-rebase  .git/hooks
 chmod +x .git/hooks/git-rebase
 
-ls .git/hooks   
+ls .git/hooks
 
 fancy_echo "Done with status $? (0=OK)."
