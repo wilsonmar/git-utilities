@@ -13,6 +13,11 @@ Such scripts are being phased out in favor of a PowerShell script for use by all
 Learners make use of two sets of scripts that issue <strong>git commands</strong>
 so you can experiment to see what happens when you make a change to commands.
 
+<hr />
+
+<strong>git-hooks-install.ps1</strong> should be run after cloning locally
+to install scripts that Git invokes automatically based on events.
+
 <strong>git-sisters-update.ps1</strong> is a PowerShell script that
 clones a sample sample repository you forked on GitHub.
 It calls a script that sets git configurations for a project (or globally)<br />
