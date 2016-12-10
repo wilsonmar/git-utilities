@@ -17,6 +17,7 @@ so you can experiment to see what happens when you make a change to commands.
 
 <strong>git-hooks-install.ps1</strong> should be run after cloning locally
 to install scripts that Git invokes automatically based on events.
+A git clone is necessary to re-build the database.
 
 <strong>git-sisters-update.ps1</strong> is a PowerShell script that
 clones a sample sample repository you forked on GitHub.
