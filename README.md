@@ -1,4 +1,4 @@
-# README.md
+# git-utilities
 
 This GitHub repository contains files referenced by Wilson Mar's
 Git and GitHub course.
