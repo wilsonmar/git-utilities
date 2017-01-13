@@ -1,7 +1,7 @@
-# README.md
-
-This GitHub repository contains files referenced by Wilson Mar's
+This GitHub repository contains files used by and explained in Wilson Mar's
 Git and GitHub course.
+
+There are two editions of scripts in this repo.
 
 File names ending in <strong>.ps1</strong> are PowerShell scripts that run on Windows,
 but now also Mac and Linux machines after installing Microsoft's PowerShell.

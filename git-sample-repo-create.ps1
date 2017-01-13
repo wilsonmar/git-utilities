@@ -18,7 +18,7 @@
 # Set-ExecutionPolicy Unrestricted
 # ./git-sample-repo-create.ps1
 
-# Last tested on MacOS 10.11 (El Capitan) 2015-09-15
+# Last tested on MacOS 10.12 (Sierra) 2017-01-12
 # http://skimfeed.com/blog/windows-command-prompt-ls-equivalent-dir/
 
 #################################
@@ -75,7 +75,7 @@ git init  # init without --bare so we get a working directory:
     del .git/hooks/*.sample
         # No files yet for Get-ChildItem -Recurse | ?{ $_.PSIsContainer }
         echo "******** tree .git  (blank repo)"
-   tree .git
+    tree .git
 
 #  exit #4 the file structure of an empty repo.
 
@@ -132,7 +132,7 @@ git config user.signingkey 2E23C648  # not --global
 
         echo "******** STEP commit (initial) README :"
         echo "hello" > README.md  # no touch command on Windows.
-git add .
+git add . -A
 git commit -m "README.md"
      # In "create mode 100644", first three is about the file type 
      # "644" (last three numbers) is the file permissions 
