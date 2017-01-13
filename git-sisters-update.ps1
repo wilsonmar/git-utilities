@@ -137,7 +137,7 @@ $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
         echo "******** PSSCRIPTROOT= $PSSCRIPTROOT"
     git --version
 
-# exit #1
+ # exit #1
 
   $REPONAME='sisters'
   $UPSTREAM="https://github.com/hotwilson/sisters" # a repo prepared for the class.
@@ -147,7 +147,7 @@ $NOW = Get-Date -Format "yyyy-MM-ddTHH:mmzzz"
 $FileExists = Test-Path $REPONAME
 if ($FileExists -eq $True ){
    # See https://technet.microsoft.com/en-ca/library/hh849765.aspx?f=255&MSPPError=-2147217396
-   Remove-Item -path ${REPONAME} -Recurse -Force # instead of rm -rf ${REPONAME}
+   Remove-Item -path ${REPONAME} -Recurse -Force  # instead of rm -rf ${REPONAME}
 }
 
 #  exit #2
