@@ -1,0 +1,6 @@
+#!/bin/sh
+# git-echo
+# From repo https://github.com/wilsonmar/git-utilities
+# A test program for git custom commands
+# Usage: git echo hello
+echo $1
