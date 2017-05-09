@@ -1,4 +1,8 @@
-Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  Bewm.  
+You can't always git what you want
+You can't always git what you want
+But if you try sometimes
+You just might find
+You git what you need
 
 This GitHub repository contains files used by and explained in Wilson Mar's
 Git and GitHub course.
