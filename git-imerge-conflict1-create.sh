@@ -68,14 +68,16 @@ git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=relative;
 git checkout master
 cat somefile.md
 git branch -avv
-#ls -al
+
+read -p "Press enter to continue"
+
 # You should now have:
 #    0 - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9 - 10 - 11 '  ← master
 #     \                                               
 #      A -- B -- C --- D --- E --- F --- G --- H --- I  ← branch
-git checkout feature1
-git-imerge start --name=NAME --goal=full master
-git imerge diagram --name=NAME
+git checkout master
+git-imerge start --name=NAME --goal=full feature1
+#git imerge diagram --name=NAME
 # sed -i "" "s/B2 feature1/B2 master/g" somefile.md
 #awk '{gsub(/pattern/,"replacement")}' file
 # TODO: Remove <<<<<<< HEAD, =======, line, and >>>>>>> 865fba2c721d68aca6486499f5e9cb33f95f5311
@@ -93,5 +95,5 @@ git imerge diagram --name=NAME
 # git commit -m"Fix I9"
 # git imerge continue
 
-# git imerge finish
+# git imerge finish --goal=merge
 # git imerge diagram --name=NAME
