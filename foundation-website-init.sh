@@ -56,27 +56,20 @@ npm install
 
 # exit #6
 
+ 		# Add custom template:
+# exit #7
+
 		# Start web server:
 npm start &
 
-# exit #7
-
- 		# Add template:
 
 # exit #8
 
-npm run build
+ 		# Build for production:
+#npm run build
 # exit #9
 
 open http://localhost:8000
-
- exit #10
-
-
-
-# git add . && git commit -m”update” && git push
-
-# git init && git add . && git commit -m”Initial”
 
 # exit #10
 
