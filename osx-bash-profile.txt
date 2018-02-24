@@ -1,0 +1,19 @@
+# osx-bash-profile.txt by Wilson Mar
+# Use a text editor to create ~/.bash_profile 
+# then copy and paste below:
+
+alias dir='ls -alr'
+alias ll='ls -lri'
+
+alias sbp='source ~/.bash_profile'
+alias rs='exec -l $SHELL'
+
+alias gwm='cd ~/gits/wilsonmar/wilsonmar.github.io;git status'
+alias gf='cd ~/gits/wilsonmar/futures;git status'
+
+alias gs='git status'
+alias gb='git branch -avv'
+alias gl='clear;git status;git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=relative;git log --show-signature -n 1'
+alias gbs='git status;git add . -A;git commit -m"Update";git push'
+function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
+alias bs='bundle exec jekyll serve --config _config.yml,_config_dev.yml'
