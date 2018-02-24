@@ -8,6 +8,7 @@ alias ll='ls -lri'
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
+# Edit this with your own account and repo (instead of wilsonmar):
 alias gwm='cd ~/gits/wilsonmar/wilsonmar.github.io;git status'
 alias gf='cd ~/gits/wilsonmar/futures;git status'
 
