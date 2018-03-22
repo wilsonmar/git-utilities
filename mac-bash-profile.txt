@@ -10,6 +10,7 @@ alias ll='ls -lri'
 
 alias gs='git status'
 alias gb='git branch -avv'
+alias get='git pull'
 alias gf='git fetch;git diff master..origin/master'
 alias gmo='git merge origin/master'
 alias gl='clear;git status;git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=relative;git log --show-signature -n 1'
