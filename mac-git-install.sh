@@ -47,11 +47,12 @@ if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
     brew install git
 else
-    fancy_echo "Git already installed, upgrading ..."
-    # To avoid response "Error: git not installed" to brew upgrade git
-    brew uninstall git
+     fancy_echo "Git already installed:"
+#    fancy_echo "Git already installed, upgrading ..."
+#    # To avoid response "Error: git not installed" to brew upgrade git
+#    brew uninstall git
     # NOTE: This does not remove .gitconfig file.
-    brew install git
+#    brew install git
 fi
 git --version
     # git version 2.14.3 (Apple Git-98)
@@ -83,12 +84,14 @@ fi
 # line=$(read -r FIRSTLINE < ~/.git-completion.bash )
 
 
-######### Read .secrets file:
-source .secrets.sh
-# $GIT_NAME = 
-# $GIT_ID = 
-# $GIT_EMAIL=
-# $GITHUB_PASSWORD=
+######### Read and use .secrets.sh file:
+echo "Readig .secrets.sh file:"
+#chmod +x ./.secrets.sh
+. .secrets.sh  # >/dev/null
+echo "GIT_NAME=$GIT_NAME"
+echo "GIT_ID=$GIT_ID"
+echo "GIT_EMAIL=$GIT_EMAIL"
+# DO NOT echo $GITHUB_PASSWORD
 
 GITCONFIG=~/.gitconfig
 if [ ! -f "$GITCONFIG" ]; then 
