@@ -8,3 +8,4 @@ GIT_NAME="Wilson Mar"
 GIT_ID="WilsonMar+GitHub@gmail.com"
 GIT_EMAIL="WilsonMar+GitHub@gmail.com"
 GITHUB_PASSWORD="change this to your GitHub account password"
+
