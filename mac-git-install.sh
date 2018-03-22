@@ -12,7 +12,7 @@ fancy_echo() {
 # TODO: For Mac only
 fancy_echo "This is for Mac only!"
 
-######### Git command completion in Terminal:
+######### Git command completion in ~/.bash_profile:
 # So you can type "git st" and press Tab to complete as "git status".
 # See video on this: https://www.youtube.com/watch?v=VI07ouVS5FE
 # If git-completion.bash file is already in home folder, download it:
@@ -36,16 +36,26 @@ fi
 # If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 INFILE=~/.bash_profile
 if grep -q "$FILEPATH" "$INFILE" ; then    
-   fancy_echo "$FILE already in $INFILE"
+   fancy_echo "$FILEPATH already in $INFILE"
 else
-   fancy_echo "Adding code for $FILE in $INFILE..."
+   fancy_echo "Adding code for $FILEPATH in $INFILE..."
    echo "# Added by mac-git-install.sh ::"
    echo "if [ -f $FILEPATH ]; then" >>$INFILE
    echo "   . $FILEPATH" >>$INFILE
    echo "fi" >>$INFILE
-   # Run .bash_profile to have changes take, run $FILEPATH:
-   source $INFILE
 fi 
+
+# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
+FILEPATH=mac-bash-profile.txt
+if grep -q "$FILEPATH" "$INFILE" ; then    
+   fancy_echo "$FILEPATH already in $INFILE"
+else
+   fancy_echo "Adding code for $FILE in $INFILE..."
+   cat $FILEPATH >>$INFILE
+fi 
+
+# Run .bash_profile to have changes take, run $FILEPATH:
+   source $INFILE
 
 
 ######### Git command coloring:
