@@ -3,7 +3,7 @@
 
 chmod 555 sonar-scanner
 ./sonar-scanner \
-  -Dsonar.projectKey=Angular-35.202.3.232 \
-  -Dsonar.sources=/Users/wilsonmar/gits/ng \
-  -Dsonar.host.url=http://35.202.3.232 \
-  -Dsonar.login=b0b030cd2d2cbcc664f7c708d3f136340fc4c064
+  -Dsonar.projectKey=sonarqube-1-vm \
+  -Dsonar.sources=/Users/wilsonmar/gits/ng/angular4-docker-example \
+  -Dsonar.host.url=http://23.236.48.147  \
+  -Dsonar.login=7a51cb71a48ea3d16f57fe66021867fc2a98771e
