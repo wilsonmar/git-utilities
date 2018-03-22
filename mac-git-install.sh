@@ -84,18 +84,20 @@ fi
 
 
 ######### Read .secrets file:
-source .secrets
+source .secrets.sh
 # $GIT_NAME = 
 # $GIT_ID = 
-# GIT_EMAIL=
+# $GIT_EMAIL=
+# $GITHUB_PASSWORD=
 
 GITCONFIG=~/.gitconfig
 if [ ! -f "$GITCONFIG" ]; then 
-   fancy_echo "Git is not configured with $GITCONFIG! Exiting..."
-   exit
+   fancy_echo "Git is not configured with $GITCONFIG!"
+else
+   fancy_echo "Git is configured with $GITCONFIG "
 fi
 
-# ~/.gitconfig file contains:
+# ~/.gitconfig file contain this examples:
 #[user]
 #	name = Wilson Mar
 #	id = WilsonMar+GitHub@gmail.com
@@ -103,16 +105,16 @@ fi
 #[color]
 #	ui = true
 
-
 if grep -q "[user]" "$GITCONFIG" ; then
-   fancy_echo "[user] already defined in ~/.gitconfig"
+   fancy_echo "[user] already defined in $GITCONFIG"
 else
    fancy_echo "Adding [user] info in in $GITCONFIG ..."
    git config --global user.name  $GIT_NAME
    git config --global user.email $GIT_ID
    git config --global user.email $GIT_EMAIL
 fi 
-
+cat $GITCONFIG
+exit
 
 ######### Git Signing:
 # NOTE: gpg is the command even though the package is gpg2:
@@ -171,6 +173,18 @@ exit
 # git config --global commit.gpgsign true
 # Configure Git client to sign commits by default for a local repository, run:
 # git config commit.gpgsign true. 
+
+
+######### Git command coloring:
+
+# If git config color.ui returns true, skip:
+git config color.ui | grep 'true' &> /dev/null
+if [ $? == 0 ]; then
+   fancy_echo "git config --global color.ui already true (on)."
+else # false or blank response:
+   fancy_echo "Setting git config --global color.ui true (on)..."
+   git config --global color.ui true
+fi
 
 
 ######### Bash.profile configuration:
