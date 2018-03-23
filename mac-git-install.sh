@@ -9,7 +9,6 @@ fancy_echo() {
   printf "\n>>> $fmt\n" "$@"
 }
 
-# TODO: For Mac only
 fancy_echo "This is for Mac only!"
 
 fancy_echo "Configure OSX Finder to show hidden files too:"
@@ -339,8 +338,8 @@ pbcopy < "$FILE.pub"
    fancy_echo "Now copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub/BitBucket..."
 
-## TODO: Read the .secrets file for GitHub account and password.
-## TODO: Add a token using GitHub API.
+## TODO: Add a token using GitHub API using vars from .secrets.sh 
+
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
