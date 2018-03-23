@@ -10,10 +10,14 @@ fancy_echo() {
 }
 
 fancy_echo "This is for Mac only!"
+# echo "**** Start elasped timer:"
+TIME_START="$(date -u +%s)"
 
 fancy_echo "Configure OSX Finder to show hidden files too:"
 defaults write com.apple.finder AppleShowAllFiles YES
-# NOTE: There are other dotfiles.
+# NOTE: Additional dotfiles for Mac
+# NOTE: osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
+#       installs other programs on Macs for developers.
 
 
 # Ensure Apple's command line tools (such as cc) are installed:
@@ -344,3 +348,6 @@ pbcopy < "$FILE.pub"
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
 
+TIME_END=$(date -u +%s);
+DIFF=$((TIME_END-TIME_START))
+fancy_echo "End of script after $((DIFF/60))m $((DIFF%60))s seconds elasped."
