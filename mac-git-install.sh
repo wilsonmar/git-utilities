@@ -9,9 +9,13 @@ fancy_echo() {
   printf "\n>>> $fmt\n" "$@"
 }
 
-fancy_echo "This is for Mac only!"
-# echo "**** Start elasped timer:"
 TIME_START="$(date -u +%s)"
+fancy_echo "This is for Mac only! Starting elasped timer ..."
+
+# Read first parameter from command line supplied at runtime to invoke:
+MY_RUNTYPE=$1
+#MY_RUNTYPE="ALL"
+fancy_echo "MY_RUNTYPE=$MY_RUNTYPE"
 
 fancy_echo "Configure OSX Finder to show hidden files too:"
 defaults write com.apple.finder AppleShowAllFiles YES
@@ -31,10 +35,50 @@ pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 #swift --version
 
 
+######### Bash.profile configuration:
+
+# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
+BASHFILE=~/.bash_profile
+
+# Check if file is present: ~/.bash_profile
+if [ ! -f "$BASHFILE" ]; then #  NOT found:
+   fancy_echo "Creating blank \"${BASHFILE}\" ..."
+   touch $BASHFILE
+   echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>$BASHFILE
+fi
+
+
+###### Locale settings missing in OS X Lion+:
+# See https://stackoverflow.com/questions/7165108/in-os-x-lion-lang-is-not-set-to-utf-8-how-to-fix-it
+# https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do
+# LC_ALL forces applications to use the default language for output, and forces sorting to be bytewise.
+if grep -q "LC_ALL" "$BASHFILE" ; then    
+   fancy_echo "LC_ALL Locale setting already in $BASHFILE"
+else
+   fancy_echo "Adding LC_ALL Locale in $BASHFILE..."
+   echo "# Added by mac-git-install.sh ::" >>$BASHFILE
+   echo "export LC_ALL=en_US.utf-8" >>$BASHFILE
+   #export LANG="en_US.UTF-8"
+   #export LC_CTYPE="en_US.UTF-8"
+   
+   # Run .bash_profile to have changes take, run $FILEPATH:
+   source $BASHFILE
+fi 
+#locale
+   # LANG="en_US.UTF-8"
+   # LC_COLLATE="en_US.UTF-8"
+   # LC_CTYPE="en_US.utf-8"
+   # LC_MESSAGES="en_US.UTF-8"
+   # LC_MONETARY="en_US.UTF-8"
+   # LC_NUMERIC="en_US.UTF-8"
+   # LC_TIME="en_US.UTF-8"
+   # LC_ALL=
+
 ###### Install homebrew using whatever Ruby is installed.
 
 # Ruby comes with MacOS:
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
+
 
 #brew tap caskroom/cask
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
@@ -44,6 +88,7 @@ if ! command -v brew >/dev/null; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
     fancy_echo "Brew already installed:"
+     # TODO: Upgrade if run-time attribute contains "upgrade":
 fi
 brew --version
    # Homebrew 1.5.12
@@ -54,12 +99,17 @@ if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
     brew install git
 else
-     fancy_echo "Git already installed:"
-#    fancy_echo "Git already installed, upgrading ..."
-#    # To avoid response "Error: git not installed" to brew upgrade git
-#    brew uninstall git
-    # NOTE: This does not remove .gitconfig file.
-#    brew install git
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       git --version
+       fancy_echo "Git already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew uninstall git
+       # NOTE: This does not remove .gitconfig file.
+       brew install git
+       # TODO: Configure more git settings using bash shell commands.
+    else
+       fancy_echo "Git already installed:"
+    fi
 fi
 git --version
     # git version 2.14.3 (Apple Git-98)
@@ -70,7 +120,17 @@ if ! command -v code >/dev/null; then
     fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
     brew install visual-studio-code
 else
-    fancy_echo "Visual Studio Code already installed:"
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       code --version
+       fancy_echo "VS Code already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew uninstall visual-studio-code
+       # NOTE: This does not remove .gitconfig file.
+       brew install visual-studio-code
+       # TODO: Configure visual-studio-code using bash shell commands.
+    else
+       fancy_echo "VS Code already installed:"
+    fi
 fi
 code --version
    # 1.21.1
@@ -78,11 +138,19 @@ code --version
    # x64
 
 
-if ! command -v code >/dev/null; then
+if ! command -v subl >/dev/null; then
     fancy_echo "Installing Sublime Text text editor using Homebrew ..."
-    brew install sublime-text
+    brew tap caskroom/versions
+    brew cask install sublime-text3
 else
-    fancy_echo "Sublime Text already installed:"
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       subl --version
+       fancy_echo "Sublime Text v3 already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew cask reinstall sublime-text3
+    else
+       fancy_echo "Sublime Text v3 already installed:"
+    fi
 fi
 subl --version
    # Sublime Text Build 3143
@@ -149,6 +217,7 @@ cat $GITCONFIG
 
 
 ######### Git Signing:
+# About http://notes.jerzygangi.com/the-best-pgp-tutorial-for-mac-os-x-ever/
 # See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
    # from 2015 recommends gnupg instead
 # Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
@@ -158,11 +227,47 @@ if ! command -v gpg >/dev/null; then
   brew install gpg2
   # See https://www.gnupg.org/faq/whats-new-in-2.1.html
 else
-  fancy_echo "GPG2 already installed:"
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       gpg --version  # outputs many lines!
+       fancy_echo "GPG2 already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew uninstall GPG2 
+       # NOTE: This does not remove .gitconfig file.
+       brew install GPG2 
+       # TODO: Configure sublime-text using bash shell commands.
+    else
+       fancy_echo "GPG2 already installed:"
+    fi
+     # TODO: Upgrade if run-time attribute contains "upgrade":
   #fancy_echo "GPG2 already installed, upgrading ..."
   # brew upgrade gpg2
 fi
-gpg --version  # outputs many lines!
+gpg --version 
+   # gpg (GnuPG) 2.2.5 and many lines!
+# NOTE: This creates folder ~/.gnupg
+
+
+# Per https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
+git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
+
+
+# Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
+if ! command -v gpg-suite >/dev/null; then
+  fancy_echo "Installing gpg-suite to store GPG keys ..."
+  brew cask install gpg-suite  # See http://macappstore.org/gpgtools/
+  # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
+  # See https://gpgtools.org/
+else
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       gpg --version  # outputs many lines!
+       fancy_echo "gpg-suite already installed: UPGRADE requested..."
+       brew cask reinstall gpg-suite 
+    else
+       fancy_echo "gpg-suite already installed:"
+    fi
+fi
+gpgtools --version  # outputs many lines!
+
 
 # Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
 # https://gpgtools.org/
@@ -171,16 +276,19 @@ gpg --version  # outputs many lines!
 
    fancy_echo "Looking in key chain for GIT_ID=$GIT_ID ..."
    str="$(gpg --list-secret-keys --keyid-format LONG )"
+   # RESPONSE FIRST TIME: gpg: /Users/wilsonmar/.gnupg/trustdb.gpg: trustdb created
    echo "$str"
    # Using regex per http://tldp.org/LDP/abs/html/bashver3.html#REGEXMATCHREF
 if [[ "$str" =~ "$GIT_ID" ]]; then 
-   fancy_echo "A GPG key for $GIT_ID has already been generated:"
-   echo "${#str} bytes in list of keys."
+   fancy_echo "A GPG key for $GIT_ID already generated:"
+   echo "${#str} bytes in list of keys."  # TODO: Capture and display list of keys.
 
-   fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
+   # fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
    str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
-   echo "KEY=$str"
-else
+   # Remove trailing space:
+   KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
+   echo "KEY=\"$KEY\""  # 16 chars. 
+else  # generate:
    # See https://help.github.com/articles/generating-a-new-gpg-key/
   fancy_echo "Generate a GPG2 pair for $GIT_ID in batch mode ..."
   # Instead of manual: gpg --gen-key  or --full-generate-key
@@ -201,18 +309,17 @@ cat >foo <<EOF
      %echo done
 EOF
   gpg --batch --gen-key foo
-  rm foo
+  rm foo  # temp intermediate work file.
 # Sample output from above command:
 #gpg: Generating a default key
 #gpg: key AC3D4CED03B81E02 marked as ultimately trusted
 #gpg: revocation certificate stored as '/Users/wilsonmar/.gnupg/openpgp-revocs.d/B66D9BD36CC672341E419283AC3D4CED03B81E02.rev'
 #gpg: done
 
-  fancy_echo "List GPG2 pairs generated ..."
-  GPG_OUTPUT="$(gpg --list-secret-keys --keyid-format LONG )"
-  echo "GPG_OUTPUT=$GPG_OUTPUT"
-   # RESPONSE FIRST TIME: gpg: /Users/wilsonmar/.gnupg/trustdb.gpg: trustdb created
+  fancy_echo "List GPG2 pairs just generated ..."
+   str="$(gpg --list-secret-keys --keyid-format LONG )"
    # IF BLANK: gpg: checking the trustdb & gpg: no ultimately trusted keys found
+   echo "$str"
    # RESPONSE AFTER a key is created:
 # Sample output:
 #sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]
@@ -224,19 +331,20 @@ EOF
 #gpg --delete-secret-key 7FA75CBDD0C5721D
     # Delete this key from the keyring? (y/N) y
     # This is a secret key! - really delete? (y/N) y
-    # Click OK in the GUI. Twice.
+    # Click <delete key> in the GUI. Twice.
 #gpg --delete-key 7FA75CBDD0C5721D
     # Delete this key from the keyring? (y/N) y
 
-   fancy_echo "TODO: Capture \"7FA75CBDD0C5721D\" between / and space char from:"
-  KEY=$(echo $GPG_OUTPUT | awk -v FS="(rsa2048/|2018*)" '{print $2}')
-   echo "KEY=$KEY"  
+   # Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
+   # Thanks to wisyhambolu@gmail.com for assistance on this:
+   str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
+   # Remove trailing space:
+   KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
+   echo "KEY=\"$KEY\""  # 16 chars. 
 fi
 
-
-fancy_echo "TODO: Remove forced Signing Key \"$KEY\" stripped."
-   KEY="7FA75CBDD0C5721D"  # 16 chars. 
-
+# TODO: Store your GPG key passphrase so you don't have to enter it every time you 
+# sign a commit by using https://gpgtools.org/
 
 # If key is not already set in .gitconfig, add it:
 if grep -q "$KEY" "$GITCONFIG" ; then    
@@ -244,9 +352,11 @@ if grep -q "$KEY" "$GITCONFIG" ; then
 else
    fancy_echo "Adding SigningKey=$KEY in $GITCONFIG..."
    git config --global user.signingkey "$KEY"
-fi 
 
-# https://help.github.com/articles/telling-git-about-your-gpg-key/
+   # Auto-type "adduid":
+   gpg --edit-key "$KEY" <"adduid"
+   # NOTE: By using git config command, repeated invocation would not duplicate lines.
+fi 
 
 
 # See https://help.github.com/articles/signing-commits-using-gpg/
@@ -256,17 +366,24 @@ git config commit.gpgsign | grep 'true' &> /dev/null
 if [ $? == 0 ]; then
    fancy_echo "git config commit.gpgsign already true (on)."
 else # false or blank response:
-   #fancy_echo "Setting git config commit.gpgsign true (on)..."
-   #git config --global commit.gpgsign true
-   fancy_echo "Setting git config commit.gpgsign false (off) until it works ..."
-   git config --global commit.gpgsign false
+   fancy_echo "Setting git config commit.gpgsign true (on)..."
+   git config --global commit.gpgsign true
    # NOTE: This updates the "[commit]" section within ~/.gitconfig
+   echo "Turn signing off with command:"
+   echo "git config --global commit.gpgsign false"
 fi
-cat $GITCONFIG
+exit
 
+######### TODO: Insert GPG in GitHub:
+# https://help.github.com/articles/telling-git-about-your-gpg-key/
+# From https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
+# Add public GPG key to GitHub
+# open https://github.com/settings/keys
+# keybase pgp export -q $KEY | pbcopy
+
+# https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
 ######### Git command coloring in .gitconfig:
-
 # If git config color.ui returns true, skip:
 git config color.ui | grep 'true' &> /dev/null
 if [ $? == 0 ]; then
@@ -276,17 +393,9 @@ else # false or blank response:
    git config --global color.ui true
 fi
 
+cat $GITCONFIG  # List contents of ~/.gitconfig
 
-######### Bash.profile configuration:
 
-# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
-BASHFILE=~/.bash_profile
-
-# Check if file is present: ~/.bash_profile
-if [ ! -f "$BASHFILE" ]; then #  NOT found:
-   fancy_echo "Creating blank \"${BASHFILE}\" ..."
-   touch $BASHFILE
-fi
 
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
    fancy_echo "$FILEPATH already in $BASHFILE"
@@ -315,7 +424,6 @@ else
       # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
 fi 
 
-
 # Run .bash_profile to have changes take, run $FILEPATH:
    source $BASHFILE
 
@@ -339,9 +447,9 @@ fi
 pbcopy < "$FILE.pub"
 
    fancy_echo "Now copy contents of \"${FILEPATH}.pub\", "
-   echo "and paste into GitHub/BitBucket..."
+   echo "and paste into GitHub/GitLab/BitBucket..."
 
-## TODO: Add a token using GitHub API using vars from .secrets.sh 
+## TODO: Add a token using GitHub API from credentials in .secrets.sh 
 
 
    fancy_echo "Pop up from folder ~/.ssh ..."
@@ -349,4 +457,4 @@ pbcopy < "$FILE.pub"
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
-fancy_echo "End of script after $((DIFF/60))m $((DIFF%60))s seconds elasped."
+fancy_echo "End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."

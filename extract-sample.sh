@@ -31,3 +31,13 @@ echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
 
    echo " "
    echo "Note: text after 7FA75CBDD0C5721D should be gone."
+
+
+echo "------------"
+# https://stackoverflow.com/questions/369758/how-to-trim-whitespace-from-a-bash-variable
+FOO=' test test test '
+FOO_NO_TRAIL_SPACE="$(echo -e "${FOO}" | sed -e 's/[[:space:]]*$//')"
+echo -e "FOO_NO_TRAIL_SPACE='${FOO_NO_TRAIL_SPACE}'"
+# > FOO_NO_TRAIL_SPACE=' test test test'
+echo -e "length(FOO_NO_TRAIL_SPACE)==${#FOO_NO_TRAIL_SPACE}"
+# > length(FOO_NO_TRAIL_SPACE)==15
