@@ -1,6 +1,9 @@
 #!/bin/bash
 # extract-sample.sh
 
+echo "sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]" | awk -v FS="(rsa2048/| )" '{print $2}'
+
+echo "------------"
 echo 'abcdefg'|tail -c +2|head -c 3
 # output bcd
 echo "------------"

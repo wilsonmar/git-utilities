@@ -27,6 +27,7 @@ fi
 pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 #swift --version
 
+
 ###### Install homebrew using whatever Ruby is installed.
 
 # Ruby comes with MacOS:
@@ -59,6 +60,29 @@ else
 fi
 git --version
     # git version 2.14.3 (Apple Git-98)
+
+
+######### Text editors:
+if ! command -v code >/dev/null; then
+    fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
+    brew install visual-studio-code
+else
+    fancy_echo "Visual Studio Code already installed:"
+fi
+code --version
+   # 1.21.1
+   # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
+   # x64
+
+
+if ! command -v code >/dev/null; then
+    fancy_echo "Installing Sublime Text text editor using Homebrew ..."
+    brew install sublime-text
+else
+    fancy_echo "Sublime Text already installed:"
+fi
+subl --version
+   # Sublime Text Build 3143
 
 
 ######### Git command completion in ~/.bash_profile:
@@ -145,10 +169,10 @@ gpg --version  # outputs many lines!
    fancy_echo "Looking in key chain for GIT_ID=$GIT_ID ..."
    str="$(gpg --list-secret-keys --keyid-format LONG )"
    echo "$str"
-# Use regular expression per http://tldp.org/LDP/abs/html/bashver3.html#REGEXMATCHREF
+   # Using regex per http://tldp.org/LDP/abs/html/bashver3.html#REGEXMATCHREF
 if [[ "$str" =~ "$GIT_ID" ]]; then 
    fancy_echo "A GPG key for $GIT_ID has already been generated:"
-   echo "${#str} bytes in output."
+   echo "${#str} bytes in list of keys."
 
    fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
    str=${str#*rsa2048/}
@@ -189,34 +213,36 @@ EOF
    # IF BLANK: gpg: checking the trustdb & gpg: no ultimately trusted keys found
    # RESPONSE AFTER a key is created:
 # Sample output:
-#sec   rsa2048/AC3D4CED03B81E02 2018-03-22 [SC]
+#sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]
 #      B66D9BD36CC672341E419283AC3D4CED03B81E02
 #uid                 [ultimate] Wilson Mar (2 long enough passphrase) <WilsonMar+GitHub@gmail.com>
 #ssb   rsa2048/31653F7418AEA6DD 2018-03-22 [E]
 
-   echo "sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]" | awk -v FS="(rsa2048/| )" '{print $2}'
-   fancy_echo "TODO: Capture \"7FA75CBDD0C5721D\" between / and space char from:"
-   KEY=`echo | awk -r=$GPG_OUTPUT FS="(rsa2048/| )" `
-
-   KEY="7FA75CBDD0C5721D"  # TODO: Remove forced
-   echo "KEY=$KEY"
-fi
-
-# Check if key was already set in .gitconfig:
-if grep -q "$KEY" "$GITCONFIG" ; then    
-   fancy_echo "Signing Key $KEY already in $GITCONFIG"
-else
-   fancy_echo "Adding Signing Key $KEY in $GITCONFIG..."
-   fancy_echo "Sign key $KEY:"
-   #git config --global user.signingkey "$KEY"
-fi 
-
-
-#gpg --delete-secret-key 964C1A25C738751E
+# To delete a key pair:
+#gpg --delete-secret-key 7FA75CBDD0C5721D
     # Delete this key from the keyring? (y/N) y
     # This is a secret key! - really delete? (y/N) y
-#gpg --delete-key 964C1A25C738751E
+    # Click OK in the GUI. Twice.
+#gpg --delete-key 7FA75CBDD0C5721D
     # Delete this key from the keyring? (y/N) y
+
+   fancy_echo "TODO: Capture \"7FA75CBDD0C5721D\" between / and space char from:"
+   KEY=`echo | awk -r=$GPG_OUTPUT FS="(rsa2048/| )" `
+   echo "KEY=$KEY"  # BLAH: error!
+fi
+
+
+fancy_echo "TODO: Remove forced Signing Key \"$KEY\" stripped."
+   KEY="7FA75CBDD0C5721D"  # 16 chars. 
+
+
+# If key is not already set in .gitconfig, add it:
+if grep -q "$KEY" "$GITCONFIG" ; then    
+   fancy_echo "Signing Key \"$KEY\" already in $GITCONFIG"
+else
+   fancy_echo "Adding SigningKey=$KEY in $GITCONFIG..."
+   git config --global user.signingkey "$KEY"
+fi 
 
 # https://help.github.com/articles/telling-git-about-your-gpg-key/
 
@@ -229,7 +255,9 @@ if [ $? == 0 ]; then
    fancy_echo "git config commit.gpgsign already true (on)."
 else # false or blank response:
    fancy_echo "Setting git config commit.gpgsign true (on)..."
-   git config --global commit.gpgsign true
+   #git config --global commit.gpgsign true
+   git config --global commit.gpgsign false
+   # NOTE: This updates the "[commit]" section within ~/.gitconfig
 fi
 cat $GITCONFIG
 
