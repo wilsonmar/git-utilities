@@ -7,6 +7,6 @@
 GIT_NAME="Wilson Mar"
 GIT_ID="WilsonMar+GitHub@gmail.com"
 GIT_EMAIL="WilsonMar+GitHub@gmail.com"
+GPG_PASSPHRASE="abc"
 GITHUB_ACCOUNT="wilsonmar"
 GITHUB_PASSWORD="change this to your GitHub account password"
-
