@@ -193,7 +193,7 @@ cat >foo <<EOF
      Name-Comment: 2 long enough passphrase
      Name-Email: $GIT_ID
      Expire-Date: 0
-     Passphrase: abc
+     Passphrase: $GPG_PASSPHRASE
      # Do a commit here, so that we can later print "done" :-)
      %commit
      %echo done
@@ -254,8 +254,9 @@ git config commit.gpgsign | grep 'true' &> /dev/null
 if [ $? == 0 ]; then
    fancy_echo "git config commit.gpgsign already true (on)."
 else # false or blank response:
-   fancy_echo "Setting git config commit.gpgsign true (on)..."
+   #fancy_echo "Setting git config commit.gpgsign true (on)..."
    #git config --global commit.gpgsign true
+   fancy_echo "Setting git config commit.gpgsign false (off) until it works ..."
    git config --global commit.gpgsign false
    # NOTE: This updates the "[commit]" section within ~/.gitconfig
 fi
@@ -315,18 +316,6 @@ fi
 
 # Run .bash_profile to have changes take, run $FILEPATH:
    source $BASHFILE
-
-
-######### Git command coloring:
-
-# If git config color.ui returns true, skip:
-git config color.ui | grep 'true' &> /dev/null
-if [ $? == 0 ]; then
-   fancy_echo "git config --global color.ui already true (on)."
-else # false or blank response:
-   fancy_echo "Setting git config --global color.ui true (on)..."
-   git config --global color.ui true
-fi
 
 
 ######### SSH-KeyGen:
