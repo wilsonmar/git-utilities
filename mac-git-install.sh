@@ -178,8 +178,7 @@ if [[ "$str" =~ "$GIT_ID" ]]; then
    echo "${#str} bytes in list of keys."
 
    fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
-   str=${str#*rsa2048/}
-   str=${str%2018*}  # TODO: This does not eliminate the rest of the data.
+   str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
    echo "KEY=$str"
 else
    # See https://help.github.com/articles/generating-a-new-gpg-key/
@@ -230,8 +229,8 @@ EOF
     # Delete this key from the keyring? (y/N) y
 
    fancy_echo "TODO: Capture \"7FA75CBDD0C5721D\" between / and space char from:"
-   KEY=`echo | awk -r=$GPG_OUTPUT FS="(rsa2048/| )" `
-   echo "KEY=$KEY"  # BLAH: error!
+  KEY=$(echo $GPG_OUTPUT | awk -v FS="(rsa2048/|2018*)" '{print $2}')
+   echo "KEY=$KEY"  
 fi
 
 
