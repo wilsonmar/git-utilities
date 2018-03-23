@@ -98,6 +98,8 @@ if [ ! -f "$GITCONFIG" ]; then
    fancy_echo "Git is not configured with $GITCONFIG!"
 else
    fancy_echo "Git is configured with $GITCONFIG "
+   fancy_echo "Deleting $GITCONFIG file:"
+   rm $GITCONFIG
 fi
 
 # ~/.gitconfig file contain this examples:
@@ -108,37 +110,51 @@ fi
 #[color]
 #	ui = true
 
-if grep -q "[user]" "$GITCONFIG" ; then
-   fancy_echo "[user] already defined in $GITCONFIG"
-else
+
    fancy_echo "Adding [user] info in in $GITCONFIG ..."
    git config --global user.name  $GIT_NAME
-   git config --global user.email $GIT_ID
    git config --global user.email $GIT_EMAIL
-fi 
+   git config --global user.id    $GIT_ID
 cat $GITCONFIG
-exit
+
 
 ######### Git Signing:
+# See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
+   # from 2015 recommends gnupg instead
+# Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
 # NOTE: gpg is the command even though the package is gpg2:
 if ! command -v gpg >/dev/null; then
   fancy_echo "Installing GPG2 for commit signing..."
   brew install gpg2
+  # See https://www.gnupg.org/faq/whats-new-in-2.1.html
 else
-  fancy_echo "GPG2 already installed, upgrading ..."
-  brew upgrade gpg2
+  fancy_echo "GPG2 already installed:"
+  #fancy_echo "GPG2 already installed, upgrading ..."
+  # brew upgrade gpg2
 fi
-gpg2 --version  # outputs many lines!
+gpg --version  # outputs many lines!
 
 # Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
 # https://gpgtools.org/
+# See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
 
-# TODO: Check to see if an key has already been generated:
 
+   fancy_echo "Looking in key chain for GIT_ID=$GIT_ID ..."
+   str="$(gpg --list-secret-keys --keyid-format LONG )"
+   echo "$str"
+# Use regular expression per http://tldp.org/LDP/abs/html/bashver3.html#REGEXMATCHREF
+if [[ "$str" =~ "$GIT_ID" ]]; then 
+   fancy_echo "A GPG key for $GIT_ID has already been generated:"
+   echo "${#str} bytes in output."
 
-# See https://help.github.com/articles/generating-a-new-gpg-key/
-  fancy_echo "Generate a GPG2 pair in batch mode ..."
-  # Instead of manual: gpg --full-generate-key
+   fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
+   str=${str#*rsa2048/}
+   str=${str%2018*}  # TODO: This does not eliminate the rest of the data.
+   echo "KEY=$str"
+else
+   # See https://help.github.com/articles/generating-a-new-gpg-key/
+  fancy_echo "Generate a GPG2 pair for $GIT_ID in batch mode ..."
+  # Instead of manual: gpg --gen-key  or --full-generate-key
   # See https://superuser.com/questions/1003403/how-to-use-gpg-gen-key-in-a-script
   # And https://gist.github.com/woods/8970150
   # And http://www.gnupg.org/documentation/manuals/gnupg-devel/Unattended-GPG-key-generation.html
@@ -148,37 +164,74 @@ cat >foo <<EOF
      Subkey-Type: default
      Name-Real: $GIT_NAME
      Name-Comment: 2 long enough passphrase
-     Name-Email: $GIT_EMAIL
+     Name-Email: $GIT_ID
      Expire-Date: 0
      Passphrase: abc
      # Do a commit here, so that we can later print "done" :-)
      %commit
      %echo done
 EOF
-  gpg  --batch --genkey foo
+  gpg --batch --gen-key foo
+  rm foo
+# Sample output from above command:
+#gpg: Generating a default key
+#gpg: key AC3D4CED03B81E02 marked as ultimately trusted
+#gpg: revocation certificate stored as '/Users/wilsonmar/.gnupg/openpgp-revocs.d/B66D9BD36CC672341E419283AC3D4CED03B81E02.rev'
+#gpg: done
 
-exit
-
-# List GPG keys for which you have both a public and private key:
-#gpg --list-secret-keys --keyid-format LONG
+  fancy_echo "List GPG2 pairs generated ..."
+  GPG_OUTPUT="$(gpg --list-secret-keys --keyid-format LONG )"
+  echo "GPG_OUTPUT=$GPG_OUTPUT"
    # RESPONSE FIRST TIME: gpg: /Users/wilsonmar/.gnupg/trustdb.gpg: trustdb created
+   # IF BLANK: gpg: checking the trustdb & gpg: no ultimately trusted keys found
    # RESPONSE AFTER a key is created:
-   # Capture "3AA5C34371567BD2" from:
-   # sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2017-03-10]
-#git config --global user.signingkey 3AA5C34371567BD2
+# Sample output:
+#sec   rsa2048/AC3D4CED03B81E02 2018-03-22 [SC]
+#      B66D9BD36CC672341E419283AC3D4CED03B81E02
+#uid                 [ultimate] Wilson Mar (2 long enough passphrase) <WilsonMar+GitHub@gmail.com>
+#ssb   rsa2048/31653F7418AEA6DD 2018-03-22 [E]
 
+   echo "sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]" | awk -v FS="(rsa2048/| )" '{print $2}'
+   fancy_echo "TODO: Capture \"7FA75CBDD0C5721D\" between / and space char from:"
+   KEY=`echo | awk -r=$GPG_OUTPUT FS="(rsa2048/| )" `
+
+   KEY="7FA75CBDD0C5721D"  # TODO: Remove forced
+   echo "KEY=$KEY"
+fi
+
+# Check if key was already set in .gitconfig:
+if grep -q "$KEY" "$GITCONFIG" ; then    
+   fancy_echo "Signing Key $KEY already in $GITCONFIG"
+else
+   fancy_echo "Adding Signing Key $KEY in $GITCONFIG..."
+   fancy_echo "Sign key $KEY:"
+   #git config --global user.signingkey "$KEY"
+fi 
+
+
+#gpg --delete-secret-key 964C1A25C738751E
+    # Delete this key from the keyring? (y/N) y
+    # This is a secret key! - really delete? (y/N) y
+#gpg --delete-key 964C1A25C738751E
+    # Delete this key from the keyring? (y/N) y
 
 # https://help.github.com/articles/telling-git-about-your-gpg-key/
 
 
 # See https://help.github.com/articles/signing-commits-using-gpg/
-# To sign all commits by default in any local repository on your computer, run:
-# git config --global commit.gpgsign true
-# Configure Git client to sign commits by default for a local repository, run:
-# git config commit.gpgsign true. 
+# Configure Git client to sign commits by default for a local repository,
+# in ANY/ALL repositories on your computer, run:
+git config commit.gpgsign | grep 'true' &> /dev/null
+if [ $? == 0 ]; then
+   fancy_echo "git config commit.gpgsign already true (on)."
+else # false or blank response:
+   fancy_echo "Setting git config commit.gpgsign true (on)..."
+   git config --global commit.gpgsign true
+fi
+cat $GITCONFIG
 
 
-######### Git command coloring:
+######### Git command coloring in .gitconfig:
 
 # If git config color.ui returns true, skip:
 git config color.ui | grep 'true' &> /dev/null
