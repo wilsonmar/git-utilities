@@ -12,13 +12,14 @@ fancy_echo() {
 # TODO: For Mac only
 fancy_echo "This is for Mac only!"
 
-fancy_echo "Configure Terminal to show all files:"
+fancy_echo "Configure OSX Finder to show hidden files too:"
 defaults write com.apple.finder AppleShowAllFiles YES
+# NOTE: There are other dotfiles.
 
 
 # Ensure Apple's command line tools (such as cc) are installed:
 if ! command -v cc >/dev/null; then
-  fancy_echo "Installing Apple's xcode command line tools ..."
+  fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
   xcode-select --install 
 else
   fancy_echo "Mac OSX Xcode already installed:"
@@ -41,6 +42,8 @@ else
     fancy_echo "Brew already installed:"
 fi
 brew --version
+   # Homebrew 1.5.12
+   # Homebrew/homebrew-core (git revision 9a81e; last commit 2018-03-22)
 
 
 if ! command -v git >/dev/null; then
