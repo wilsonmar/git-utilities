@@ -1,5 +1,6 @@
 #!/bin/bash
 # From mac-git-install.sh in https://github.com/wilsonmar/git-utilities
+# Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 
 set -a
 
@@ -77,6 +78,7 @@ fi
 ###### Install homebrew using whatever Ruby is installed.
 
 # Ruby comes with MacOS:
+fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
 
 
@@ -137,23 +139,85 @@ code --version
    # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
    # x64
 
+git config --global core.editor code
 
+
+if grep -q "/usr/local/bin/subl" "$BASHFILE" ; then    
+   fancy_echo "PATH to Sublime already in $BASHFILE"
+else
+   fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
+   echo "export PATH=\"$PATH:/usr/local/bin/subl\"" >>$BASHFILE
+   # Run .bash_profile to have changes take, run $FILEPATH:
+   source $BASHFILE
+   echo $PATH
+fi 
+
+#[core]
+#  editor = vim
+#  whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+#  excludesfile = ~/.gitignore
+#[web]
+#  browser = google-chrome
+#[rerere]
+#  enabled = 1
+#  autoupdate = 1
+#[push]
+#  default = matching
+
+# /usr/local/bin/subl
 if ! command -v subl >/dev/null; then
     fancy_echo "Installing Sublime Text text editor using Homebrew ..."
-    brew tap caskroom/versions
-    brew cask install sublime-text3
+    brew cask install sublime-text
+    # TODO: Configure Sublime for spell checker, etc. using shell commands.
 else
     if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
        subl --version
        fancy_echo "Sublime Text v3 already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
-       brew cask reinstall sublime-text3
+       brew cask reinstall sublime-text
     else
        fancy_echo "Sublime Text v3 already installed:"
     fi
 fi
 subl --version
    # Sublime Text Build 3143
+
+
+######### Difference engine:
+if ! command -v p4merge >/dev/null; then
+    fancy_echo "Installing p4merge diff engine using Homebrew ..."
+    brew cask install p4merge
+    # TODO: Configure p4merge using shell commands.
+else
+    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+       # p4merge --version
+       fancy_echo "p4merge diff engine already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew cask reinstall p4merge
+    else
+       fancy_echo "p4merge diff engine already installed:"
+    fi
+fi
+#p4merge --version
+   # ?
+
+#[diff]
+#  tool = vimdiff
+#[difftool]
+#prompt = false
+
+if grep -q "[difftool]" "$GITCONFIG" ; then    
+   fancy_echo "p4merge already in $GITCONFIG"
+else
+   fancy_echo "Adding p4merge in $GITCONFIG..."
+   git config --global diff.tool p4merge
+   git config --global difftool.prompt false
+
+   # Auto-type in "adduid":
+   # gpg --edit-key "$KEY" <"adduid"
+   # NOTE: By using git config command, repeated invocation would not duplicate lines.
+fi 
+
 
 
 ######### Git command completion in ~/.bash_profile:
@@ -182,6 +246,7 @@ fi
 # line=$(read -r FIRSTLINE < ~/.git-completion.bash )
 
 
+
 ######### Read and use .secrets.sh file:
 echo "Readig .secrets.sh file:"
 #chmod +x ./.secrets.sh
@@ -189,13 +254,14 @@ echo "Readig .secrets.sh file:"
 echo "GIT_NAME=$GIT_NAME"
 echo "GIT_ID=$GIT_ID"
 echo "GIT_EMAIL=$GIT_EMAIL"
+echo "GIT_USERNAME=$GIT_USERNAME"
 # DO NOT echo $GITHUB_PASSWORD
 
 GITCONFIG=~/.gitconfig
 if [ ! -f "$GITCONFIG" ]; then 
-   fancy_echo "Git is not configured with $GITCONFIG!"
+   fancy_echo "Git is not configured in $GITCONFIG!"
 else
-   fancy_echo "Git is configured with $GITCONFIG "
+   fancy_echo "Git is configured in $GITCONFIG "
    fancy_echo "Deleting $GITCONFIG file:"
    rm $GITCONFIG
 fi
@@ -210,9 +276,10 @@ fi
 
 
    fancy_echo "Adding [user] info in in $GITCONFIG ..."
-   git config --global user.name  $GIT_NAME
-   git config --global user.email $GIT_EMAIL
-   git config --global user.id    $GIT_ID
+   git config --global user.name     "$GIT_NAME"
+   git config --global user.email    "$GIT_EMAIL"
+   git config --global user.id       "$GIT_ID"
+   git config --global user.username "$GIT_USERNAME"
 cat $GITCONFIG
 
 
@@ -247,31 +314,29 @@ gpg --version
 # NOTE: This creates folder ~/.gnupg
 
 
-# Per https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
-git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
-
+# Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
+# https://gpgtools.org/
+# See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
 
 # Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
-if ! command -v gpg-suite >/dev/null; then
-  fancy_echo "Installing gpg-suite to store GPG keys ..."
-  brew cask install gpg-suite  # See http://macappstore.org/gpgtools/
-  # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
-  # See https://gpgtools.org/
+if [ ! -d "/Applications/GPG Keychain.app" ]; then 
+   fancy_echo "Installing gpg-suite to store GPG keys ..."
+   brew cask install gpg-suite  # See http://macappstore.org/gpgtools/
+   # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
+   # See https://gpgtools.org/
 else
     if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-       gpg --version  # outputs many lines!
        fancy_echo "gpg-suite already installed: UPGRADE requested..."
        brew cask reinstall gpg-suite 
     else
        fancy_echo "gpg-suite already installed:"
     fi
 fi
-gpgtools --version  # outputs many lines!
+# TODO: How to gpg-suite --version
 
 
-# Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
-# https://gpgtools.org/
-# See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
+# Per https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
+# git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
 
 
    fancy_echo "Looking in key chain for GIT_ID=$GIT_ID ..."
@@ -353,8 +418,8 @@ else
    fancy_echo "Adding SigningKey=$KEY in $GITCONFIG..."
    git config --global user.signingkey "$KEY"
 
-   # Auto-type "adduid":
-   gpg --edit-key "$KEY" <"adduid"
+   # Auto-type in "adduid":
+   # gpg --edit-key "$KEY" <"adduid"
    # NOTE: By using git config command, repeated invocation would not duplicate lines.
 fi 
 
@@ -372,7 +437,7 @@ else # false or blank response:
    echo "Turn signing off with command:"
    echo "git config --global commit.gpgsign false"
 fi
-exit
+
 
 ######### TODO: Insert GPG in GitHub:
 # https://help.github.com/articles/telling-git-about-your-gpg-key/
@@ -393,15 +458,30 @@ else # false or blank response:
    git config --global color.ui true
 fi
 
+
+if grep -q "color.status=auto" "$GITCONFIG" ; then    
+   fancy_echo "color.status=auto already in $GITCONFIG"
+else
+   fancy_echo "Adding color.status=auto in $GITCONFIG..."
+   git config --global color.status=auto
+   git config --global color.branch=auto
+   git config --global color.interactive=auto
+   git config --global color.diff=auto
+fi 
+
+
+fancy_echo "$GITCONFIG:"
 cat $GITCONFIG  # List contents of ~/.gitconfig
 
+fancy_echo "git config --list:"
+git config --list
 
 
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
    fancy_echo "$FILEPATH already in $BASHFILE"
 else
    fancy_echo "Adding code for $FILEPATH in $BASHFILE..."
-   echo "# Added by mac-git-install.sh ::"
+   echo "# Added by mac-git-install.sh ::" >>$BASHFILE
    echo "if [ -f $FILEPATH ]; then" >>$BASHFILE
    echo "   . $FILEPATH" >>$BASHFILE
    echo "fi" >>$BASHFILE
