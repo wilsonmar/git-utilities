@@ -11,3 +11,7 @@ GIT_USERNAME="hotwilson"
 GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
+GIT_CLIENT="sublime"
+          # gitkraken, smartgit.
+GIT_EDITOR="sublime"
+          # sublime, code.
