@@ -13,6 +13,26 @@ fancy_echo() {
 TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
 
+
+######### Read and use .secrets.sh file:
+# If the file still contains defaults, it should not be used:
+SECRETSFILE=".secrets.sh"
+if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then    
+   fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
+   exit
+else
+   fancy_echo "Reading from $SECRETSFILE ..."
+   #chmod +x $SECRETSFILE
+   . ./$SECRETSFILE
+   echo "GIT_NAME=$GIT_NAME"
+   echo "GIT_ID=$GIT_ID"
+   echo "GIT_EMAIL=$GIT_EMAIL"
+   echo "GIT_USERNAME=$GIT_USERNAME"
+   echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
+   # DO NOT echo $GITHUB_PASSWORD
+fi 
+exit
+
 # Read first parameter from command line supplied at runtime to invoke:
 MY_RUNTYPE=$1
 #MY_RUNTYPE="ALL"
@@ -38,14 +58,16 @@ pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 
 ######### Bash.profile configuration:
 
-# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 BASHFILE=~/.bash_profile
 
-# Check if file is present: ~/.bash_profile
+# if ~/.bash_profile has not been defined, create it:
 if [ ! -f "$BASHFILE" ]; then #  NOT found:
    fancy_echo "Creating blank \"${BASHFILE}\" ..."
    touch $BASHFILE
    echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>$BASHFILE
+else
+   LINES=$(wc -l < ${BASHFILE})
+   fancy_echo "\"${BASHFILE}\" already created with $LINES lines."
 fi
 
 
@@ -75,8 +97,8 @@ fi
    # LC_TIME="en_US.UTF-8"
    # LC_ALL=
 
-###### Install homebrew using whatever Ruby is installed.
 
+###### Install homebrew using whatever Ruby is installed:
 # Ruby comes with MacOS:
 fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
@@ -108,13 +130,17 @@ else
        brew uninstall git
        # NOTE: This does not remove .gitconfig file.
        brew install git
-       # TODO: Configure more git settings using bash shell commands.
     else
        fancy_echo "Git already installed:"
     fi
 fi
 git --version
     # git version 2.14.3 (Apple Git-98)
+
+# TODO: Other git clients:
+# SmartGit from https://syntevo.com/smartgit
+# GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
+# Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
 
 
 ######### Text editors:
@@ -139,6 +165,8 @@ code --version
    # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
    # x64
 
+# See https://git-scm.com/docs/git-config
+# https://danlimerick.wordpress.com/2011/06/12/git-for-windows-tip-setting-an-editor/
 git config --global core.editor code
 
 
@@ -172,50 +200,76 @@ if ! command -v subl >/dev/null; then
 else
     if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
        subl --version
-       fancy_echo "Sublime Text v3 already installed: UPGRADE requested..."
+       fancy_echo "Sublime Text already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
        brew cask reinstall sublime-text
     else
-       fancy_echo "Sublime Text v3 already installed:"
+       fancy_echo "Sublime Text already installed:"
     fi
 fi
 subl --version
    # Sublime Text Build 3143
 
 
-######### Difference engine:
-if ! command -v p4merge >/dev/null; then
-    fancy_echo "Installing p4merge diff engine using Homebrew ..."
+######### Difference engine p4merge:
+# See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
+if [ ! -d "/Applications/p4merge.app" ]; then 
+    fancy_echo "Installing p4merge diff engine app using Homebrew ..."
     brew cask install p4merge
     # TODO: Configure p4merge using shell commands.
 else
     if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
        # p4merge --version
-       fancy_echo "p4merge diff engine already installed: UPGRADE requested..."
+       fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
        brew cask reinstall p4merge
     else
-       fancy_echo "p4merge diff engine already installed:"
+       fancy_echo "p4merge diff engine app already installed:"
     fi
 fi
-#p4merge --version
+# TODO: p4merge --version
    # ?
+
+if grep -q "alias p4merge" "$BASHFILE" ; then    
+   fancy_echo "alias p4merge already in $BASHFILE"
+else
+   fancy_echo "Adding alias p4merge in $BASHFILE..."
+   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge" >>$BASHFILE
+fi 
+
+
 
 #[diff]
 #  tool = vimdiff
 #[difftool]
 #prompt = false
 
+# Based on https://gist.github.com/tony4d/3454372 
+fancy_echo "Configuring to enable git mergetool..."
 if grep -q "[difftool]" "$GITCONFIG" ; then    
-   fancy_echo "p4merge already in $GITCONFIG"
+   fancy_echo "[difftool] p4merge already in $GITCONFIG"
 else
-   fancy_echo "Adding p4merge in $GITCONFIG..."
-   git config --global diff.tool p4merge
+   fancy_echo "Adding [difftool] p4merge in $GITCONFIG..."
+   git config --global merge.tool p4mergetool
+   git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
+   # false = prompting:
+   git config --global mergetool.p4mergetool.trustExitCode false
+   git config --global mergetool.keepBackup false
+
+   git config --global diff.tool p4mergetool
    git config --global difftool.prompt false
+   git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
 
    # Auto-type in "adduid":
-   # gpg --edit-key "$KEY" <"adduid"
+   # gpg --edit-key "$KEY" answer adduid"
    # NOTE: By using git config command, repeated invocation would not duplicate lines.
+
+   # git mergetool
+   # You will be prompted to run "p4mergetool", hit enter and the visual merge editor will launch.
+
+   # See https://danlimerick.wordpress.com/2011/06/19/git-for-window-tip-use-p4merge-as-mergetool/
+   # git difftool
+
 fi 
 
 
@@ -226,6 +280,7 @@ fi
 # If git-completion.bash file is already in home folder, download it:
 FILE=.git-completion.bash
 FILEPATH=~/.git-completion.bash
+# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 if [ -f $FILEPATH ]; then 
    # list file to confirm size:
    ls -al $FILEPATH
@@ -246,23 +301,12 @@ fi
 # line=$(read -r FIRSTLINE < ~/.git-completion.bash )
 
 
-
-######### Read and use .secrets.sh file:
-echo "Readig .secrets.sh file:"
-#chmod +x ./.secrets.sh
-. .secrets.sh  # >/dev/null
-echo "GIT_NAME=$GIT_NAME"
-echo "GIT_ID=$GIT_ID"
-echo "GIT_EMAIL=$GIT_EMAIL"
-echo "GIT_USERNAME=$GIT_USERNAME"
-# DO NOT echo $GITHUB_PASSWORD
-
 GITCONFIG=~/.gitconfig
 if [ ! -f "$GITCONFIG" ]; then 
-   fancy_echo "Git is not configured in $GITCONFIG!"
+   fancy_echo "$GITCONFIG! file not found."
 else
    fancy_echo "Git is configured in $GITCONFIG "
-   fancy_echo "Deleting $GITCONFIG file:"
+   fancy_echo "Deleting $GITCONFIG file..."
    rm $GITCONFIG
 fi
 
@@ -280,6 +324,9 @@ fi
    git config --global user.email    "$GIT_EMAIL"
    git config --global user.id       "$GIT_ID"
    git config --global user.username "$GIT_USERNAME"
+
+   git config --global github.user   "$GITHUB_ACCOUNT"
+   git config --global github.token  token
 cat $GITCONFIG
 
 
@@ -301,13 +348,9 @@ else
        brew uninstall GPG2 
        # NOTE: This does not remove .gitconfig file.
        brew install GPG2 
-       # TODO: Configure sublime-text using bash shell commands.
     else
        fancy_echo "GPG2 already installed:"
     fi
-     # TODO: Upgrade if run-time attribute contains "upgrade":
-  #fancy_echo "GPG2 already installed, upgrading ..."
-  # brew upgrade gpg2
 fi
 gpg --version 
    # gpg (GnuPG) 2.2.5 and many lines!
@@ -320,16 +363,16 @@ gpg --version
 
 # Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
 if [ ! -d "/Applications/GPG Keychain.app" ]; then 
-   fancy_echo "Installing gpg-suite to store GPG keys ..."
+   fancy_echo "Installing gpg-suite app to store GPG keys ..."
    brew cask install gpg-suite  # See http://macappstore.org/gpgtools/
    # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
    # See https://gpgtools.org/
 else
     if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-       fancy_echo "gpg-suite already installed: UPGRADE requested..."
+       fancy_echo "gpg-suite app already installed: UPGRADE requested..."
        brew cask reinstall gpg-suite 
     else
-       fancy_echo "gpg-suite already installed:"
+       fancy_echo "gpg-suite app already installed:"
     fi
 fi
 # TODO: How to gpg-suite --version
@@ -448,6 +491,7 @@ fi
 
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
+
 ######### Git command coloring in .gitconfig:
 # If git config color.ui returns true, skip:
 git config color.ui | grep 'true' &> /dev/null
@@ -463,11 +507,67 @@ if grep -q "color.status=auto" "$GITCONFIG" ; then
    fancy_echo "color.status=auto already in $GITCONFIG"
 else
    fancy_echo "Adding color.status=auto in $GITCONFIG..."
-   git config --global color.status=auto
-   git config --global color.branch=auto
-   git config --global color.interactive=auto
-   git config --global color.diff=auto
-fi 
+   git config --global color.status auto
+   git config --global color.branch auto
+   git config --global color.interactive auto
+   git config --global color.diff auto
+   git config --global color.pager true
+
+   # normal, black, red, green, yellow, blue, magenta, cyan, white
+   # Attributes: bold, dim, ul, blink, reverse, italic, strike
+   git config --global color.status.added     "green   normal bold"
+   git config --global color.status.changed   "blue    normal bold"
+   git config --global color.status.header    "white   normal dim"
+   git config --global color.status.untracked "cyan    normal bold"
+
+   git config --global color.branch.current   "yellow  reverse"
+   git config --global color.branch.local     "yellow  normal bold"
+   git config --global color.branch.remote    "cyan    normal dim"
+
+   git config --global color.diff.meta        "yellow  normal bold"
+   git config --global color.diff.frag        "magenta normal bold"
+   git config --global color.diff.old         "blue    normal strike"
+   git config --global color.diff.new         "green   normal bold"
+   git config --global color.diff.whitespace  "red     normal bold"
+fi
+
+
+#[rerere]
+#  enabled = 1
+#  autoupdate = 1
+   git config --global rerere.enabled  "1"
+   git config --global rerere.autoupdate  "1"
+
+
+######### Git Flow helper:
+# GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
+# See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+# See https://datasift.github.io/gitflow/IntroducingGitFlow.html
+# https://danielkummer.github.io/git-flow-cheatsheet/
+# https://github.com/nvie/gitflow
+# https://vimeo.com/16018419
+# https://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow
+
+# Per https://github.com/nvie/gitflow/wiki/Mac-OS-X
+if ! command -v git-flow >/dev/null; then
+  fancy_echo "Installing git-flow ..."
+  brew install git-flow
+else
+  fancy_echo "git-flow already installed:"
+fi
+
+#[gitflow "prefix"]
+#  feature = feature-
+#  release = release-
+#  hotfix = hotfix-
+#  support = support-
+#  versiontag = v
+
+#git clone --recursive git@github.com:<username>/gitflow.git
+#cd gitflow
+#git branch master origin/master
+#git flow init -d
+#git flow feature start <your feature>
 
 
 fancy_echo "$GITCONFIG:"
@@ -477,6 +577,7 @@ fancy_echo "git config --list:"
 git config --list
 
 
+# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
    fancy_echo "$FILEPATH already in $BASHFILE"
 else
@@ -485,15 +586,9 @@ else
    echo "if [ -f $FILEPATH ]; then" >>$BASHFILE
    echo "   . $FILEPATH" >>$BASHFILE
    echo "fi" >>$BASHFILE
-fi 
-
-# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
-if grep -q "$FILEPATH" "$BASHFILE" ; then    
-   fancy_echo "$FILEPATH already in $BASHFILE"
-else
-   fancy_echo "Concatenating code for $FILEPATH in $BASHFILE..."
    cat $FILEPATH >>$BASHFILE
 fi 
+
 
 # If GPG suite is not used, add the GPG key to ~/.bash_profile:
 if grep -q "GPG_TTY" "$BASHFILE" ; then    
@@ -504,7 +599,8 @@ else
       # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
 fi 
 
-# Run .bash_profile to have changes take, run $FILEPATH:
+
+# Run .bash_profile to have changes above take:
    source $BASHFILE
 
 
@@ -523,10 +619,45 @@ else
       # -Comment, -No passphrase or -P
 fi
 
+
+######### ~/.ssh/config file of users:
+SSHCONFIG=~/.ssh/config
+if [ ! -f "$SSHCONFIG" ]; then 
+   fancy_echo "$SSHCONFIG file not found. Creating..."
+   touch $SSHCONFIG
+else
+   OCCURENCES=$(echo ${SSHCONFIG} | grep -o '\<HostName\>')
+   fancy_echo "$SSHCONFIG file already created with $OCCURENCES entries."
+   # Do not delete $SSHCONFIG file!
+fi
+cat $SSHCONFIG
+
+
+# See https://www.saltycrane.com/blog/2008/11/creating-remote-server-nicknames-sshconfig/
+if grep -q "$FILEPATH" "$SSHCONFIG" ; then    
+   fancy_echo "SSH \"$FILEPATH\" to \"$GITHUB_ACCOUNT\" already in $SSHCONFIG"
+else
+   # Do not delete $SSHCONFIG
+
+   # Check if GITHUB_ACCOUNT has content:
+   if [ ! -f "$GITHUB_ACCOUNT" ]; then 
+   fancy_echo "Adding SSH $FILEPATH to \"$GITHUB_ACCOUNT\" in $SSHCONFIG..."
+   echo "# For: git clone git@github.com:${GITHUB_ACCOUNT}/some-repo.git from $GIT_ID" >> $SSHCONFIG
+   echo "Host github.com" >> $SSHCONFIG
+   echo "    Hostname github.com" >> $SSHCONFIG
+   echo "    User git" >> $SSHCONFIG
+   echo "    IdentityFile $FILEPATH" >> $SSHCONFIG
+   echo "Host gist.github.com" >> $SSHCONFIG
+   echo "    Hostname github.com" >> $SSHCONFIG
+   echo "    User git" >> $SSHCONFIG
+   echo "    IdentityFile $FILEPATH" >> $SSHCONFIG
+   fi
+fi
+
 # NOTE: pbcopy is a Mac-only command:
 pbcopy < "$FILE.pub"
 
-   fancy_echo "Now copy contents of \"${FILEPATH}.pub\", "
+   fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub/GitLab/BitBucket..."
 
 ## TODO: Add a token using GitHub API from credentials in .secrets.sh 

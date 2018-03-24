@@ -8,7 +8,7 @@ alias rs='exec -l $SHELL'
 alias dir='ls -alr'
 alias ll='ls -lri'
 
-alias gs='git status'
+alias gs='git status -s -b'
 alias gb='git branch -avv'
 alias get='git pull'
 alias gf='git fetch;git diff master..origin/master'

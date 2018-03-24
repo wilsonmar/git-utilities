@@ -15,11 +15,11 @@ so you can experiment to see what happens when you make a change to commands.
 
 <hr />
 
-<strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git professionally. It downloads and installs xcode, homebrew, git, code completion, GPG to enable code signing. Sublime and Microsoft's Code editors are installed.
-It configures .bash_profile by adding in contents of the <tt>mac-bash-profile.txt</tt> file containing keyboard aliases. It configures your .gitconfig with color.ui and code signing after it generates GPG and SSH keys for pasting into GitHub or other repositories.
+<strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Git clients, Bash ode completion, GPG to enable code signing. Text editors Sublime and Microsoft's Code are installed. It configures .bash_profile by adding in contents of the <tt>mac-bash-profile.txt</tt> file containing keyboard aliases. It configures your .gitconfig with color.ui and code signing after it generates GPG and SSH keys for pasting into GitHub or other repositories.
 Version numbers are output for each utility installed.
 If something is already installed, that is skipped. So this script can be run again.
-Begin by changing file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a> with your own information.
+
+Begin by changing file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a> with your own information. This script stops if the secrets file still contain default account info. The .gitignore file keeps local customizations (password) from being uploaded to GitHub.
 
 <strong>git-hooks-install.ps1</strong> should be run after cloning locally
 to install scripts that Git invokes automatically based on events.
