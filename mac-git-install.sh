@@ -45,7 +45,7 @@ else
           # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
           # See https://git-scm.com/download/gui/linux
    echo "GIT_EDITOR=$GIT_EDITOR"
-          # sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano, pico, vim.
+          # nano, pico, vim, sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
 fi 
 
