@@ -13,7 +13,7 @@ GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
 GIT_CLIENT="sublime"
-          # git, github, gitkraken, smartgit, sourcetree, tower. 
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
 GIT_EDITOR="sublime"
           # sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
 
