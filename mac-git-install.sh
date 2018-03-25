@@ -19,6 +19,14 @@ TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
+bash --version
+   # GNU bash, version 4.4.12(1)-release (x86_64-apple-darwin16.3.0)
+   # Copyright (C) 2016 Free Software Foundation, Inc.
+   # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+   # This is free software; you are free to change and redistribute it.
+   # There is NO WARRANTY, to the extent permitted by law.
+
+
 ######### Function definitions:
 
 # TODO: Add function to read in string and email, and return a KEY found for that email.
