@@ -12,10 +12,11 @@ GIT_USERNAME="hotwilson"
 GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
-GIT_CLIENT="git, cola, github, gitkraken, smartgit, sourcetree, tower"
-          # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
-GIT_EDITOR="sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano, pico, vim."
-          # sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano, pico, vim.
+# The last one in a list is the Git default:
+GIT_CLIENT="git"
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower 
+GIT_EDITOR="sublime"
+          # ano, pico, vim, sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
 
 # Add upgrade parameter in the command line:
