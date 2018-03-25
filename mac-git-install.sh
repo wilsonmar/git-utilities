@@ -145,6 +145,9 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 ######### Git clients:
 
 
+fancy_echo "GIT_CLIENT=$GIT_CLIENT..."
+echo "The last one installed is the Git default."
+
 if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
     brew install git
@@ -185,14 +188,14 @@ if [[ "$GIT_CLIENT" = *"cola"* ]]; then
    # https://git-cola.github.io/  (written in Python)
    # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
    if [ ! -d "/Applications/git-cola.app" ]; then 
-      fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+      fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."    
       brew install git-cola
    else
       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-         fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+         fancy_echo "Upgrading GIT_CLIENT=\"cola\" using Homebrew ..."    
          brew upgrade git-cola
       else
-         fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+         fancy_echo "GIT_CLIENT=\"cola\" already installed"
       fi
    fi
    git-cola --version
@@ -204,14 +207,14 @@ if [[ "$GIT_CLIENT" = *"github"* ]]; then
     # github from https://www.git-github.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
     # This was taken over by Atlanssian, which requires one of its accounts.
     if [ ! -d "/Applications/github.app" ]; then 
-        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        fancy_echo "Installing GIT_CLIENT=\"github\" using Homebrew ..."    
         brew cask install github
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           fancy_echo "Upgrading GIT_CLIENT=\"github\" using Homebrew ..."    
            brew cask upgrade github
         else
-           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+           fancy_echo "GIT_CLIENT=\"github\" already installed"
         fi
     fi
 fi
@@ -221,14 +224,14 @@ fi
 if [[ "$GIT_CLIENT" = *"gitkraken"* ]]; then
     # GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
     if [ ! -d "/Applications/gitkraken.app" ]; then 
-        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        fancy_echo "Installing GIT_CLIENT=\"gitkraken\" using Homebrew ..."    
         brew cask install gitkraken
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           fancy_echo "Upgrading GIT_CLIENT=\"gitkraken\" using Homebrew ..."    
            brew cask upgrade gitkraken
         else
-           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+           fancy_echo "GIT_CLIENT=\"gitkraken\" already installed"
         fi
     fi
 fi
@@ -237,15 +240,15 @@ fi
 if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
     # 
     if ! command -v sourcetree >/dev/null; then
-        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        fancy_echo "Installing GIT_CLIENT=\"sourcetree\" using Homebrew ..."    
         brew cask install sourcetree
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           fancy_echo "Upgrading GIT_CLIENT=\"sourcetree\" using Homebrew ..."    
            brew cask upgrade sourcetree
            # WARNING: This requires your MacOS password.
         else
-           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed:"
+           fancy_echo "GIT_CLIENT=\"sourcetree\" already installed:"
         fi
     fi
 fi
@@ -254,14 +257,14 @@ fi
 if [[ "$GIT_CLIENT" = *"smartgit"* ]]; then
     # SmartGit from https://syntevo.com/smartgit
     if ! command -v smartgit >/dev/null; then
-        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        fancy_echo "Installing GIT_CLIENT=\"smartgit\" using Homebrew ..."    
         brew cask install smartgit
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           fancy_echo "Upgrading GIT_CLIENT=\"smartgit\" using Homebrew ..."    
            brew cask upgrade smartgit
         else
-           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed:"
+           fancy_echo "GIT_CLIENT=\"smartgit\" already installed:"
         fi
     fi
 fi
@@ -270,14 +273,14 @@ fi
 if [[ "$GIT_CLIENT" = *"tower"* ]]; then
     # Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
     if [ ! -d "~/Applications/Tower.app" ]; then 
-        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        fancy_echo "Installing GIT_CLIENT=\"tower\" using Homebrew ..."    
         brew cask install tower
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           fancy_echo "Upgrading GIT_CLIENT=\"tower\" using Homebrew ..."    
            brew cask upgrade tower
         else
-           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+           fancy_echo "GIT_CLIENT=\"tower\" already installed"
         fi
     fi
 fi
@@ -285,6 +288,8 @@ fi
 
 ######### Text editors:
 
+fancy_echo "GIT_EDITOR=$GIT_EDITOR..."
+echo "The last one installed is the Git default."
 
 # https://danlimerick.wordpress.com/2011/06/12/git-for-windows-tip-setting-an-editor/
 
@@ -349,19 +354,19 @@ fi
 
 if [[ "$GIT_EDITOR" = *"atom"* ]]; then
     if ! command -v atom >/dev/null; then
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
         brew cask install atom
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           atom --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"atom\" already installed: UPGRADE requested..."
           # To avoid response "Error: No available formula with the name "atom"
           brew uninstall atom
           brew install atom
           # TODO: Configure atom text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"atom\" already installed:"
        fi
     fi
     git config --global core.editor atom
@@ -376,19 +381,19 @@ fi
 
 if [[ "$GIT_EDITOR" = *"macvim"* ]]; then
     if [ ! -d "/Applications/MacVim.app" ]; then 
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"macvim\" text editor using Homebrew ..."
         brew cask install macvim
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           # TODO: macvim --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"macvim\" already installed: UPGRADE requested..."
           # To avoid response "==> No Casks to upgrade" on uprade:
           brew cask uninstall macvim
           brew cask install macvim
           # TODO: Configure macvim text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"macvim\" already installed:"
        fi
     fi
     git config --global core.editor macvim
@@ -398,18 +403,18 @@ fi
 
 if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
     if [ ! -d "/Applications/textmate.app" ]; then 
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"textmate\" text editor using Homebrew ..."
         brew cask install textmate
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           # TODO: textmate --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"textmate\" already installed: UPGRADE requested..."
           brew cask uninstall textmate
           brew cask install textmate
           # TODO: Configure textmate text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"textmate\" already installed:"
        fi
     fi
     git config --global core.editor textmate
@@ -420,20 +425,20 @@ fi
 if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
     # See http://macappstore.org/intellij-idea-ce/
     if [ ! -d "/Applications/IntelliJ IDEA CE.app" ]; then 
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"intellij\" text editor using Homebrew ..."
         brew cask install intellij-idea-ce 
         # alias idea='open -a "`ls -dt /Applications/IntelliJ\ IDEA*|head -1`"'
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           # TODO: intellij-idea-ce  --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"intellij\" already installed: UPGRADE requested..."
           # brew upgrade: No formula, so:
           brew cask uninstall intellij-idea-ce 
           brew cask install intellij-idea-ce 
           # TODO: Configure intellij text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"intellij\" already installed:"
        fi
     fi
     git config --global core.editor intellij
@@ -447,18 +452,18 @@ fi
 if [[ "$GIT_EDITOR" = *"sts"* ]]; then
     # See http://macappstore.org/sts/
     if [ ! -d "/Applications/STS.app" ]; then 
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"sts\" text editor using Homebrew ..."
         brew cask install sts
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           # TODO: sts --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"sts\" already installed: UPGRADE requested..."
           brew cask uninstall sts
           brew cask install sts
           # TODO: Configure sts text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"sts\" already installed:"
        fi
     fi
     git config --global core.editor sts
@@ -469,18 +474,18 @@ fi
 if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
     # See http://macappstore.org/eclipse-ide/
     if [ ! -d "/Applications/Eclipse.app" ]; then 
-        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        fancy_echo "Installing GIT_EDITOR=\"eclipse\" text editor using Homebrew ..."
         brew cask install eclipse-ide
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           # TODO: eclipse-ide --version
              # 
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          fancy_echo "GIT_EDITOR=\"eclipse\" already installed: UPGRADE requested..."
           brew cask uninstall eclipse-ide
           brew cask install eclipse-ide
           # TODO: Configure eclipse text editor using bash shell commands.
        else
-          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+          fancy_echo "GIT_EDITOR=\"eclipse\" already installed:"
        fi
     fi
     git config --global core.editor eclipse
