@@ -12,6 +12,7 @@ GIT_USERNAME="hotwilson"
 GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
+<<<<<<< HEAD
 GIT_CLIENT="git, cola, github, gitkraken, smartgit, sourcetree, tower"
           # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
 GIT_EDITOR="sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano, pico, vim."
@@ -20,3 +21,12 @@ GIT_EDITOR="sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano,
 
 # Add upgrade parameter in the command line:
 #    ./mac-git-install.sh upgrade
+=======
+GIT_CLIENT="sublime"
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
+GIT_EDITOR="sublime"
+          # sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
+
+# BTW, to upgrade, add parameter in the command line:
+#    ./mac-git-install.sh upgrade
+>>>>>>> 8ceb6e82c8e47fafbd01d0dec558b8b151ca70b6
