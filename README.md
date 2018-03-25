@@ -3,23 +3,30 @@ Git and GitHub course.
 
 There are two editions of scripts in this repo:
 
-* File names ending in <strong>.ps1</strong> are PowerShell scripts that run on Windows,
+* File names ending in <strong>.sh</strong> are <strong>Bash shell scripts</strong> 
+that normally run on Mac,
+and now also on Windows machines installed with <a target="_blank" href="https://wilsonmar.github.io/bash-windows/">Microsoft's WSL (Windows Subystem for Linux)</a>.
+
+* File names ending in <strong>.ps1</strong> are <strong>PowerShell scripts</strong> 
+that run on Windows,
 but now also Mac and Linux machines after installing <a target="_blank" href="https://wilsonmar.github.io/powershell-on-mac/">Microsoft's PowerShell on OSX</a>.
 
-* File names ending in <strong>.sh</strong> are Bash scripts that normally run on Mac,
+* File names ending in <strong>.py</strong> are <strong>Python</strong> scripts that normally run on Mac,
 and now also on Windows machines installed with <a target="_blank" href="https://wilsonmar.github.io/bash-windows/">Microsoft's WSL (Windows Subystem for Linux)</a>.
-Such scripts are being phased out in favor of a PowerShell script for use by all.
 
-Learners make use of two sets of scripts that issue <strong>git commands</strong>
-so you can experiment to see what happens when you make a change to commands.
+Such scripts are being phased out in favor of cross-platform Python script for use on all platforms. However, Python first needs to be installed.
 
 <hr />
 
-<strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Git clients, Bash ode completion, GPG to enable code signing. Text editors Sublime and Microsoft's Code are installed. It configures .bash_profile by adding in contents of the <tt>mac-bash-profile.txt</tt> file containing keyboard aliases. It configures your .gitconfig with color.ui and code signing after it generates GPG and SSH keys for pasting into GitHub or other repositories.
+<strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Bash code completion, GPG to enable code signing. Text editors Sublime Text, MacVim, and Microsoft's Code are installed. Git clients GitHub Desktop, GitKraken, or SmartGit are installed. These are installed based a setting in file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a>.
+
+Begin by changing that file with your own information. That data is used to create SSH keys and config files. The script stops if the secrets file still contain default account info. The .gitignore file keeps local customizations (password) from being uploaded to GitHub.
+
+If a component has already been installed, the "UPGRADE" parameter added when executing the script results in an upgrade to the latest version of each component.
+
+The script also configures .bash_profile by adding in contents of the <tt>mac-bash-profile.txt</tt> file containing keyboard aliases. It configures your .gitconfig with color.ui and code signing after it generates GPG and SSH keys for pasting into GitHub or other repositories.
 Version numbers are output for each utility installed.
 If something is already installed, that is skipped. So this script can be run again.
-
-Begin by changing file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a> with your own information. This script stops if the secrets file still contain default account info. The .gitignore file keeps local customizations (password) from being uploaded to GitHub.
 
 <strong>git-hooks-install.ps1</strong> should be run after cloning locally
 to install scripts that Git invokes automatically based on events.

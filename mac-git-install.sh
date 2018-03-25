@@ -1,6 +1,11 @@
 #!/bin/bash
-# From mac-git-install.sh in https://github.com/wilsonmar/git-utilities
-# Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+# mac-git-install.sh in https://github.com/wilsonmar/git-utilities
+# This establishes all the utilities related to use of Git,
+# customized based on specification in file .secrets.sh within the same repo.
+
+# See https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+# See https://git-scm.com/docs/git-config
+# https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
 set -a
 
@@ -12,14 +17,16 @@ fancy_echo() {
 
 TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
-
+# For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
 ######### Read and use .secrets.sh file:
+
+
 # If the file still contains defaults, it should not be used:
 SECRETSFILE=".secrets.sh"
 if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then    
    fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
-   exit
+   exit  # so script ends now
 else
    fancy_echo "Reading from $SECRETSFILE ..."
    #chmod +x $SECRETSFILE
@@ -30,8 +37,14 @@ else
    echo "GIT_USERNAME=$GIT_USERNAME"
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
+   echo "GIT_CLIENT=$GIT_CLIENT"
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
+          # See https://git-scm.com/download/gui/linux
+   echo "GIT_EDITOR=$GIT_EDITOR"
+          # sublime, code, atom, macvim, textmate, intellij, sts, eclipse, nano, pico, vim.
+          # NOTE: nano and vim are built into MacOS, so no install.
 fi 
-exit
+
 
 # Read first parameter from command line supplied at runtime to invoke:
 MY_RUNTYPE=$1
@@ -56,7 +69,8 @@ pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 #swift --version
 
 
-######### Bash.profile configuration:
+######### bash.profile configuration:
+
 
 BASHFILE=~/.bash_profile
 
@@ -72,6 +86,8 @@ fi
 
 
 ###### Locale settings missing in OS X Lion+:
+
+
 # See https://stackoverflow.com/questions/7165108/in-os-x-lion-lang-is-not-set-to-utf-8-how-to-fix-it
 # https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do
 # LC_ALL forces applications to use the default language for output, and forces sorting to be bytewise.
@@ -99,13 +115,12 @@ fi
 
 
 ###### Install homebrew using whatever Ruby is installed:
+
+
 # Ruby comes with MacOS:
 fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
 
-
-#brew tap caskroom/cask
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 if ! command -v brew >/dev/null; then
     fancy_echo "Installing homebrew using Ruby..."
@@ -117,6 +132,13 @@ fi
 brew --version
    # Homebrew 1.5.12
    # Homebrew/homebrew-core (git revision 9a81e; last commit 2018-03-22)
+
+#brew tap caskroom/cask
+# brew cask installs GUI apps (see https://caskroom.github.io/)
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+
+
+######### Git clients:
 
 
 if ! command -v git >/dev/null; then
@@ -137,48 +159,6 @@ fi
 git --version
     # git version 2.14.3 (Apple Git-98)
 
-# TODO: Other git clients:
-# SmartGit from https://syntevo.com/smartgit
-# GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
-# Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
-
-
-######### Text editors:
-if ! command -v code >/dev/null; then
-    fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
-    brew install visual-studio-code
-else
-    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-       code --version
-       fancy_echo "VS Code already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew uninstall visual-studio-code
-       # NOTE: This does not remove .gitconfig file.
-       brew install visual-studio-code
-       # TODO: Configure visual-studio-code using bash shell commands.
-    else
-       fancy_echo "VS Code already installed:"
-    fi
-fi
-code --version
-   # 1.21.1
-   # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
-   # x64
-
-# See https://git-scm.com/docs/git-config
-# https://danlimerick.wordpress.com/2011/06/12/git-for-windows-tip-setting-an-editor/
-git config --global core.editor code
-
-
-if grep -q "/usr/local/bin/subl" "$BASHFILE" ; then    
-   fancy_echo "PATH to Sublime already in $BASHFILE"
-else
-   fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
-   echo "export PATH=\"$PATH:/usr/local/bin/subl\"" >>$BASHFILE
-   # Run .bash_profile to have changes take, run $FILEPATH:
-   source $BASHFILE
-   echo $PATH
-fi 
 
 #[core]
 #  editor = vim
@@ -192,26 +172,321 @@ fi
 #[push]
 #  default = matching
 
-# /usr/local/bin/subl
-if ! command -v subl >/dev/null; then
-    fancy_echo "Installing Sublime Text text editor using Homebrew ..."
-    brew cask install sublime-text
-    # TODO: Configure Sublime for spell checker, etc. using shell commands.
-else
-    if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
-       subl --version
-       fancy_echo "Sublime Text already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew cask reinstall sublime-text
+#[diff]
+#  tool = vimdiff
+#[difftool]
+#prompt = false
+
+if [[ "$GIT_CLIENT" = *"cola"* ]]; then
+   # https://git-cola.github.io/  (written in Python)
+   # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
+   if [ ! -d "/Applications/git-cola.app" ]; then 
+      fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+      brew install git-cola
+   else
+      if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+         fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+         brew upgrade git-cola
+      else
+         fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+      fi
+   fi
+   git-cola --version
+      # cola version 3.0
+fi
+
+
+if [[ "$GIT_CLIENT" = *"github"* ]]; then
+    # github from https://www.git-github.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
+    # This was taken over by Atlanssian, which requires one of its accounts.
+    if [ ! -d "/Applications/github.app" ]; then 
+        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        brew cask install github
     else
-       fancy_echo "Sublime Text already installed:"
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           brew cask upgrade github
+        else
+           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+        fi
     fi
 fi
-subl --version
-   # Sublime Text Build 3143
+
+
+
+if [[ "$GIT_CLIENT" = *"gitkraken"* ]]; then
+    # GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
+    if [ ! -d "/Applications/gitkraken.app" ]; then 
+        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        brew cask install gitkraken
+    else
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           brew cask upgrade gitkraken
+        else
+           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+        fi
+    fi
+fi
+
+
+if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
+    # 
+    if ! command -v sourcetree >/dev/null; then
+        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        brew cask install sourcetree
+    else
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           brew cask upgrade sourcetree
+           # WARNING: This requires your MacOS password.
+        else
+           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed:"
+        fi
+    fi
+fi
+
+
+if [[ "$GIT_CLIENT" = *"smartgit"* ]]; then
+    # SmartGit from https://syntevo.com/smartgit
+    if ! command -v smartgit >/dev/null; then
+        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        brew cask install smartgit
+    else
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           brew cask upgrade smartgit
+        else
+           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed:"
+        fi
+    fi
+fi
+
+
+if [[ "$GIT_CLIENT" = *"tower"* ]]; then
+    # Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
+    if [ ! -d "~/Applications/Tower.app" ]; then 
+        fancy_echo "Installing GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+        brew cask install tower
+    else
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=$GIT_CLIENT using Homebrew ..."    
+           brew cask upgrade tower
+        else
+           fancy_echo "GIT_CLIENT=$GIT_CLIENT already installed"
+        fi
+    fi
+fi
+
+
+######### Text editors:
+
+
+# https://danlimerick.wordpress.com/2011/06/12/git-for-windows-tip-setting-an-editor/
+
+if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
+   # /usr/local/bin/subl
+   if [ ! -d "~/Applications/Sublime Text.app" ]; then 
+   #if ! command -v subl >/dev/null; then
+      fancy_echo "Installing Sublime Text text editor using Homebrew ..."
+      brew cask install sublime-text
+      # TODO: Configure Sublime for spell checker, etc. using shell commands.
+
+      if grep -q "/usr/local/bin/subl" "$BASHFILE" ; then    
+         fancy_echo "PATH to Sublime already in $BASHFILE"
+      else
+         fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
+         echo "export PATH=\"$PATH:/usr/local/bin/subl\"" >>$BASHFILE
+         # Run .bash_profile to have changes take, run $FILEPATH:
+         source $BASHFILE
+         echo $PATH
+      fi 
+   else
+      if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+         subl --version
+            # Sublime Text Build 3143
+         fancy_echo "Sublime Text already installed: UPGRADE requested..."
+            # To avoid response "Error: git not installed" to brew upgrade git
+         brew cask reinstall sublime-text
+      else
+         fancy_echo "Sublime Text already installed:"
+      fi
+   fi
+   git config --global core.editor code
+   subl --version
+      # Sublime Text Build 3143
+fi
+
+
+if [[ "$GIT_EDITOR" = *"code"* ]]; then
+    if ! command -v code >/dev/null; then
+        fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
+        brew install visual-studio-code
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          code --version
+          fancy_echo "VS Code already installed: UPGRADE requested..."
+          # To avoid response "Error: git not installed" to brew upgrade git
+          brew uninstall visual-studio-code
+          # NOTE: This does not remove .gitconfig file.
+          brew install visual-studio-code
+          # TODO: Configure visual-studio-code using bash shell commands.
+       else
+          fancy_echo "VS Code already installed:"
+       fi
+    fi
+    git config --global core.editor code
+   code --version
+      # 1.21.1
+      # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
+      # x64
+fi
+
+
+if [[ "$GIT_EDITOR" = *"atom"* ]]; then
+    if ! command -v atom >/dev/null; then
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install atom
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          atom --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          # To avoid response "Error: No available formula with the name "atom"
+          brew uninstall atom
+          brew install atom
+          # TODO: Configure atom text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor atom
+   atom --version
+      # Atom    : 1.20.1
+      # Electron: 1.6.9
+      # Chrome  : 56.0.2924.87
+      # Node    : 7.4.0
+      # Wilsons-MacBook-Pro
+fi
+
+
+if [[ "$GIT_EDITOR" = *"macvim"* ]]; then
+    if [ ! -d "/Applications/MacVim.app" ]; then 
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install macvim
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          # TODO: macvim --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          # To avoid response "==> No Casks to upgrade" on uprade:
+          brew cask uninstall macvim
+          brew cask install macvim
+          # TODO: Configure macvim text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor macvim
+fi
+# TODO: macvim --version
+
+
+if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
+    if [ ! -d "/Applications/textmate.app" ]; then 
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install textmate
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          # TODO: textmate --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          brew cask uninstall textmate
+          brew cask install textmate
+          # TODO: Configure textmate text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor textmate
+fi
+# TODO: textmate --version
+
+
+if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
+    # See http://macappstore.org/intellij-idea-ce/
+    if [ ! -d "/Applications/IntelliJ IDEA CE.app" ]; then 
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install intellij-idea-ce 
+        # alias idea='open -a "`ls -dt /Applications/IntelliJ\ IDEA*|head -1`"'
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          # TODO: intellij-idea-ce  --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          # brew upgrade: No formula, so:
+          brew cask uninstall intellij-idea-ce 
+          brew cask install intellij-idea-ce 
+          # TODO: Configure intellij text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor intellij
+fi
+# TODO: intellij-idea-ce --version
+# See https://www.jetbrains.com/help/idea/using-git-integration.html
+
+# https://gerrit-review.googlesource.com/Documentation/dev-intellij.html
+
+
+if [[ "$GIT_EDITOR" = *"sts"* ]]; then
+    # See http://macappstore.org/sts/
+    if [ ! -d "/Applications/STS.app" ]; then 
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install sts
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          # TODO: sts --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          brew cask uninstall sts
+          brew cask install sts
+          # TODO: Configure sts text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor sts
+fi
+# TODO: sts --version
+
+
+if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
+    # See http://macappstore.org/eclipse-ide/
+    if [ ! -d "/Applications/Eclipse.app" ]; then 
+        fancy_echo "Installing GIT_EDITOR=$GIT_EDITOR text editor using Homebrew ..."
+        brew cask install eclipse-ide
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          # TODO: eclipse-ide --version
+             # 
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed: UPGRADE requested..."
+          brew cask uninstall eclipse-ide
+          brew cask install eclipse-ide
+          # TODO: Configure eclipse text editor using bash shell commands.
+       else
+          fancy_echo "GIT_EDITOR=$GIT_EDITOR already installed:"
+       fi
+    fi
+    git config --global core.editor eclipse
+fi
+# TODO: eclipse-ide --version
 
 
 ######### Difference engine p4merge:
+
+
 # See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
 if [ ! -d "/Applications/p4merge.app" ]; then 
     fancy_echo "Installing p4merge diff engine app using Homebrew ..."
@@ -230,19 +505,13 @@ fi
 # TODO: p4merge --version
    # ?
 
-if grep -q "alias p4merge" "$BASHFILE" ; then    
-   fancy_echo "alias p4merge already in $BASHFILE"
+if grep -q "alias p4merge=" "$BASHFILE" ; then    
+   fancy_echo "p4merge alias already in $BASHFILE"
 else
-   fancy_echo "Adding alias p4merge in $BASHFILE..."
-   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge" >>$BASHFILE
+   fancy_echo "Adding p4merge alias in $BASHFILE..."
+   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>$BASHFILE
 fi 
 
-
-
-#[diff]
-#  tool = vimdiff
-#[difftool]
-#prompt = false
 
 # Based on https://gist.github.com/tony4d/3454372 
 fancy_echo "Configuring to enable git mergetool..."
@@ -275,6 +544,8 @@ fi
 
 
 ######### Git command completion in ~/.bash_profile:
+
+
 # So you can type "git st" and press Tab to complete as "git status".
 # See video on this: https://www.youtube.com/watch?v=VI07ouVS5FE
 # If git-completion.bash file is already in home folder, download it:
@@ -330,7 +601,10 @@ fi
 cat $GITCONFIG
 
 
+
 ######### Git Signing:
+
+
 # About http://notes.jerzygangi.com/the-best-pgp-tutorial-for-mac-os-x-ever/
 # See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
    # from 2015 recommends gnupg instead
@@ -444,7 +718,7 @@ EOF
     # Delete this key from the keyring? (y/N) y
 
    # Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
-   # Thanks to wisyhambolu@gmail.com for assistance on this:
+   # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for assistance on this:
    str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
    # Remove trailing space:
    KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
@@ -470,19 +744,19 @@ fi
 # See https://help.github.com/articles/signing-commits-using-gpg/
 # Configure Git client to sign commits by default for a local repository,
 # in ANY/ALL repositories on your computer, run:
+   # NOTE: This updates the "[commit]" section within ~/.gitconfig
 git config commit.gpgsign | grep 'true' &> /dev/null
 if [ $? == 0 ]; then
    fancy_echo "git config commit.gpgsign already true (on)."
 else # false or blank response:
-   fancy_echo "Setting git config commit.gpgsign true (on)..."
-   git config --global commit.gpgsign true
-   # NOTE: This updates the "[commit]" section within ~/.gitconfig
-   echo "Turn signing off with command:"
-   echo "git config --global commit.gpgsign false"
+   fancy_echo "Setting git config commit.gpgsign false (on)..."
+   git config --global commit.gpgsign false
 fi
 
 
 ######### TODO: Insert GPG in GitHub:
+
+
 # https://help.github.com/articles/telling-git-about-your-gpg-key/
 # From https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
 # Add public GPG key to GitHub
@@ -491,8 +765,25 @@ fi
 
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
+######### Repository:
+
+# https://github.com/
+# https://gitlab.com/
+# https://bitbucket.org/
+# https://travis-ci.org/
+
+
+######### Git code review:
+
+# Prerequisite: Python
+# sudo easy_install pip
+# sudo pip install -U setuptools
+# sudo pip install git-review
+
 
 ######### Git command coloring in .gitconfig:
+
+
 # If git config color.ui returns true, skip:
 git config color.ui | grep 'true' &> /dev/null
 if [ $? == 0 ]; then
@@ -540,6 +831,8 @@ fi
 
 
 ######### Git Flow helper:
+
+
 # GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
 # See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 # See https://datasift.github.io/gitflow/IntroducingGitFlow.html
@@ -605,6 +898,8 @@ fi
 
 
 ######### SSH-KeyGen:
+
+
 #RANDOM=$((1 + RANDOM % 1000))  # 5 digit random number.
 #FILE="$USER@$(uname -n)-$RANDOM"  # computer node name.
 FILE="$USER@$(uname -n)"  # computer node name.
@@ -621,6 +916,8 @@ fi
 
 
 ######### ~/.ssh/config file of users:
+
+
 SSHCONFIG=~/.ssh/config
 if [ ! -f "$SSHCONFIG" ]; then 
    fancy_echo "$SSHCONFIG file not found. Creating..."
