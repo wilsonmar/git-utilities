@@ -1,5 +1,5 @@
 .DS_Store
-.secrets.sh
+*.secrets.sh
 foo
 tempfile
 sisters
