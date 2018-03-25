@@ -19,8 +19,12 @@ TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
-######### Read and use .secrets.sh file:
+######### Function definitions:
 
+# TODO: Add function to read in string and email, and return a KEY found for that email.
+
+
+######### Read and use .secrets.sh file:
 
 # If the file still contains defaults, it should not be used:
 SECRETSFILE=".secrets.sh"
