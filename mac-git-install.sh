@@ -833,7 +833,7 @@ fi
    #KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
    #echo "KEY=\"$KEY\""  # 16 chars. 
    # GPG_MAP_MAIL2KEY() here to make $KEY
-   KEY="E3ABC07AF72BD084"  # forced static value for DEBUGGING.
+   KEY=$(GPG_MAP_MAIL2KEY "$GIT_ID")
 
 # TODO: Store your GPG key passphrase so you don't have to enter it every time you 
 # sign a commit by using https://gpgtools.org/
