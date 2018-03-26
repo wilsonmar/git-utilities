@@ -72,10 +72,11 @@ defaults write com.apple.finder AppleShowAllFiles YES
 
 # Ensure Apple's command line tools (such as cc) are installed:
 if ! command -v cc >/dev/null; then
-  fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
-  xcode-select --install 
+   fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
+   xcode-select --install 
+   # Xcode installs its git to /usr/bin/git; recent versions of OS X (Yosemite and later) ship with stubs in /usr/bin, which take precedence over this git. 
 else
-  fancy_echo "Mac OSX Xcode already installed:"
+   fancy_echo "Mac OSX Xcode already installed:"
 fi
 pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 #swift --version
@@ -211,16 +212,20 @@ if [[ "$GIT_CLIENT" = *"cola"* ]]; then
 fi
 
 
+# Error: Cask 'github-desktop' is unavailable: No Cask with this name exists. 
 if [[ "$GIT_CLIENT" = *"github"* ]]; then
+    # https://github.com/timcharper/git_osx_installer
+    # https://sourceforge.net/projects/git-osx-installer/
     # github from https://www.git-github.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
+    # https://desktop.github.com/
     # This was taken over by Atlanssian, which requires one of its accounts.
     if [ ! -d "/Applications/github.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"github\" using Homebrew ..."    
-        brew cask install github
+        brew cask install github-desktop
     else
         if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
            fancy_echo "Upgrading GIT_CLIENT=\"github\" using Homebrew ..."    
-           brew cask upgrade github
+           brew cask upgrade github-desktop
         else
            fancy_echo "GIT_CLIENT=\"github\" already installed"
         fi
@@ -246,7 +251,7 @@ fi
 
 
 if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
-    # 
+    # See https://www.sourcetreeapp.com/
     if ! command -v sourcetree >/dev/null; then
         fancy_echo "Installing GIT_CLIENT=\"sourcetree\" using Homebrew ..."    
         brew cask install sourcetree
@@ -363,7 +368,7 @@ fi
 if [[ "$GIT_EDITOR" = *"atom"* ]]; then
     if ! command -v atom >/dev/null; then
         fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
-        brew cask install atom
+        brew cask install --appdir="/Applications" atom
     else
        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           atom --version
@@ -782,7 +787,9 @@ fi
 
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
+
 ######### Repository:
+
 
 # https://github.com/
 # https://gitlab.com/
@@ -790,7 +797,15 @@ fi
 # https://travis-ci.org/
 
 
+#########  brew cleanup
+
+
+brew cleanup --force
+rm -f -r /Library/Caches/Homebrew/*
+
+
 ######### Git code review:
+
 
 # Prerequisite: Python
 # sudo easy_install pip
