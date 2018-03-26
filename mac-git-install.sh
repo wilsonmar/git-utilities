@@ -19,12 +19,15 @@ TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
+
 ######### Function definitions:
 
-# TODO: Add function to read in string and email, and return a KEY found for that email.
-#GPG_MAP_MAIL2KEY associates the key and email in an array
+
+# Add function to read in string and email, and return a KEY found for that email.
+# GPG_MAP_MAIL2KEY associates the key and email in an array
 GPG_MAP_MAIL2KEY(){
 KEY_ARRAY=($(echo "$str" | awk -F'sec   rsa2048/|2018* [SC]' '{print $2}' | awk '{print $1}'))
+# Remove trailing blank: KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
 MAIL_ARRAY=($(echo "$str" | awk -F'<|>' '{print $2}'))
 #Test if the array count of the emails and the keys are the same to avoid conflicts
 if [ ${#KEY_ARRAY[@]} == ${#MAIL_ARRAY[@]} ]; then
@@ -44,6 +47,7 @@ fi
 
 ######### Read and use .secrets.sh file:
 
+
 # If the file still contains defaults, it should not be used:
 SECRETSFILE=".secrets.sh"
 if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then    
@@ -59,10 +63,10 @@ else
    echo "GIT_USERNAME=$GIT_USERNAME"
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
-   echo "GIT_CLIENT=$GIT_CLIENT"
+#   echo "GIT_CLIENT=$GIT_CLIENT"
           # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
           # See https://git-scm.com/download/gui/linux
-   echo "GIT_EDITOR=$GIT_EDITOR"
+#   echo "GIT_EDITOR=$GIT_EDITOR"
           # nano, pico, vim, sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
 fi 
@@ -102,6 +106,7 @@ if [ ! -f "$BASHFILE" ]; then #  NOT found:
    fancy_echo "Creating blank \"${BASHFILE}\" ..."
    touch $BASHFILE
    echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>$BASHFILE
+   # El Capitan no longer allows modifications to /usr/bin, and /usr/local/bin is preferred over /usr/bin, by default.
 else
    LINES=$(wc -l < ${BASHFILE})
    fancy_echo "\"${BASHFILE}\" already created with $LINES lines."
@@ -224,8 +229,9 @@ fi
 
 # Error: Cask 'github-desktop' is unavailable: No Cask with this name exists. 
 if [[ "$GIT_CLIENT" = *"github"* ]]; then
+    # https://sourceforge.net/projects/git-osx-installer/files/latest/download
+       # to git-2.15.0-intel-universal-mavericks.dmg
     # https://github.com/timcharper/git_osx_installer
-    # https://sourceforge.net/projects/git-osx-installer/
     # github from https://www.git-github.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
     # https://desktop.github.com/
     # This was taken over by Atlanssian, which requires one of its accounts.
@@ -698,12 +704,6 @@ fi
 if [[ "$str" =~ "$GIT_ID" ]]; then 
    fancy_echo "A GPG key for $GIT_ID already generated:"
    echo "${#str} bytes in list of keys."  # TODO: Capture and display list of keys.
-
-   # fancy_echo "Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
-   str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
-   # Remove trailing space:
-   KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
-   echo "KEY=\"$KEY\""  # 16 chars. 
 else  # generate:
    # See https://help.github.com/articles/generating-a-new-gpg-key/
   fancy_echo "Generate a GPG2 pair for $GIT_ID in batch mode ..."
@@ -751,13 +751,17 @@ EOF
 #gpg --delete-key 7FA75CBDD0C5721D
     # Delete this key from the keyring? (y/N) y
 
-   # Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
-   # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for assistance on this:
-   str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
-   # Remove trailing space:
-   KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
-   echo "KEY=\"$KEY\""  # 16 chars. 
 fi
+
+   fancy_echo "Retrive from response Key for "$GIT_ID" ..."
+   # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for assistance on this:
+   # Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
+   #str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
+   # Remove trailing space:
+   #KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
+   #echo "KEY=\"$KEY\""  # 16 chars. 
+   # GPG_MAP_MAIL2KEY() here to make $KEY
+   KEY="E3ABC07AF72BD084"  # forced static value for DEBUGGING.
 
 # TODO: Store your GPG key passphrase so you don't have to enter it every time you 
 # sign a commit by using https://gpgtools.org/
