@@ -19,3 +19,4 @@ function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
 
 # For more Mac alias, see https://gist.github.com/natelandau/10654137
    # described at https://natelandau.com/my-mac-osx-bash_profile/
+# https://github.com/clvv/fasd
