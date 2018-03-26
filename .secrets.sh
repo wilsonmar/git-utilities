@@ -13,7 +13,7 @@ GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
 # The last one in a list is the Git default:
-GIT_CLIENT="github"
+GIT_CLIENT="gitkraken"
           # git, cola, github, gitkraken, smartgit, sourcetree, tower 
 GIT_EDITOR="sublime"
           # ano, pico, vim, sublime, code, atom, macvim, textmate, intellij, sts, eclipse.

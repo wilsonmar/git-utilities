@@ -311,6 +311,7 @@ fi
 
 ######### Text editors:
 
+
 fancy_echo "GIT_EDITOR=$GIT_EDITOR..."
 echo "The last one installed is the Git default."
 
@@ -585,18 +586,19 @@ FILE=.git-completion.bash
 FILEPATH=~/.git-completion.bash
 # If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 if [ -f $FILEPATH ]; then 
-   # list file to confirm size:
+   fancy_echo "List file to confirm size:"
    ls -al $FILEPATH
       # -rw-r--r--  1 wilsonmar  staff  68619 Mar 21 10:31 /Users/wilsonmar/.git-completion.bash
 #   rm -rf $FILE
 else
-   # Download in home directory the file maintained by git people:
+   fancy_echo "Download in home directory the file maintained by git people:"
    curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o $FILEPATH
    # alt # cp $FILE  ~/$FILEPATH
 fi
 
 # if internet download fails, use saved copy in GitHub repo:
 if [ ! -f $FILEPATH ]; then 
+   fancy_echo "Copy file saved in GitHub repo:"
    cp $FILE  $FILEPATH
 fi
 
