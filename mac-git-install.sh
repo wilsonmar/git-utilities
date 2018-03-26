@@ -679,6 +679,7 @@ if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
 
    fancy_echo "Opening eclipse in background ..."
    eclipse &
+   # See https://www.cs.colostate.edu/helpdocs/eclipseCommLineArgs.html
 fi
 
 
@@ -973,6 +974,34 @@ fi
 #rm -f -r /Library/Caches/Homebrew/*
 
 
+######### Git web browser setting:
+
+
+# TODO: New .secrets.sh variable BROWSER=google-chrome, etc.
+# TODO: Install browser as needed using Homebrew.
+
+# See Complications at
+# https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
+# [web]
+# browser = google-chrome
+#[browser "chrome"]
+#    cmd = C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+#    path = C:/Program Files (x86)/Google/Chrome/Application/
+
+if grep -q "browser = " "$GITCONFIG" ; then    
+   fancy_echo "git config --global web.browser already defined:"
+   git config --global web.browser 
+else 
+   fancy_echo "git config --global web.browser google-chrome ..."
+   git config --global web.browser google-chrome
+
+   # google-chrome is the most tested and popular.
+   # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
+   #git config --global web.browser cygstart
+   #git config --global browser.cygstart.cmd cygstart
+fi
+
+
 ######### Git code review:
 
 
@@ -1068,6 +1097,7 @@ fi
 #git branch master origin/master
 #git flow init -d
 #git flow feature start <your feature>
+
 
 
 fancy_echo "$GITCONFIG:"
