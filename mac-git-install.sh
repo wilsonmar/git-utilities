@@ -851,17 +851,11 @@ EOF
 fi
 
    fancy_echo "Retrieve from response Key for "$GIT_ID" ..."
-   # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for assistance on this:
-   # Extract GPG list between \"rsa2048/\" and \" 2018\" onward:"
-   #str=$(echo $str | awk -v FS="(rsa2048/|2018*)" '{print $2}')
-   # Remove trailing space:
-   #KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
-   #echo "KEY=\"$KEY\""  # 16 chars. 
-   GPG_MAP_MAIL2KEY() #here to make $KEY
-   #KEY="E3ABC07AF72BD084"  # forced static value for DEBUGGING.
+   # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for this:
+   KEY=$(GPG_MAP_MAIL2KEY "$GIT_ID")  # 16 chars. 
 
 # TODO: Store your GPG key passphrase so you don't have to enter it every time you 
-# sign a commit by using https://gpgtools.org/
+#       sign a commit by using https://gpgtools.org/
 
 # If key is not already set in .gitconfig, add it:
 if grep -q "$KEY" "$GITCONFIG" ; then    
