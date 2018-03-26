@@ -2,10 +2,11 @@
 # mac-git-install.sh in https://github.com/wilsonmar/git-utilities
 # This establishes all the utilities related to use of Git,
 # customized based on specification in file .secrets.sh within the same repo.
+# See https://github.com/wilsonmar/git-utilities/blob/master/README.md
 
-# See https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
-# See https://git-scm.com/docs/git-config
-# https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
+# Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+# and https://git-scm.com/docs/git-config
+# and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
 set -a
 
@@ -64,10 +65,10 @@ else
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
 #   echo "GIT_CLIENT=$GIT_CLIENT"
-          # git, cola, github, gitkraken, smartgit, sourcetree, tower. 
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit. 
           # See https://git-scm.com/download/gui/linux
 #   echo "GIT_EDITOR=$GIT_EDITOR"
-          # nano, pico, vim, sublime, code, atom, macvim, textmate, intellij, sts, eclipse.
+          # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
 fi 
 
@@ -171,6 +172,14 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 fancy_echo "GIT_CLIENT=$GIT_CLIENT..."
 echo "The last one installed is the Git default."
+# See https://www.slant.co/topics/465/~best-git-clients-for-macos
+          # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
+          # See https://git-scm.com/download/gui/linux
+          # https://www.slant.co/topics/465/~best-git-clients-for-macos
+          
+#   echo "GIT_EDITOR=$GIT_EDITOR"
+          # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
+          # NOTE: nano and vim are built into MacOS, so no install.
 
 if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
@@ -228,6 +237,9 @@ fi
 
 
 # Error: Cask 'github-desktop' is unavailable: No Cask with this name exists. 
+# GitHub Desktop is written by GitHub, Inc. 
+# open sourced at https://github.com/desktop/desktop
+# so people can just click a button on GitHub to download a repo from an internet browser.
 if [[ "$GIT_CLIENT" = *"github"* ]]; then
     # https://sourceforge.net/projects/git-osx-installer/files/latest/download
        # to git-2.15.0-intel-universal-mavericks.dmg
@@ -315,6 +327,45 @@ if [[ "$GIT_CLIENT" = *"tower"* ]]; then
 fi
 
 
+if [[ "$GIT_CLIENT" = *"magit"* ]]; then
+    # See https://www.slant.co/topics/465/viewpoints/18/~best-git-clients-for-macos~gitup
+    #     "Useful only for people who use Emacs text editor."
+    # https://magit.vc/manual/magit/
+    if ! command -v magit >/dev/null; then
+        fancy_echo "Installing GIT_CLIENT=\"magit\" using Homebrew ..."    
+         brew tap dunn/emacs
+         brew install magit
+    else
+        if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+           fancy_echo "Upgrading GIT_CLIENT=\"magit\" using Homebrew ..."    
+           brew upgrade magit
+        else
+           fancy_echo "GIT_CLIENT=\"magit\" already installed:"
+        fi
+    fi
+    # magit -v
+fi
+
+
+if [[ "$GIT_CLIENT" = *"gitup"* ]]; then
+   # See https://www.slant.co/topics/465/viewpoints/18/~best-git-clients-for-macos~gitup
+   #      "Useful only for people who use Emacs text editor."
+   # https://gitup.vc/manual/gitup/
+   if ! command -v gitup >/dev/null; then
+      fancy_echo "Installing GIT_CLIENT=\"gitup\" using Homebrew ..."
+       brew install gitup
+   else
+      if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+         fancy_echo "Upgrading GIT_CLIENT=\"gitup\" using Homebrew ..."
+         brew upgrade gitup
+      else
+         fancy_echo "GIT_CLIENT=\"gitup\" already installed:"
+      fi
+   fi
+   gitup -v
+fi
+
+
 ######### Text editors:
 
 
@@ -375,7 +426,7 @@ if [[ "$GIT_EDITOR" = *"code"* ]]; then
        fi
     fi
     git config --global core.editor code
-   code --version
+    code --version
       # 1.21.1
       # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
       # x64
@@ -427,8 +478,8 @@ if [[ "$GIT_EDITOR" = *"macvim"* ]]; then
        fi
     fi
     git config --global core.editor macvim
+    # TODO: macvim --version
 fi
-# TODO: macvim --version
 
 
 if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
@@ -448,8 +499,8 @@ if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
        fi
     fi
     git config --global core.editor textmate
+    # TODO: textmate --version
 fi
-# TODO: textmate --version
 
 
 if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
@@ -472,8 +523,8 @@ if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
        fi
     fi
     git config --global core.editor intellij
+    # TODO: intellij-idea-ce --version
 fi
-# TODO: intellij-idea-ce --version
 # See https://www.jetbrains.com/help/idea/using-git-integration.html
 
 # https://gerrit-review.googlesource.com/Documentation/dev-intellij.html
@@ -497,8 +548,8 @@ if [[ "$GIT_EDITOR" = *"sts"* ]]; then
        fi
     fi
     git config --global core.editor sts
+    # TODO: sts --version
 fi
-# TODO: sts --version
 
 
 if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
@@ -519,8 +570,29 @@ if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
        fi
     fi
     git config --global core.editor eclipse
+    # TODO: eclipse-ide --version
 fi
-# TODO: eclipse-ide --version
+
+
+if [[ "$GIT_EDITOR" = *"emacs"* ]]; then
+    if ! command -v emacs >/dev/null; then
+        fancy_echo "Installing emacs text editor using Homebrew ..."
+        brew cask install emacs
+    else
+       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+          emacs --version
+             # /usr/local/bin/emacs:41: warning: Insecure world writable dir /Users/wilsonmar/gits/wilsonmar in PATH, mode 040777
+             # GNU Emacs 25.3.1
+          fancy_echo "emacs already installed: UPGRADE requested..."
+          brew cask upgrade emacs
+          # TODO: Configure emacs using bash shell commands.
+       else
+          fancy_echo "emacs already installed:"
+       fi
+    fi
+    git config --global core.editor emacs
+    emacs --version
+fi
 
 
 ######### Difference engine p4merge:
@@ -869,6 +941,9 @@ else
    git config --global color.diff.new         "green   normal bold"
    git config --global color.diff.whitespace  "red     normal bold"
 fi
+
+
+######### Re
 
 
 #[rerere]
