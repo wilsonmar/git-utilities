@@ -18,6 +18,7 @@ Such scripts are being phased out in favor of cross-platform Python script for u
 
 <hr />
 
+<a name="mac-git-install.sh">
 <strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Bash code completion, GPG to enable code signing. Text editors Sublime Text, MacVim, and Microsoft's Code are installed. Git clients GitHub Desktop, GitKraken, or SmartGit are installed. These are installed based a setting in file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a>.
 
 Begin by changing that file with your own information. That data is used to create SSH keys and config files. The script stops if the secrets file still contain default account info. The .gitignore file keeps local customizations (password) from being uploaded to GitHub.
@@ -28,15 +29,18 @@ The script also configures .bash_profile by adding in contents of the <tt>mac-ba
 Version numbers are output for each utility installed.
 If something is already installed, that is skipped. So this script can be run again.
 
+<a name="git-hooks-install.ps1">
 <strong>git-hooks-install.ps1</strong> should be run after cloning locally
 to install scripts that Git invokes automatically based on events.
 A git clone is necessary to re-build the database.
 
+<a name="git-sisters-update.ps1">
 <strong>git-sisters-update.ps1</strong> is a PowerShell script that
 clones a sample sample repository you forked on GitHub.
 It calls a script that sets git configurations for a project (or globally)<br />
 <strong>git_client-config.ps1</strong>
 
+<a name="git-sample-repo-create.ps1">
 <strong>git-sample-repo-create.ps1</strong> is a PowerShell script that
 creates a repository on your local clones your fork of a sample sample repository.
 
