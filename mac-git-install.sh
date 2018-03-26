@@ -19,7 +19,7 @@ fancy_echo() {
 }
 
 TIME_START="$(date -u +%s)"
-fancy_echo "This is for Mac only! Starting elasped timer ..."
+fancy_echo "This is for Mac only! Starting elapsed timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
 
@@ -1149,8 +1149,14 @@ fi
 #RANDOM=$((1 + RANDOM % 1000))  # 5 digit random number.
 #FILE="$USER@$(uname -n)-$RANDOM"  # computer node name.
 FILE="$USER@$(uname -n)"  # computer node name.
-   fancy_echo "Diving into folder ~/.ssh ..."
-   pushd ~/.ssh  # specification of folder didn't work.
+fancy_echo "Diving into folder ~/.ssh ..."
+
+if [ ! -d ".ssh" ]; then # found:
+   fancy_echo "Making ~/.ssh folder ..."
+   mkdir ~/.ssh
+fi
+
+pushd ~/.ssh  # specification of folder didn't work.
 FILEPATH="~/.ssh/$FILE"
 if [ -f "$FILE" ]; then # found:
    fancy_echo "File \"${FILEPATH}\" already exists."
