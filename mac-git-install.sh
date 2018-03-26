@@ -19,17 +19,27 @@ TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elasped timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
-bash --version
-   # GNU bash, version 4.4.12(1)-release (x86_64-apple-darwin16.3.0)
-   # Copyright (C) 2016 Free Software Foundation, Inc.
-   # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-   # This is free software; you are free to change and redistribute it.
-   # There is NO WARRANTY, to the extent permitted by law.
-
-
 ######### Function definitions:
 
 # TODO: Add function to read in string and email, and return a KEY found for that email.
+#GPG_MAP_MAIL2KEY associates the key and email in an array
+GPG_MAP_MAIL2KEY(){
+KEY_ARRAY=($(echo "$str" | awk -F'sec   rsa2048/|2018* [SC]' '{print $2}' | awk '{print $1}'))
+MAIL_ARRAY=($(echo "$str" | awk -F'<|>' '{print $2}'))
+#Test if the array count of the emails and the keys are the same to avoid conflicts
+if [ ${#KEY_ARRAY[@]} == ${#MAIL_ARRAY[@]} ]; then
+   declare -A KEY_MAIL_ARRAY=()
+   for i in "${!KEY_ARRAY[@]}"
+	 do
+        KEY_MAIL_ARRAY[${MAIL_ARRAY[$i]}]=${KEY_ARRAY[$i]}
+	 done
+   #Return key matching email passed into function
+	 echo "${KEY_MAIL_ARRAY[$1]}"
+else
+   #exit from script if array count of emails and keys are not the same
+	 exit 1 && fancy_echo "Email count and Key count do not match"
+fi
+}
 
 
 ######### Read and use .secrets.sh file:
