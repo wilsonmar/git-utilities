@@ -198,18 +198,13 @@ git --version
 #  editor = vim
 #  whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
 #  excludesfile = ~/.gitignore
-#[web]
-#  browser = google-chrome
-#[rerere]
-#  enabled = 1
-#  autoupdate = 1
 #[push]
 #  default = matching
 
 #[diff]
 #  tool = vimdiff
 #[difftool]
-#prompt = false
+#  prompt = false
 
 if [[ "$GIT_CLIENT" = *"cola"* ]]; then
    # https://git-cola.github.io/  (written in Python)
@@ -388,6 +383,20 @@ fancy_echo "GIT_EDITOR=$GIT_EDITOR..."
       echo "The last one installed is the Git default."
 
 # INFO: https://danlimerick.wordpress.com/2011/06/12/git-for-windows-tip-setting-an-editor/
+# https://insights.stackoverflow.com/survey/2018/#development-environments-and-tools
+#    Says vim is the most popular among Sysadmins. 
+
+if [[ "$GIT_CLIENT" = *"nano"* ]]; then
+   git config --global core.editor nano
+fi
+
+if [[ "$GIT_CLIENT" = *"vim"* ]]; then
+   git config --global core.editor vim
+fi
+
+if [[ "$GIT_CLIENT" = *"pico"* ]]; then
+   git config --global core.editor pico
+fi
 
 if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
    # /usr/local/bin/subl
@@ -458,11 +467,11 @@ fi
 
 
 if [[ "$GIT_EDITOR" = *"atom"* ]]; then
-    if ! command -v atom >/dev/null; then
-        fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
-        brew cask install --appdir="/Applications" atom
-    else
-       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
+   if ! command -v atom >/dev/null; then
+      fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
+      brew cask install --appdir="/Applications" atom
+   else
+      if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
           atom --version
              # 
           fancy_echo "GIT_EDITOR=\"atom\" already installed: UPGRADE requested..."
