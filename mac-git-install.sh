@@ -1266,20 +1266,24 @@ if [[ $CLOUD = *"azure"* ]]; then  # contains azure.
    # Issues at https://github.com/Azure/azure-cli/issues
    if ! command -v az >/dev/null; then  # not installed.
       # NOTE: The az CLI does not use a Python virtual environment.
+      python3_install  # function defined at top of this file.
       # Python location '/usr/local/opt/python/bin/python3.6'
+   
       fancy_echo "Installing azure using Homebrew ..."
       brew install azure-cli
    else
       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
          fancy_echo "Git already installed: UPGRADE requested..."
          az --version
+            # azure-cli (2.0.18)
+            # ... and many other lines.
          brew upgrade azure-cli
       else
          fancy_echo "azure already installed."
       fi
    fi
    az --version
-      # azure-cli (2.0.18)
+      # azure-cli (2.0.30)
       # ... and many other lines.
 fi
 
