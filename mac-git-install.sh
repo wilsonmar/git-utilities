@@ -56,7 +56,6 @@ python_install(){
 
       # pip comes with brew install python
       pip --version
-      pip3 --version
 
       fancy_echo "Installing virtualenv to manage multiple Python versions ..."
       pip install virtualenv
@@ -89,6 +88,10 @@ python_install(){
          source $BASHFILE
          echo $PATH
       fi
+}
+
+python3_install(){
+	fancy_echo "This is for AWS"
 }
 
 
@@ -1173,6 +1176,7 @@ fi
 
 # See https://cloud.google.com/sdk/docs/
 echo "CLOUD=$CLOUD"
+# See https://wilsonmar.github.io/gcp
 if [[ $CLOUD = *"gcp"* ]]; then  # contains gcp.
    if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
       fancy_echo "Installing CLOUD=$CLOUD = brew cask install google-cloud-sdk ..."
@@ -1187,21 +1191,22 @@ if [[ $CLOUD = *"gcp"* ]]; then  # contains gcp.
    else
       fancy_echo "CLOUD=$CLOUD = google-cloud-sdk already installed."
    fi
+   # NOTE: gcloud command on its own results in an error.
 
-   #fancy_echo "Starting \"gcloud init\" to http://localhost:8085/ ..."
+   fancy_echo "Run \"gcloud init\" "
    # See https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
    # about creating the app.yaml configuration file and running dev_appserver.py  --port=8085
-   #gcloud init &
-   #gcloud auth login
-   #gcloud config set account ACCOUNT
-   # See https://wilsonmar.github.io/gcp
+   fancy_echo "Run \"gcloud auth login\" for web page to authenticate login."
+      # successful auth leads to https://cloud.google.com/sdk/auth_success
+   fancy_echo "Run \"gcloud config set account your-account\""
+      # Response is "Updated property [core/account]."
 fi
 
 
 if [[ $CLOUD = *"aws"* ]]; then  # contains aws.
    fancy_echo "AWS requires Python3."
    # See https://docs.aws.amazon.com/cli/latest/userguide/cli-install-macos.html#awscli-install-osx-pip
-   python_install  # function defined at top of this file.
+   python3_install  # function defined at top of this file.
 
    :  # break out immediately. Not execute the rest of this if only Python3 is not installed:
 
