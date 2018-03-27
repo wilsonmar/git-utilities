@@ -110,7 +110,7 @@ python3_install(){
    
    if ! command -v python3 >/dev/null; then
       # No upgrade option.
-      fancy_echo "Installing Python3, a pre-requisite for awscli ..."
+      fancy_echo "Installing Python3, a pre-requisite for awscli and azure ..."
       brew install python3
 
       # pip comes with brew install python
@@ -131,7 +131,9 @@ python3_install(){
       # Python 3.6.4
 }
 
+
 ######### Starting:
+
 
 TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elapsed timer ..."
@@ -166,10 +168,9 @@ fi
 # Read first parameter from command line supplied at runtime to invoke:
 MY_RUNTYPE=$1
 fancy_echo "MY_RUNTYPE=$MY_RUNTYPE"
-if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then  # variable made lower case.
+if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then # variable made lower case.
    echo "All packages here will be upgraded ..."
 fi
-exit
 
 fancy_echo "Configure OSX Finder to show hidden files too:"
 defaults write com.apple.finder AppleShowAllFiles YES
@@ -274,7 +275,7 @@ if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
     brew install git
 else
-    if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        git --version
        fancy_echo "Git already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
@@ -309,7 +310,7 @@ if [[ "$GIT_CLIENT" = *"cola"* ]]; then
       fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."
       brew install git-cola
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "Upgrading GIT_CLIENT=\"cola\" using Homebrew ..."
          brew upgrade git-cola
       else
@@ -333,7 +334,7 @@ if [[ "$GIT_CLIENT" = *"github"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"github\" using Homebrew ..."
         brew cask install --appdir="/Applications" github
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"github\" using Homebrew ..."
            brew cask upgrade github
         else
@@ -352,7 +353,7 @@ if [[ "$GIT_CLIENT" = *"gitkraken"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"gitkraken\" using Homebrew ..."
         brew cask install --appdir="/Applications" gitkraken
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"gitkraken\" using Homebrew ..."
            brew cask upgrade gitkraken
         else
@@ -370,7 +371,7 @@ if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"sourcetree\" using Homebrew ..."
         brew cask install --appdir="/Applications" sourcetree
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"sourcetree\" using Homebrew ..."
            brew cask upgrade sourcetree
            # WARNING: This requires your MacOS password.
@@ -389,7 +390,7 @@ if [[ "$GIT_CLIENT" = *"smartgit"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"smartgit\" using Homebrew ..."
         brew cask install --appdir="/Applications" smartgit
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"smartgit\" using Homebrew ..."
            brew cask upgrade smartgit
         else
@@ -407,7 +408,7 @@ if [[ "$GIT_CLIENT" = *"tower"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"tower\" using Homebrew ..."
         brew cask install --appdir="/Applications" tower
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"tower\" using Homebrew ..."
            brew cask upgrade tower
         else
@@ -429,7 +430,7 @@ if [[ "$GIT_CLIENT" = *"magit"* ]]; then
          brew tap dunn/emacs
          brew install magit
     else
-        if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"magit\" using Homebrew ..."
            brew upgrade magit
         else
@@ -452,7 +453,7 @@ if [[ "$GIT_CLIENT" = *"gitup"* ]]; then
       # https://s3-us-west-2.amazonaws.com/gitup-builds/stable/GitUp.zip
       brew cask install --appdir="/Applications" gitup
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "Upgrading GIT_CLIENT=\"gitup\" using Homebrew ..."
          brew upgrade gitup
       else
@@ -512,7 +513,7 @@ if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
       # TODO: Configure Sublime for spell checker, etc.
       # install Package Control see https://gist.github.com/patriciogonzalezvivo/77da993b14a48753efda
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          subl --version
             # Sublime Text Build 3143
          fancy_echo "Sublime Text already installed: UPGRADE requested..."
@@ -535,7 +536,7 @@ if [[ "$GIT_EDITOR" = *"code"* ]]; then
         fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
         brew install visual-studio-code
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           code --version
           fancy_echo "VS Code already installed: UPGRADE requested..."
           # To avoid response "Error: git not installed" to brew upgrade git
@@ -618,7 +619,7 @@ if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
         fancy_echo "Installing GIT_EDITOR=\"textmate\" text editor using Homebrew ..."
         brew cask install --appdir="/Applications" textmate
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           mate -v
           fancy_echo "GIT_EDITOR=\"textmate\" already installed: UPGRADE requested..."
           brew cask uninstall textmate
@@ -653,7 +654,7 @@ if [[ "$GIT_EDITOR" = *"emacs"* ]]; then
         fancy_echo "Installing emacs text editor using Homebrew ..."
         brew cask install --appdir="/Applications" emacs
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           emacs --version
              # /usr/local/bin/emacs:41: warning: Insecure world writable dir /Users/wilsonmar/gits/wilsonmar in PATH, mode 040777
              # GNU Emacs 25.3.1
@@ -680,7 +681,7 @@ if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
        # alias idea='open -a "`ls -dt /Applications/IntelliJ\ IDEA*|head -1`"'
         # TODO: Configure intellij text editor using bash shell commands.
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          # TODO: idea  --version
             # 
          fancy_echo "GIT_EDITOR=\"intellij\" already installed: UPGRADE requested..."
@@ -717,7 +718,7 @@ if [[ "$GIT_EDITOR" = *"sts"* ]]; then
         fancy_echo "Installing GIT_EDITOR=\"sts\" text editor using Homebrew ..."
         brew cask install --appdir="/Applications" sts
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           # TODO: sts --version
              # 
           fancy_echo "GIT_EDITOR=\"sts\" already installed: UPGRADE requested..."
@@ -753,7 +754,7 @@ if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
         fancy_echo "Installing GIT_EDITOR=\"eclipse\" text editor using Homebrew ..."
         brew cask install --appdir="/Applications" eclipse-ide
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           # TODO: eclipse-ide --version
              # 
           fancy_echo "GIT_EDITOR=\"eclipse\" already installed: UPGRADE requested..."
@@ -795,7 +796,7 @@ if [ ! -d "/Applications/p4merge.app" ]; then
     brew cask install --appdir="/Applications" p4merge
     # TODO: Configure p4merge using shell commands.
 else
-    if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        # p4merge --version
        fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
@@ -919,7 +920,7 @@ if ! command -v gpg >/dev/null; then
   brew install gpg2
   # See https://www.gnupg.org/faq/whats-new-in-2.1.html
 else
-    if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        gpg --version  # outputs many lines!
        fancy_echo "GPG2 already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
@@ -946,7 +947,7 @@ if [ ! -d "/Applications/GPG Keychain.app" ]; then
    # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
    # See https://gpgtools.org/
 else
-    if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        fancy_echo "gpg-suite app already installed: UPGRADE requested..."
        brew cask reinstall gpg-suite 
     else
@@ -1216,7 +1217,7 @@ fi
 echo "CLOUD=$CLOUD"
 
 # See https://wilsonmar.github.io/gcp
-if [[ $CLOUD = *"gcp"* ]]; then  # contains gcp.
+if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
    if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
       fancy_echo "Installing CLOUD=$CLOUD = brew cask install google-cloud-sdk ..."
       python_install  # function defined at top of this file.
@@ -1242,44 +1243,50 @@ if [[ $CLOUD = *"gcp"* ]]; then  # contains gcp.
 fi
 
 
-if [[ $CLOUD = *"aws"* ]]; then  # contains aws.
-   fancy_echo "AWS requires Python3."
+if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
+   fancy_echo "awscli requires Python3."
    # See https://docs.aws.amazon.com/cli/latest/userguide/cli-install-macos.html#awscli-install-osx-pip
    python3_install  # function defined at top of this file.
-
-   :  # break out immediately. Not execute the rest of this if only Python3 is not installed:
+   # :  # break out immediately. Not execute the rest of the if strucutre.
 
    if ! command -v aws >/dev/null; then
-      fancy_echo "Installing aws using PIP ..."
+      fancy_echo "Installing awscli using PIP ..."
       pip3 install awscli --upgrade --user
    else
-      fancy_echo "aws already installed."
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "awscli already installed: UPGRADE requested..."
+         aws --version
+            # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+         pip3 upgrade awscli --upgrade --user
+      else
+         fancy_echo "awscli already installed."
+      fi
    fi
-
    aws --version
-      # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+            # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
 fi
 
 
-if [[ $CLOUD = *"azure"* ]]; then  # contains azure.
+if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    # See https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-macos?view=azure-cli-latest
    # Issues at https://github.com/Azure/azure-cli/issues
+
+   # NOTE: The az CLI does not use a Python virtual environment. So ...
+   python3_install  # function defined at top of this file.
+   # Python location '/usr/local/opt/python/bin/python3.6'
+
    if ! command -v az >/dev/null; then  # not installed.
-      # NOTE: The az CLI does not use a Python virtual environment.
-      python3_install  # function defined at top of this file.
-      # Python location '/usr/local/opt/python/bin/python3.6'
-   
       fancy_echo "Installing azure using Homebrew ..."
       brew install azure-cli
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then 
-         fancy_echo "Git already installed: UPGRADE requested..."
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "azure-cli already installed: UPGRADE requested..."
          az --version
             # azure-cli (2.0.18)
             # ... and many other lines.
          brew upgrade azure-cli
       else
-         fancy_echo "azure already installed."
+         fancy_echo "azure-cli already installed."
       fi
    fi
    az --version
