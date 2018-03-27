@@ -1,5 +1,4 @@
 #!/usr/local/bin/bash
-#!/bin/bash
 
 # mac-git-install.sh in https://github.com/wilsonmar/git-utilities
 # This establishes all the utilities related to use of Git,
@@ -12,19 +11,15 @@
 
 set -a
 
+
+######### Function definitions:
+
+
 fancy_echo() {
   local fmt="$1"; shift
   # shellcheck disable=SC2059
   printf "\n>>> $fmt\n" "$@"
 }
-
-TIME_START="$(date -u +%s)"
-fancy_echo "This is for Mac only! Starting elapsed timer ..."
-# For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
-
-
-######### Function definitions:
-
 
 # Add function to read in string and email, and return a KEY found for that email.
 # GPG_MAP_MAIL2KEY associates the key and email in an array
@@ -36,16 +31,41 @@ MAIL_ARRAY=($(echo "$str" | awk -F'<|>' '{print $2}'))
 if [ ${#KEY_ARRAY[@]} == ${#MAIL_ARRAY[@]} ]; then
    declare -A KEY_MAIL_ARRAY=()
    for i in "${!KEY_ARRAY[@]}"
-	 do
+   do
         KEY_MAIL_ARRAY[${MAIL_ARRAY[$i]}]=${KEY_ARRAY[$i]}
-	 done
+   done
    #Return key matching email passed into function
-	 echo "${KEY_MAIL_ARRAY[$1]}"
+   echo "${KEY_MAIL_ARRAY[$1]}"
 else
    #exit from script if array count of emails and keys are not the same
-	 exit 1 && fancy_echo "Email count and Key count do not match"
+   exit 1 && fancy_echo "Email count and Key count do not match"
 fi
 }
+
+python_install()
+   # Python is a pre-requisite for git-cola & GCP installed below.
+   # Because there are two active versions of Pythong (2.7.4 and 3)...
+     # See https://docs.brew.sh/Homebrew-and-Python
+   # See https://docs.python-guide.org/en/latest/starting/install3/osx/
+   if ! command -v python >/dev/null; then
+      # No upgrade option.
+      fancy_echo "Installing Python, a pre-requisite for git-cola & GCP ..."
+      brew install python
+   else
+      fancy_echo "Python already installed:"
+   fi
+   python --version
+      # Python 2.7.14
+}
+
+
+######### Starting:
+
+
+TIME_START="$(date -u +%s)"
+fancy_echo "This is for Mac only! Starting elapsed timer ..."
+# For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
+
 
 
 ######### Read and use .secrets.sh file:
@@ -66,6 +86,7 @@ else
    echo "GIT_USERNAME=$GIT_USERNAME"
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
+   echo "CLOUD=$CLOUD"
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
@@ -211,8 +232,7 @@ if [[ "$GIT_CLIENT" = *"cola"* ]]; then
    # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
    if ! command -v git-cola >/dev/null; then
       if ! command -v python >/dev/null; then
-         fancy_echo "Installing Python, a pre-requisite for git-cola ..."
-         brew install python
+         python_install()
       fi
       fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."
       brew install git-cola
@@ -1005,7 +1025,13 @@ else
    git config --global web.browser google-chrome
 
    # google-chrome is the most tested and popular.
+   # Check to see if google-chrome is installed and if not:
+   # brew cask install google-chrome
+
    # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
+   # The command line web browser:
+   # brew install links
+
    #git config --global web.browser cygstart
    #git config --global browser.cygstart.cmd cygstart
 fi
@@ -1108,13 +1134,46 @@ fi
 #git flow feature start <your feature>
 
 
+######### Google Cloud:
 
+
+# See https://cloud.google.com/sdk/docs/
+if grep -q "gcp" "$CLOUD" ; then
+   if ! command -v gcloud >/dev/null; then   # not already installed:
+      fancy_echo "Installing \"google-cloud-sdk\" ..."
+      python_install()
+
+      brew tap caskroom/cask
+      brew cask install google-cloud-sdk  # to ./google-cloud-sdk
+      gcloud -v
+         # Google Cloud SDK 194.0.0
+         # bq 2.0.30
+         # core 2018.03.16
+         # gsutil 4.29
+
+      #fancy_echo "Starting \"gcloud init\" to http://localhost:8085/ ..."
+      # See https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
+      # about creating the app.yaml configuration file and running dev_appserver.py  --port=8085
+      #gcloud init &
+      # See https://wilsonmar.github.io/gcp
+   fi
+fi
+
+
+if grep -q "aws" "$CLOUD" ; then
+   # Per ???
+fi
+
+
+######### Confirm
+
+
+# If in verbose mode:
 fancy_echo "$GITCONFIG:"
 cat $GITCONFIG  # List contents of ~/.gitconfig
 
 fancy_echo "git config --list:"
 git config --list
-
 
 # If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
@@ -1127,6 +1186,10 @@ else
    echo "fi" >>$BASHFILE
    cat $FILEPATH >>$BASHFILE
 fi 
+
+# BTW, for completion of bash commands on MacOS:
+# brew install bash-completion
+
 
 
 # If GPG suite is not used, add the GPG key to ~/.bash_profile:
