@@ -91,12 +91,36 @@ python_install(){
 }
 
 python3_install(){
-	fancy_echo "This is for AWS"
+   fancy_echo "Installing Python3 is a pre-requisite for AWS-CLI"
+   # Python3 is a pre-requisite for aws.
+   # Because there are two active versions of Python (2.7.4 and 3.6 now)...
+     # See https://docs.brew.sh/Homebrew-and-Python
+   # See https://docs.python-guide.org/en/latest/starting/install3/osx/
+   
+   if ! command -v python3 >/dev/null; then
+      # No upgrade option.
+      fancy_echo "Installing Python3, a pre-requisite for awscli ..."
+      brew install python3
+
+      # pip comes with brew install python
+      pip3 --version
+
+      fancy_echo "Installing virtualenv to manage multiple Python versions ..."
+      pip3 install virtualenv
+      pip3 install virtualenvwrapper
+      source /usr/local/bin/virtualenvwrapper.sh
+	  
+   else
+      fancy_echo "$(python3 --version) already installed:"
+   fi
+   which python3
+   ls -al $(which python3) # /usr/local/bin/python
+
+   python3 --version
+      # Python 3.6.4
 }
 
-
 ######### Starting:
-
 
 TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elapsed timer ..."
