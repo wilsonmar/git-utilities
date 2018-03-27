@@ -2,7 +2,7 @@
 # Sample file .secrets.sh in https://github.com/wilsonmar/git-utilities
 # referenced by mac-git-install.sh also in https://github.com/wilsonmar/git-utilities
 # This file name .secrets.sh should be specified in .gitignore so 
-# it doesn't upload to a public GitHub/BitBucket, etc.
+#    it doesn't upload to a public GitHub/BitBucket, etc.
 # Command source .secrets.sh pull these variables in.
 # CAUTION: No spaces around = sign.
 GIT_NAME="Wilson Mar"
@@ -18,7 +18,7 @@ GIT_CLIENT="git"
 GIT_EDITOR="sublime"
           # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
-CLOUD="none"
+CLOUD="gcp"
      # none, aws, gcp"
 
 # To upgrade, add upgrade parameter in the command line:

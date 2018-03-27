@@ -42,20 +42,53 @@ else
 fi
 }
 
-python_install()
-   # Python is a pre-requisite for git-cola & GCP installed below.
-   # Because there are two active versions of Pythong (2.7.4 and 3)...
+python_install(){
+   # Python2 is a pre-requisite for git-cola & GCP installed below.
+   # Python3 is a pre-requisite for aws.
+   # Because there are two active versions of Pythong (2.7.4 and 3.6 now)...
      # See https://docs.brew.sh/Homebrew-and-Python
    # See https://docs.python-guide.org/en/latest/starting/install3/osx/
+   
    if ! command -v python >/dev/null; then
       # No upgrade option.
       fancy_echo "Installing Python, a pre-requisite for git-cola & GCP ..."
       brew install python
+
+      # pip comes with brew install python
+      pip --version
+      pip3 --version
+
+      fancy_echo "Installing virtualenv to manage multiple Python versions ..."
+      pip install virtualenv
+      pip install virtualenvwrapper
+      source /usr/local/bin/virtualenvwrapper.sh
+
+      #brew install freetype  # http://www.freetype.org to render fonts
+      #fancy_echo "Installing other popular Python helper modules ..."
+      # anaconda?
+      #pip install numpy
+      #pip install scipy
+      #pip install matplotlib
+      #pip install ipython[all]
    else
-      fancy_echo "Python already installed:"
+      fancy_echo "$(python --version) already installed:"
    fi
-   python --version
+   which python
+   ls -al $(which python) # /usr/local/bin/python
+
+   #python --version
       # Python 2.7.14
+
+   # To prevent the older MacOS default python being seen first in PATH ...
+      if grep -q "/usr/local/opt/python/libexec/bin" "$BASHFILE" ; then    
+         fancy_echo "Python PATH already in $BASHFILE"
+      else
+         fancy_echo "Adding Python PATH in $BASHFILE..."
+         echo "export PATH=\"/usr/local/opt/python/libexec/bin:$PATH\"" >>$BASHFILE
+         # Run .bash_profile to have changes take, run $FILEPATH:
+         source $BASHFILE
+         echo $PATH
+      fi
 }
 
 
@@ -86,7 +119,7 @@ else
    echo "GIT_USERNAME=$GIT_USERNAME"
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
-   echo "CLOUD=$CLOUD"
+#   echo "CLOUD=$CLOUD"
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
@@ -230,10 +263,8 @@ git --version
 if [[ "$GIT_CLIENT" = *"cola"* ]]; then
    # https://git-cola.github.io/  (written in Python)
    # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
-   if ! command -v git-cola >/dev/null; then
-      if ! command -v python >/dev/null; then
-         python_install()
-      fi
+   if ! command -v git-cola >/dev/null; then  # not recognized:
+      python_install  # function defined at top of this file.
       fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."
       brew install git-cola
    else
@@ -420,21 +451,25 @@ fi
 
 if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
    # /usr/local/bin/subl
-   if [ ! -d "~/Applications/Sublime Text.app" ]; then 
+   if [ ! -d "/Applications/Sublime Text.app" ]; then 
    #if ! command -v subl >/dev/null; then
       fancy_echo "Installing Sublime Text text editor using Homebrew ..."
       brew cask install --appdir="/Applications" sublime-text
-      # TODO: Configure Sublime for spell checker, etc. using shell commands.
-
+ 
       if grep -q "/usr/local/bin/subl" "$BASHFILE" ; then    
          fancy_echo "PATH to Sublime already in $BASHFILE"
       else
          fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
          echo "export PATH=\"$PATH:/usr/local/bin/subl\"" >>$BASHFILE
+
+         echo "alias subl='open -a \"/Applications/Sublime Text.app\"'" >>$BASHFILE
          # Run .bash_profile to have changes take, run $FILEPATH:
          source $BASHFILE
          echo $PATH
       fi 
+ 
+      # TODO: Configure Sublime for spell checker, etc.
+      # install Package Control see https://gist.github.com/patriciogonzalezvivo/77da993b14a48753efda
    else
       if [ "$MY_RUNTYPE" == "UPGRADE" ]; then 
          subl --version
@@ -449,10 +484,8 @@ if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
    git config --global core.editor code
    subl --version
       # Sublime Text Build 3143
-   fancy_echo "Starting Sublime Text in background ..."
+   fancy_echo "Opening Sublime Text in background ..."
    subl &
-#   fancy_echo "Opening Sublime Text ..."
-#   open "/Applications/Sublime Text.app"
 fi
 
 
@@ -743,7 +776,7 @@ fi
 
 # Based on https://gist.github.com/tony4d/3454372 
 fancy_echo "Configuring to enable git mergetool..."
-if grep -q "[difftool]" "$GITCONFIG" ; then    
+if [[ $GITCONFIG = *"[difftool]"* ]]; then  # contains text.
    fancy_echo "[difftool] p4merge already in $GITCONFIG"
 else
    fancy_echo "Adding [difftool] p4merge in $GITCONFIG..."
@@ -751,7 +784,7 @@ else
    git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
    # false = prompting:
    git config --global mergetool.p4mergetool.trustExitCode false
-   git config --global mergetool.keepBackup false
+   git config --global mergetool.keepBackup true
 
    git config --global diff.tool p4mergetool
    git config --global difftool.prompt false
@@ -784,7 +817,6 @@ if [ -f $FILEPATH ]; then
    fancy_echo "List file to confirm size:"
    ls -al $FILEPATH
       # -rw-r--r--  1 wilsonmar  staff  68619 Mar 21 10:31 /Users/wilsonmar/.git-completion.bash
-#   rm -rf $FILE
 else
    fancy_echo "Download in home directory the file maintained by git people:"
    curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o $FILEPATH
@@ -805,12 +837,11 @@ GITCONFIG=~/.gitconfig
 if [ ! -f "$GITCONFIG" ]; then 
    fancy_echo "$GITCONFIG! file not found."
 else
-   fancy_echo "Git is configured in $GITCONFIG "
-   fancy_echo "Backing up $GITCONFIG file..."
-   RANDOM=$((1 + RANDOM % 1000)); 
-   cp "$GITCONFIG" "$GITCONFIG-$RANDOM.bak"
-   fancy_echo "Deleting $GITCONFIG file..."
-   rm $GITCONFIG
+   fancy_echo "Git is configured in new $GITCONFIG "
+   fancy_echo "Backing up $GITCONFIG file to $GITCONFIG-$RANDOM.bak ..."
+   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
+   mv "$GITCONFIG" "$GITCONFIG-$RANDOM.backup"
+   fancy_echo "git config command creates new $GITCONFIG file..."
 fi
 
 # ~/.gitconfig file contain this examples:
@@ -1141,30 +1172,48 @@ fi
 
 
 # See https://cloud.google.com/sdk/docs/
-if grep -q "gcp" "$CLOUD" ; then
-   if ! command -v gcloud >/dev/null; then   # not already installed:
-      fancy_echo "Installing \"google-cloud-sdk\" ..."
-      python_install()
-
+echo "CLOUD=$CLOUD"
+if [[ $CLOUD = *"gcp"* ]]; then  # contains gcp.
+   if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
+      fancy_echo "Installing CLOUD=$CLOUD = brew cask install google-cloud-sdk ..."
+      python_install  # function defined at top of this file.
       brew tap caskroom/cask
       brew cask install google-cloud-sdk  # to ./google-cloud-sdk
-      gcloud -v
+      gcloud --version
          # Google Cloud SDK 194.0.0
          # bq 2.0.30
          # core 2018.03.16
          # gsutil 4.29
-
-      #fancy_echo "Starting \"gcloud init\" to http://localhost:8085/ ..."
-      # See https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
-      # about creating the app.yaml configuration file and running dev_appserver.py  --port=8085
-      #gcloud init &
-      # See https://wilsonmar.github.io/gcp
+   else
+      fancy_echo "CLOUD=$CLOUD = google-cloud-sdk already installed."
    fi
+
+   #fancy_echo "Starting \"gcloud init\" to http://localhost:8085/ ..."
+   # See https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
+   # about creating the app.yaml configuration file and running dev_appserver.py  --port=8085
+   #gcloud init &
+   #gcloud auth login
+   #gcloud config set account ACCOUNT
+   # See https://wilsonmar.github.io/gcp
 fi
 
 
-if grep -q "aws" "$CLOUD" ; then
-   # Per ???
+if [[ $CLOUD = *"aws"* ]]; then  # contains aws.
+   fancy_echo "AWS requires Python3."
+   # See https://docs.aws.amazon.com/cli/latest/userguide/cli-install-macos.html#awscli-install-osx-pip
+   python_install  # function defined at top of this file.
+
+   :  # break out immediately. Not execute the rest of this if only Python3 is not installed:
+
+   if ! command -v aws >/dev/null; then
+      fancy_echo "Installing aws using PIP ..."
+      pip3 install awscli --upgrade --user
+   else
+      fancy_echo "git-flow already installed."
+   fi
+
+   aws --version
+      # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
 fi
 
 
@@ -1178,7 +1227,7 @@ cat $GITCONFIG  # List contents of ~/.gitconfig
 fancy_echo "git config --list:"
 git config --list
 
-# If git-completion.bash file is mentioned in  ~/.bash_profile, add it:
+# If git-completion.bash file is not already in  ~/.bash_profile, add it:
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
    fancy_echo "$FILEPATH already in $BASHFILE"
 else
@@ -1192,7 +1241,7 @@ fi
 
 # BTW, for completion of bash commands on MacOS:
 # brew install bash-completion
-
+# Also see https://github.com/barryclark/bashstrap
 
 
 # If GPG suite is not used, add the GPG key to ~/.bash_profile:
@@ -1273,10 +1322,9 @@ fi
 pbcopy < "$FILE.pub"
 
    fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
-   echo "and paste into GitHub/GitLab/BitBucket..."
-
-## TODO: Add a token using GitHub API from credentials in .secrets.sh 
-
+   echo "and paste into GitHub, Settings, New SSH Key ..."
+   open https://github.com/settings/keys
+   ## TODO: Add a token using GitHub API from credentials in .secrets.sh 
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
