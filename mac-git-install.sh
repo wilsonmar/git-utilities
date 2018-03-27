@@ -806,6 +806,9 @@ if [ ! -f "$GITCONFIG" ]; then
    fancy_echo "$GITCONFIG! file not found."
 else
    fancy_echo "Git is configured in $GITCONFIG "
+   fancy_echo "Backing up $GITCONFIG file..."
+   RANDOM=$((1 + RANDOM % 1000)); 
+   cp "$GITCONFIG" "$GITCONFIG-$RANDOM.bak"
    fancy_echo "Deleting $GITCONFIG file..."
    rm $GITCONFIG
 fi
