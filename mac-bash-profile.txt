@@ -32,3 +32,4 @@ alias gp='git push'
 # For more Mac aliases, see https://gist.github.com/natelandau/10654137
    # described at https://natelandau.com/my-mac-osx-bash_profile/
 # https://github.com/clvv/fasd
+# https://gist.github.com/pksunkara/988716

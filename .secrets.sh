@@ -18,8 +18,8 @@ GIT_CLIENT="git"
 GIT_EDITOR="sublime"
           # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
-CLOUD="gcp"
-     # none, aws, gcp"
+CLOUD="azure"
+     # none, aws, gcp, azure"
 
 # To upgrade, add upgrade parameter in the command line:
 #    ./mac-git-install.sh upgrade
