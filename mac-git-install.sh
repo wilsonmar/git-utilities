@@ -188,7 +188,8 @@ else
    fancy_echo "Mac OSX Xcode already installed:"
 fi
 pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
-#swift --version
+   # Tools_Executables | grep version
+   # version: 9.2.0.0.1.1510905681
 
 
 ######### bash.profile configuration:
@@ -250,7 +251,14 @@ if ! command -v brew >/dev/null; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
     fancy_echo "Brew already installed:"
-     # TODO: Upgrade if run-time attribute contains "upgrade":
+    # Upgrade if run-time attribute contains "upgrade":
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       brew --version
+       fancy_echo "Brew already installed: UPGRADE requested..."
+       brew upgrade
+    else
+       fancy_echo "Bres already installed:"
+    fi
 fi
 brew --version
    # Homebrew 1.5.12
@@ -302,7 +310,7 @@ git --version
 #[difftool]
 #  prompt = false
 
-if [[ "$GIT_CLIENT" = *"cola"* ]]; then
+if [[ "$GIT_CLIENT" == *"cola"* ]]; then
    # https://git-cola.github.io/  (written in Python)
    # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
    if ! command -v git-cola >/dev/null; then  # not recognized:
@@ -328,7 +336,7 @@ fi
 # GitHub Desktop is written by GitHub, Inc. 
 # open sourced at https://github.com/desktop/desktop
 # so people can just click a button on GitHub to download a repo from an internet browser.
-if [[ "$GIT_CLIENT" = *"github"* ]]; then
+if [[ "$GIT_CLIENT" == *"github"* ]]; then
     # https://desktop.github.com/
     if [ ! -d "/Applications/GitHub Desktop.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"github\" using Homebrew ..."
@@ -347,7 +355,7 @@ fi
 
 
 
-if [[ "$GIT_CLIENT" = *"gitkraken"* ]]; then
+if [[ "$GIT_CLIENT" == *"gitkraken"* ]]; then
     # GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
     if [ ! -d "/Applications/GitKraken.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"gitkraken\" using Homebrew ..."
@@ -365,7 +373,7 @@ if [[ "$GIT_CLIENT" = *"gitkraken"* ]]; then
 fi
 
 
-if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
+if [[ "$GIT_CLIENT" == *"sourcetree"* ]]; then
     # See https://www.sourcetreeapp.com/
     if [ ! -d "/Applications/Sourcetree.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"sourcetree\" using Homebrew ..."
@@ -384,7 +392,7 @@ if [[ "$GIT_CLIENT" = *"sourcetree"* ]]; then
 fi
 
 
-if [[ "$GIT_CLIENT" = *"smartgit"* ]]; then
+if [[ "$GIT_CLIENT" == *"smartgit"* ]]; then
     # SmartGit from https://syntevo.com/smartgit
     if [ ! -d "/Applications/SmartGit.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"smartgit\" using Homebrew ..."
@@ -402,7 +410,7 @@ if [[ "$GIT_CLIENT" = *"smartgit"* ]]; then
 fi
 
 
-if [[ "$GIT_CLIENT" = *"tower"* ]]; then
+if [[ "$GIT_CLIENT" == *"tower"* ]]; then
     # Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
     if [ ! -d "~/Applications/Tower.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"tower\" using Homebrew ..."
@@ -421,7 +429,7 @@ if [[ "$GIT_CLIENT" = *"tower"* ]]; then
 fi
 
 
-if [[ "$GIT_CLIENT" = *"magit"* ]]; then
+if [[ "$GIT_CLIENT" == *"magit"* ]]; then
     # See https://www.slant.co/topics/465/viewpoints/18/~best-git-clients-for-macos~macvim
     #     "Useful only for people who use Emacs text editor."
     # https://magit.vc/manual/magit/
@@ -444,7 +452,7 @@ if [[ "$GIT_CLIENT" = *"magit"* ]]; then
 fi
 
 
-if [[ "$GIT_CLIENT" = *"gitup"* ]]; then
+if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
    # http://gitup.co/
    # https://github.com/git-up/GitUp
    # https://gitup.vc/manual/gitup/
@@ -479,19 +487,19 @@ fancy_echo "GIT_EDITOR=$GIT_EDITOR..."
 # https://insights.stackoverflow.com/survey/2018/#development-environments-and-tools
 #    Says vim is the most popular among Sysadmins. 
 
-if [[ "$GIT_CLIENT" = *"nano"* ]]; then
+if [[ "$GIT_CLIENT" == *"nano"* ]]; then
    git config --global core.editor nano
 fi
 
-if [[ "$GIT_CLIENT" = *"vim"* ]]; then
+if [[ "$GIT_CLIENT" == *"vim"* ]]; then
    git config --global core.editor vim
 fi
 
-if [[ "$GIT_CLIENT" = *"pico"* ]]; then
+if [[ "$GIT_CLIENT" == *"pico"* ]]; then
    git config --global core.editor pico
 fi
 
-if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
+if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
    # /usr/local/bin/subl
    if [ ! -d "/Applications/Sublime Text.app" ]; then 
    #if ! command -v subl >/dev/null; then
@@ -531,7 +539,7 @@ if [[ "$GIT_EDITOR" = *"sublime"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"code"* ]]; then
+if [[ "$GIT_EDITOR" == *"code"* ]]; then
     if ! command -v code >/dev/null; then
         fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
         brew install visual-studio-code
@@ -561,12 +569,12 @@ if [[ "$GIT_EDITOR" = *"code"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"atom"* ]]; then
+if [[ "$GIT_EDITOR" == *"atom"* ]]; then
    if ! command -v atom >/dev/null; then
       fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
       brew cask install --appdir="/Applications" atom
    else
-      if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           atom --version
              # 
           fancy_echo "GIT_EDITOR=\"atom\" already installed: UPGRADE requested..."
@@ -590,12 +598,12 @@ if [[ "$GIT_EDITOR" = *"atom"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"macvim"* ]]; then
-    if [ ! -d "/Applications/MacVim.app" ]; then 
+if [[ "$GIT_EDITOR" == *"macvim"* ]]; then
+    if [ ! -d "/Applications/MacVim.app" ]; then
         fancy_echo "Installing GIT_EDITOR=\"macvim\" text editor using Homebrew ..."
         brew cask install --appdir="/Applications" macvim
     else
-       if [[ "${MY_RUNTYPE,,}" = *"upgrade"* ]]; then
+       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           # TODO: macvim --version
              # 
           fancy_echo "GIT_EDITOR=\"macvim\" already installed: UPGRADE requested..."
@@ -614,7 +622,7 @@ if [[ "$GIT_EDITOR" = *"macvim"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
+if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
     if [ ! -d "/Applications/textmate.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"textmate\" text editor using Homebrew ..."
         brew cask install --appdir="/Applications" textmate
@@ -649,7 +657,7 @@ if [[ "$GIT_EDITOR" = *"textmate"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"emacs"* ]]; then
+if [[ "$GIT_EDITOR" == *"emacs"* ]]; then
     if ! command -v emacs >/dev/null; then
         fancy_echo "Installing emacs text editor using Homebrew ..."
         brew cask install --appdir="/Applications" emacs
@@ -673,7 +681,7 @@ if [[ "$GIT_EDITOR" = *"emacs"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"intellij"* ]]; then
+if [[ "$GIT_EDITOR" == *"intellij"* ]]; then
     # See http://macappstore.org/intellij-idea-ce/
    if [ ! -d "/Applications/IntelliJ IDEA CE.app" ]; then 
        fancy_echo "Installing GIT_EDITOR=\"intellij\" text editor using Homebrew ..."
@@ -712,7 +720,7 @@ fi
 # https://gerrit-review.googlesource.com/Documentation/dev-intellij.html
 
 
-if [[ "$GIT_EDITOR" = *"sts"* ]]; then
+if [[ "$GIT_EDITOR" == *"sts"* ]]; then
     # See http://macappstore.org/sts/
     if [ ! -d "/Applications/STS.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"sts\" text editor using Homebrew ..."
@@ -748,7 +756,7 @@ if [[ "$GIT_EDITOR" = *"sts"* ]]; then
 fi
 
 
-if [[ "$GIT_EDITOR" = *"eclipse"* ]]; then
+if [[ "$GIT_EDITOR" == *"eclipse"* ]]; then
     # See http://macappstore.org/eclipse-ide/
     if [ ! -d "/Applications/Eclipse.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"eclipse\" text editor using Homebrew ..."
@@ -1281,7 +1289,7 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "azure-cli already installed: UPGRADE requested..."
-         az --version
+         az --version | grep azure-cli
             # azure-cli (2.0.18)
             # ... and many other lines.
          brew upgrade azure-cli
@@ -1289,7 +1297,7 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
          fancy_echo "azure-cli already installed."
       fi
    fi
-   az --version
+   az --version | grep azure-cli
       # azure-cli (2.0.30)
       # ... and many other lines.
 fi
