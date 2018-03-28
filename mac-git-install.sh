@@ -12,7 +12,7 @@
 set -a
 
 
-######### Function definitions:
+######### Bash function definitions:
 
 
 fancy_echo() {
@@ -42,7 +42,7 @@ else
 fi
 }
 
-python_install(){
+PYTHON_INSTALL(){
    # Python2 is a pre-requisite for git-cola & GCP installed below.
    # Python3 is a pre-requisite for aws.
    # Because there are two active versions of Pythong (2.7.4 and 3.6 now)...
@@ -140,7 +140,6 @@ fancy_echo "This is for Mac only! Starting elapsed timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
 
-
 ######### Read and use .secrets.sh file:
 
 
@@ -206,6 +205,10 @@ if [ ! -f "$BASHFILE" ]; then #  NOT found:
 else
    LINES=$(wc -l < ${BASHFILE})
    fancy_echo "\"${BASHFILE}\" already created with $LINES lines."
+
+   fancy_echo "Backing up file $BASHFILE to $BASHFILE-$RANDOM.bak ..."
+   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
+   cp "$BASHFILE" "$BASHFILE-$RANDOM.backup"
 fi
 
 
@@ -273,11 +276,12 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 
 fancy_echo "GIT_CLIENT=$GIT_CLIENT..."
-echo "The last one installed is the Git default."
+echo "The last one installed is set as the Git editor."
 # See https://www.slant.co/topics/465/~best-git-clients-for-macos
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
           # See https://git-scm.com/download/gui/linux
           # https://www.slant.co/topics/465/~best-git-clients-for-macos
+
 
 if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
@@ -288,7 +292,7 @@ else
        fancy_echo "Git already installed: UPGRADE requested..."
        # To avoid response "Error: git not installed" to brew upgrade git
        brew uninstall git
-       # NOTE: This does not remove .gitconfig file.
+       # QUESTION: This removes .gitconfig file?
        brew install git
     else
        fancy_echo "Git already installed:"
@@ -296,7 +300,6 @@ else
 fi
 git --version
     # git version 2.14.3 (Apple Git-98)
-
 
 #[core]
 #  editor = vim
@@ -314,7 +317,7 @@ if [[ "$GIT_CLIENT" == *"cola"* ]]; then
    # https://git-cola.github.io/  (written in Python)
    # https://medium.com/@hamen/installing-git-cola-on-osx-eaa9368b4ee
    if ! command -v git-cola >/dev/null; then  # not recognized:
-      python_install  # function defined at top of this file.
+      PYTHON_INSTALL  # function defined at top of this file.
       fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."
       brew install git-cola
    else
@@ -501,8 +504,7 @@ fi
 
 if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
    # /usr/local/bin/subl
-   if [ ! -d "/Applications/Sublime Text.app" ]; then 
-   #if ! command -v subl >/dev/null; then
+   if [ ! -f "/Applications/Sublime Text.app" ]; then 
       fancy_echo "Installing Sublime Text text editor using Homebrew ..."
       brew cask install --appdir="/Applications" sublime-text
  
@@ -510,14 +512,19 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
          fancy_echo "PATH to Sublime already in $BASHFILE"
       else
          fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
-         echo "export PATH=\"$PATH:/usr/local/bin/subl\"" >>$BASHFILE
-
-         echo "alias subl='open -a \"/Applications/Sublime Text.app\"'" >>$BASHFILE
-         # Run .bash_profile to have changes take, run $FILEPATH:
+         echo "" >>$BASHFILE
+         echo "export PATH=\"\$PATH:/usr/local/bin/subl\"" >>$BASHFILE
          source $BASHFILE
-         echo $PATH
       fi 
  
+      if grep -q "alias subl=" "$BASHFILE" ; then
+         fancy_echo "PATH to Sublime already in $BASHFILE"
+      else
+         echo "" >>$BASHFILE
+         echo "alias subl='open -a \"/Applications/Sublime Text.app\"'" >>$BASHFILE
+         source $BASHFILE
+      fi 
+      # Only install the following during initial install:
       # TODO: Configure Sublime for spell checker, etc.
       # install Package Control see https://gist.github.com/patriciogonzalezvivo/77da993b14a48753efda
    else
@@ -534,7 +541,8 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
    git config --global core.editor code
    subl --version
       # Sublime Text Build 3143
-   fancy_echo "Opening Sublime Text in background ..."
+
+   fancy_echo "Opening Sublime Text app in background ..."
    subl &
 fi
 
@@ -549,7 +557,6 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
           fancy_echo "VS Code already installed: UPGRADE requested..."
           # To avoid response "Error: git not installed" to brew upgrade git
           brew uninstall visual-studio-code
-          # NOTE: This does not remove .gitconfig file.
           brew install visual-studio-code
           # TODO: Configure visual-studio-code using bash shell commands.
        else
@@ -795,33 +802,84 @@ if [[ "$GIT_EDITOR" == *"eclipse"* ]]; then
 fi
 
 
-######### Difference engine p4merge:
+######### Eclipse settings:
+
+# Add the "clean-sheet" Ergonomic Eclipse Theme for Windows 10 and Mac OS X.
+# http://www.codeaffine.com/2015/11/04/clean-sheet-an-ergonomic-eclipse-theme-for-windows-10/
 
 
-# See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
-if [ ! -d "/Applications/p4merge.app" ]; then 
-    fancy_echo "Installing p4merge diff engine app using Homebrew ..."
-    brew cask install --appdir="/Applications" p4merge
-    # TODO: Configure p4merge using shell commands.
+######### ~/.bash_profile prompt settings:
+
+
+# See http://maximomussini.com/posts/bash-git-prompt/
+if ! command -v brew >/dev/null; then
+   fancy_echo "Installing bash-git-prompt using Homebrew ..."
+   # From https://github.com/magicmonty/bash-git-prompt
+   brew install bash-git-prompt
+
+   if grep -q "gitprompt.sh" "$BASHFILE" ; then    
+      fancy_echo "gitprompt.sh already in $BASHFILE"
+   else
+      fancy_echo "Adding gitprompt.sh in $BASHFILE..."
+      echo "if [ -f \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" ]; then" >>$BASHFILE
+      echo "   __GIT_PROMPT_DIR=\"/usr/local/opt/bash-git-prompt/share\" " >>$BASHFILE
+      echo "   source \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" " >>$BASHFILE
+      echo "fi" >>$BASHFILE
+   fi
 else
     if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       # p4merge --version
-       fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew cask reinstall p4merge
+       # ?  --version
+       fancy_echo "Brew already installed: UPGRADE requested..."
+       brew upgrade bash-git-prompt
     else
-       fancy_echo "p4merge diff engine app already installed:"
+       fancy_echo "brew bash-git-prompt already installed:"
     fi
 fi
-# TODO: p4merge --version
-   # ?
+# ? --version
 
-if grep -q "alias p4merge=" "$BASHFILE" ; then    
-   fancy_echo "p4merge alias already in $BASHFILE"
+
+######### ~/.gitconfig initial settings:
+
+
+GITCONFIG=~/.gitconfig
+
+if [ ! -f "$GITCONFIG" ]; then 
+   fancy_echo "$GITCONFIG! file not found."
 else
-   fancy_echo "Adding p4merge alias in $BASHFILE..."
-   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>$BASHFILE
-fi 
+   fancy_echo "Git is configured in new $GITCONFIG "
+   fancy_echo "Backing up $GITCONFIG file to $GITCONFIG-$RANDOM.bak ..."
+   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
+   cp "$GITCONFIG" "$GITCONFIG-$RANDOM.backup"
+   fancy_echo "git config command creates new $GITCONFIG file..."
+fi
+
+# ~/.gitconfig file contain this examples:
+#[user]
+#	name = Wilson Mar
+#	id = WilsonMar+GitHub@gmail.com
+#	email = wilsonmar+github@gmail.com
+
+   fancy_echo "Adding [user] info in in $GITCONFIG ..."
+   git config --global user.name     "$GIT_NAME"
+   git config --global user.email    "$GIT_EMAIL"
+   git config --global user.id       "$GIT_ID"
+   git config --global user.username "$GIT_USERNAME"
+
+   git config --global github.user   "$GITHUB_ACCOUNT"
+   git config --global github.token  token
+
+#[core]
+#	# Use custom `.gitignore`
+#	excludesfile = ~/.gitignore
+#   hitespace = space-before-tab,indent-with-non-tab,trailing-space
+
+#fancy_echo "Configuring core git settings ..."
+   # Use custom `.gitignore`
+   git config --global core.excludesfile "~/.gitignore"
+   # Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
+   git config --global core.hitespace "space-before-tab,indent-with-non-tab,trailing-space"
+
+# cat $GITCONFIG
 
 
 # Based on https://gist.github.com/tony4d/3454372 
@@ -850,8 +908,7 @@ else
    # See https://danlimerick.wordpress.com/2011/06/19/git-for-window-tip-use-p4merge-as-mergetool/
    # git difftool
 
-fi 
-
+fi
 
 
 ######### Git command completion in ~/.bash_profile:
@@ -883,36 +940,37 @@ fi
 # line=$(read -r FIRSTLINE < ~/.git-completion.bash )
 
 
-GITCONFIG=~/.gitconfig
-if [ ! -f "$GITCONFIG" ]; then 
-   fancy_echo "$GITCONFIG! file not found."
+
+
+######### Difference engine p4merge:
+
+
+# TODO: Different diff/merge engines
+
+# See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
+if [ ! -d "/Applications/p4merge.app" ]; then 
+    fancy_echo "Installing p4merge diff engine app using Homebrew ..."
+    brew cask install --appdir="/Applications" p4merge
+    # TODO: Configure p4merge using shell commands.
 else
-   fancy_echo "Git is configured in new $GITCONFIG "
-   fancy_echo "Backing up $GITCONFIG file to $GITCONFIG-$RANDOM.bak ..."
-   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
-   mv "$GITCONFIG" "$GITCONFIG-$RANDOM.backup"
-   fancy_echo "git config command creates new $GITCONFIG file..."
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       # p4merge --version
+       fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew cask reinstall p4merge
+    else
+       fancy_echo "p4merge diff engine app already installed:"
+    fi
 fi
+# TODO: p4merge --version
+   # ?
 
-# ~/.gitconfig file contain this examples:
-#[user]
-#	name = Wilson Mar
-#	id = WilsonMar+GitHub@gmail.com
-#	email = wilsonmar+github@gmail.com
-#[color]
-#	ui = true
-
-
-   fancy_echo "Adding [user] info in in $GITCONFIG ..."
-   git config --global user.name     "$GIT_NAME"
-   git config --global user.email    "$GIT_EMAIL"
-   git config --global user.id       "$GIT_ID"
-   git config --global user.username "$GIT_USERNAME"
-
-   git config --global github.user   "$GITHUB_ACCOUNT"
-   git config --global github.token  token
-cat $GITCONFIG
-
+if grep -q "alias p4merge=" "$BASHFILE" ; then    
+   fancy_echo "p4merge alias already in $BASHFILE"
+else
+   fancy_echo "Adding p4merge alias in $BASHFILE..."
+   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>$BASHFILE
+fi 
 
 
 ######### Git Signing:
@@ -1130,7 +1188,7 @@ fi
 # sudo pip install git-review
 
 
-######### Git command coloring in .gitconfig:
+######### Gitconfig command coloring in .gitconfig:
 
 
 # If git config color.ui returns true, skip:
@@ -1142,6 +1200,9 @@ else # false or blank response:
    git config --global color.ui true
 fi
 
+
+#[color]
+#	ui = true
 
 if grep -q "color.status=auto" "$GITCONFIG" ; then    
    fancy_echo "color.status=auto already in $GITCONFIG"
@@ -1228,7 +1289,7 @@ echo "CLOUD=$CLOUD"
 if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
    if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
       fancy_echo "Installing CLOUD=$CLOUD = brew cask install google-cloud-sdk ..."
-      python_install  # function defined at top of this file.
+      PYTHON_INSTALL  # function defined at top of this file.
       brew tap caskroom/cask
       brew cask install google-cloud-sdk  # to ./google-cloud-sdk
       gcloud --version
@@ -1240,6 +1301,14 @@ if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
       fancy_echo "CLOUD=$CLOUD = google-cloud-sdk already installed."
    fi
    # NOTE: gcloud command on its own results in an error.
+
+   # Define alias:
+      if grep -q "alias gcs=" "$BASHFILE" ; then    
+         fancy_echo "alias gcs= already in $BASHFILE"
+      else
+         fancy_echo "Adding alias gcs in $BASHFILE ..."
+         echo "alias gcs='cd ~/.google-cloud-sdk;ls'" >>$BASHFILE
+      fi
 
    fancy_echo "Run \"gcloud init\" "
    # See https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
@@ -1308,7 +1377,7 @@ fi
 
 # If in verbose mode:
 fancy_echo "$GITCONFIG:"
-cat $GITCONFIG  # List contents of ~/.gitconfig
+# cat $GITCONFIG  # List contents of ~/.gitconfig
 
 fancy_echo "git config --list:"
 git config --list

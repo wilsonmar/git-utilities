@@ -44,6 +44,10 @@ It calls a script that sets git configurations for a project (or globally)<br />
 <strong>git-sample-repo-create.ps1</strong> is a PowerShell script that
 creates a repository on your local clones your fork of a sample sample repository.
 
+TODO: A script that provides a summary report of where there are un-pushed files lingering among a set of  repo folders locally (folders with a .git folder).
+
+<hr />
+
 All these scripts create a folder, but that folder is deleted at the beginning of each run
 to make them "idempotent" in that each run of the script ends up in the same condition,
 whether run the first time or subsequent times.
