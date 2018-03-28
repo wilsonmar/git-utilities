@@ -1183,8 +1183,18 @@ fi
 
 ######### TODO: git local hooks 
 
+
 # Based https://wilsonmar.github.io/git-hooks/
-# See https://github.com/git/git/tree/master/contrib/hooks
+if [ ! -f ".git/hooks/git-commit" ]; then 
+   fancy_echo "git-commit file not found in .git/hooks. Copying ..."
+   cp hooks/* .git/hooks
+   chmod +x .git/hooks
+else
+   fancy_echo "git-commit file found in .git/hooks. Skipping ..."
+fi
+exit
+
+# For more, see https://github.com/git/git/tree/master/contrib/hooks
 
 
 ######### Git Signing:
@@ -1446,6 +1456,7 @@ fi
 
 # IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
 # page https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started
+# or curl -fsSL https://clis.ng.bluemix.net/install/osx | sh
 # The command is "bx login".
 # IBM's BlueMix cloud for AI has a pre-prequisite in NodeJs.
 # npm install watson-visual-recognition-utils -g
@@ -1489,7 +1500,7 @@ else
    fancy_echo "$SSHCONFIG file already created with $OCCURENCES entries."
    # Do not delete $SSHCONFIG file!
 fi
-cat $SSHCONFIG
+cat "$SSHCONFIG"
 
 
 # See https://www.saltycrane.com/blog/2008/11/creating-remote-server-nicknames-sshconfig/
