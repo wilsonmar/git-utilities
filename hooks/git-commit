@@ -1,7 +1,0 @@
-#!/bin/sh
-# git-commit
-# 1) Copy this file to .git/hooks folder.
-# 2) chmod +x .git/hooks/pre-are-commit-msg 
-# 3) ./git-commit
-echo "# git-commit hook executing!"
-# echo "# Please include a useful commit message!" > $1
