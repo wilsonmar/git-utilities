@@ -318,11 +318,11 @@ fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
 if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
    # google-chrome is the most tested and popular.
    if [ ! -d "/Applications/Google Chrome.app" ]; then 
-      fancy_echo "Installing GIT_CLIENT=\"google-chrome\" using Homebrew ..."
+      fancy_echo "Installing GIT_BROWSER=\"google-chrome\" using Homebrew ..."
       brew cask install --appdir="/Applications" google-chrome
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading GIT_CLIENT=\"google-chrome\" using Homebrew ..."
+         fancy_echo "Upgrading GIT_BROWSER=\"google-chrome\" using Homebrew ..."
          brew cask upgrade google-chrome
       else
          fancy_echo "GIT_BROWSER=\"google-chrome\" already installed."
@@ -345,11 +345,11 @@ fi
 if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    # firefox is more respectful of user data.
    if [ ! -d "/Applications/Firefox.app" ]; then 
-      fancy_echo "Installing GIT_CLIENT=\"firefox\" using Homebrew ..."
+      fancy_echo "Installing GIT_BROWSER=\"firefox\" using Homebrew ..."
       brew cask install --appdir="/Applications" firefox
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading GIT_CLIENT=\"firefox\" using Homebrew ..."
+         fancy_echo "Upgrading GIT_BROWSER=\"firefox\" using Homebrew ..."
          brew cask upgrade firefox
       else
          fancy_echo "GIT_BROWSER=\"firefox\" already installed."
@@ -371,11 +371,11 @@ fi
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # brave is more respectful of user data.
    if [ ! -d "/Applications/Brave.app" ]; then 
-      fancy_echo "Installing GIT_CLIENT=\"brave\" using Homebrew ..."
+      fancy_echo "Installing GIT_BROWSER=\"brave\" using Homebrew ..."
       brew cask install --appdir="/Applications" brave
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading GIT_CLIENT=\"brave\" using Homebrew ..."
+         fancy_echo "Upgrading GIT_BROWSER=\"brave\" using Homebrew ..."
          brew cask upgrade brave
       else
          fancy_echo "GIT_BROWSER=\"brave\" already installed."
