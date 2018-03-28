@@ -1181,18 +1181,18 @@ fi
 # sudo pip install git-review
 
 
-######### TODO: git local hooks 
+######### git local hooks 
 
 
 # Based https://wilsonmar.github.io/git-hooks/
 if [ ! -f ".git/hooks/git-commit" ]; then 
    fancy_echo "git-commit file not found in .git/hooks. Copying ..."
    cp hooks/* .git/hooks
-   chmod +x .git/hooks
+   chmod +x .git/hooks/*
 else
    fancy_echo "git-commit file found in .git/hooks. Skipping ..."
 fi
-exit
+
 
 # For more, see https://github.com/git/git/tree/master/contrib/hooks
 
