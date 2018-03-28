@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # prepare-commit-msg
 echo "Hello from prepare-commit-msg"
 exit 0

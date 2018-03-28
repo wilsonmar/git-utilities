@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "*** git-push hook executing!"
+# From https://longair.net/blog/2011/04/09/missing-git-hooks-documentation/
+echo Running $BASH_SOURCE
+set | egrep GIT
+echo GIT_DIR is $GIT_DIR
+echo PWD is $PWD

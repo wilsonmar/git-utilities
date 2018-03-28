@@ -1,0 +1,22 @@
+#!/bin/sh
+# git-squash
+# From https://coderwall.com/p/bt93ia/extend-git-with-custom-commands
+# Usage: git squash 3
+# squashes the last 3 commits (HEAD~3)
+
+source "$(git --exec-path)/git-sh-setup"
+
+USAGE="COMMITS"
+function _squash() {
+    if [[ $# == 1 ]]; then
+        if [[ -n $(git rev-parse --verify --quiet HEAD~$1) ]]; then
+            git rebase -i HEAD~$1
+        else
+            die "HEAD~$1 does not exist"
+        fi
+    else
+        usage
+    fi  
+}
+
+_squash $1

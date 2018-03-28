@@ -1,0 +1,16 @@
+{
+  "name": "Prehooks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "precommit": "jshint index.js",
+    "prepush": "jshint index.js"
+  },
+  "devDependencies": {
+    "husky": "0.7.0",
+    "jshint": "^2.8.0"
+  },
+  "author": "PentaCode",
+  "license": "ISC"
+}
