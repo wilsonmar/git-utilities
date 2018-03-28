@@ -1,0 +1,4 @@
+#!/bin/sh
+# post-commit file
+echo "Hello from post-commit."
+exit 0

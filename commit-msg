@@ -1,0 +1,4 @@
+#!/bin/sh
+# commit-msg file
+echo "Hello from commit-msg."
+exit 0
