@@ -300,6 +300,7 @@ fi
 ######### Git web browser setting:
 
 
+
 # Install browser using Homebrew to display GitHub to paste SSH key at the end.
 fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
       echo "The last one installed is set as the Git browser."
@@ -327,13 +328,13 @@ if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
          fancy_echo "GIT_BROWSER=\"google-chrome\" already installed."
       fi
    fi
-   fancy_echo "Opening google-chrome ..."
-   open "/Applications/google-chrome.app"
+   # fancy_echo "Opening Google Chrome ..."
+   # open "/Applications/Google Chrome.app"
 fi
 
 # Check to see if browser is already specified in $GITCONFIG:
 if grep -q "google-chrome" "$(git config web.browser)" ; then    
-   fancy_echo "git config --global web.browser already defined for chrome."
+   fancy_echo "git config --global web.browser google-chrome already defined."
 else 
    fancy_echo "git config --global web.browser google-chrome ..."
    git config --global web.browser google-chrome
@@ -354,22 +355,47 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
          fancy_echo "GIT_BROWSER=\"firefox\" already installed."
       fi
    fi
-   fancy_echo "Opening firefox ..."
-   open "/Applications/firefox.app"
+   #fancy_echo "Opening firefox ..."
+   #open "/Applications/Firefox.app"
 fi
 
 # Check to see if browser is already specified in $GITCONFIG:
 if grep -q "firefox" "$(git config web.browser)" ; then    
-   fancy_echo "git config --global web.browser already defined for firefox."
+   fancy_echo "git config --global web.browser firefox already defined."
 else 
    fancy_echo "git config --global web.browser firefox ..."
    git config --global web.browser firefox
 fi
 
 
+if [[ "$GIT_BROWSER" == *"brave"* ]]; then
+   # brave is more respectful of user data.
+   if [ ! -d "/Applications/Brave.app" ]; then 
+      fancy_echo "Installing GIT_CLIENT=\"brave\" using Homebrew ..."
+      brew cask install --appdir="/Applications" brave
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading GIT_CLIENT=\"brave\" using Homebrew ..."
+         brew cask upgrade brave
+      else
+         fancy_echo "GIT_BROWSER=\"brave\" already installed."
+      fi
+   fi
+   # fancy_echo "Opening brave ..."
+   # open "/Applications/brave.app"
+fi
 
-   # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
-   # The command line web browser:
+# Check to see if browser is already specified in $GITCONFIG:
+if grep -q "brave" "$(git config web.browser)" ; then    
+   fancy_echo "git config --global web.browser brave already defined."
+else 
+   fancy_echo "git config --global web.browser brave ..."
+   git config --global web.browser brave
+fi
+
+
+# Other alternatives listed at https://git-scm.com/docs/git-web--browse.html
+
    # brew install links
 
    #git config --global web.browser cygstart
@@ -425,7 +451,7 @@ brew install shellcheck
 ######### Git clients:
 
 
-fancy_echo "GIT_CLIENT=$GIT_CLIENT ..."
+fancy_echo "GIT_CLIENT=$GIT_CLIENT in .secrets.sh ..."
 echo "The last one installed is set as the Git editor."
 # See https://www.slant.co/topics/465/~best-git-clients-for-macos
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
@@ -1591,6 +1617,8 @@ pbcopy < "$FILE.pub"
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
+
+# Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
