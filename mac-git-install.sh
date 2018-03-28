@@ -1444,6 +1444,15 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
 fi
 
 
+# IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
+# page https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started
+# The command is "bx login".
+# IBM's BlueMix cloud for AI has a pre-prequisite in NodeJs.
+# npm install watson-visual-recognition-utils -g
+* npm install watson-speech-to-text-utils -g
+# See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
+
+
 ######### SSH-KeyGen:
 
 
