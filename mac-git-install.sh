@@ -811,7 +811,13 @@ fi
 ######### ~/.bash_profile prompt settings:
 
 
+# https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 # See http://maximomussini.com/posts/bash-git-prompt/
+
+# BTW, for completion of bash commands on MacOS:
+# brew install bash-completion
+# Also see https://github.com/barryclark/bashstrap
+
 if ! command -v brew >/dev/null; then
    fancy_echo "Installing bash-git-prompt using Homebrew ..."
    # From https://github.com/magicmonty/bash-git-prompt
@@ -1393,10 +1399,6 @@ else
    echo "fi" >>$BASHFILE
    cat $FILEPATH >>$BASHFILE
 fi 
-
-# BTW, for completion of bash commands on MacOS:
-# brew install bash-completion
-# Also see https://github.com/barryclark/bashstrap
 
 
 # If GPG suite is not used, add the GPG key to ~/.bash_profile:
