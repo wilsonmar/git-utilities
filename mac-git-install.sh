@@ -299,9 +299,11 @@ fi
 
 ######### Git web browser setting:
 
+
 # Install browser using Homebrew to display GitHub to paste SSH key at the end.
 fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
       echo "The last one installed is set as the Git browser."
+
 
 # See Complications at
 # https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
@@ -312,25 +314,59 @@ fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
 #    cmd = C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
 #    path = C:/Program Files (x86)/Google/Chrome/Application/
 
+if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
+   # google-chrome is the most tested and popular.
+   if [ ! -d "/Applications/Google Chrome.app" ]; then 
+      fancy_echo "Installing GIT_CLIENT=\"google-chrome\" using Homebrew ..."
+      brew cask install --appdir="/Applications" google-chrome
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading GIT_CLIENT=\"google-chrome\" using Homebrew ..."
+         brew cask upgrade google-chrome
+      else
+         fancy_echo "GIT_BROWSER=\"google-chrome\" already installed."
+      fi
+   fi
+   fancy_echo "Opening google-chrome ..."
+   open "/Applications/google-chrome.app"
+fi
+
 # Check to see if browser is already specified in $GITCONFIG:
-BROWSER=$(git config web.browser) 
-if grep -q "browser = " "$GITCONFIG" ; then    
-   fancy_echo "git config --global web.browser already defined for $BROWSER."
+if grep -q "google-chrome" "$(git config web.browser)" ; then    
+   fancy_echo "git config --global web.browser already defined for chrome."
 else 
    fancy_echo "git config --global web.browser google-chrome ..."
    git config --global web.browser google-chrome
-
-# TODO: xxx
-if [ $? == 0 ]; then
-   fancy_echo "git config --global color.ui already true (on)."
-else # false or blank response:
-   fancy_echo "Setting git config --global color.ui true (on)..."
-   git config --global color.ui true
 fi
 
-   # google-chrome is the most tested and popular.
-   # Check to see if google-chrome is installed and if not:
-   # brew cask install google-chrome
+
+
+if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
+   # firefox is more respectful of user data.
+   if [ ! -d "/Applications/Firefox.app" ]; then 
+      fancy_echo "Installing GIT_CLIENT=\"firefox\" using Homebrew ..."
+      brew cask install --appdir="/Applications" firefox
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading GIT_CLIENT=\"firefox\" using Homebrew ..."
+         brew cask upgrade firefox
+      else
+         fancy_echo "GIT_BROWSER=\"firefox\" already installed."
+      fi
+   fi
+   fancy_echo "Opening firefox ..."
+   open "/Applications/firefox.app"
+fi
+
+# Check to see if browser is already specified in $GITCONFIG:
+if grep -q "firefox" "$(git config web.browser)" ; then    
+   fancy_echo "git config --global web.browser already defined for firefox."
+else 
+   fancy_echo "git config --global web.browser firefox ..."
+   git config --global web.browser firefox
+fi
+
+
 
    # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
    # The command line web browser:
@@ -338,8 +374,6 @@ fi
 
    #git config --global web.browser cygstart
    #git config --global browser.cygstart.cmd cygstart
-fi
-
 
 
 ######### Diff/merge tools:
@@ -378,6 +412,7 @@ fi
 
 
 # This Bash file was run through online at https://www.shellcheck.net/
+# See https://github.com/koalaman/shellcheck#user-content-in-your-editor
 
 # To ignore/override an error identified:
 # shellcheck disable=SC1091
@@ -390,7 +425,7 @@ brew install shellcheck
 ######### Git clients:
 
 
-fancy_echo "GIT_CLIENT=$GIT_CLIENT..."
+fancy_echo "GIT_CLIENT=$GIT_CLIENT ..."
 echo "The last one installed is set as the Git editor."
 # See https://www.slant.co/topics/465/~best-git-clients-for-macos
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 

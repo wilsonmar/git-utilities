@@ -4,6 +4,6 @@
 # Called by "git commit" with no arguments.  The hook should
 # exit with non-zero status after issuing an appropriate message if
 # it wants to stop the commit.
-#
+# Execute shellcheck to check bash scripts.
 echo "Hello from pre-commit."
-exit 0
+exit 0  # 1 is error.
