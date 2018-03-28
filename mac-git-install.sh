@@ -4,12 +4,14 @@
 # This establishes all the utilities related to use of Git,
 # customized based on specification in file .secrets.sh within the same repo.
 # See https://github.com/wilsonmar/git-utilities/blob/master/README.md
-# NOTE: This was run through https://www.shellcheck.net/
 # Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > Git clients > git users > Editors > git [core] > coloring > rerere > diff/merge > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > code review > git hooks > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > Git clients > git users > Editors > git [core] > coloring > rerere > diff/merge > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
+
+# NOTE: This was run through https://www.shellcheck.net/
+# shellcheck disable=SC1091
 
 set -a
 
@@ -711,7 +713,7 @@ if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
 
         # Per https://stackoverflow.com/questions/4011707/how-to-start-textmate-in-command-line
         # Create a symboling link to bin folder
-        ln -s /Applications/TextMate.app/Contents/Resources/mate $HOME/bin/mate
+        ln -s /Applications/TextMate.app/Contents/Resources/mate "$HOME/bin/mate"
 
         if grep -q "export EDITOR=" "$BASHFILE" ; then    
            fancy_echo "export EDITOR= already in $BASHFILE."
@@ -777,7 +779,7 @@ if [[ "$GIT_EDITOR" == *"intellij"* ]]; then
            fancy_echo "alias idea= already in $BASHFILE."
         else
            fancy_echo "Concatenating \"alias idea=\" in $BASHFILE..."
-           echo "alias idea='open -a \"`ls -dt /Applications/IntelliJ\ IDEA*|head -1`\"'" >>"$BASHFILE"
+           echo "alias idea='open -a \"$(ls -dt /Applications/IntelliJ\ IDEA*|head -1)\"'" >>"$BASHFILE"
            source "$BASHFILE"
         fi 
     git config --global core.editor idea
@@ -1171,6 +1173,19 @@ fi
 #git flow feature start <your feature>
 
 
+######### git local hooks 
+
+
+# Based https://wilsonmar.github.io/git-hooks/
+if [ ! -f ".git/hooks/git-commit" ]; then 
+   fancy_echo "git-commit file not found in .git/hooks. Copying hooks folder ..."
+   rm .git/hooks/*.sample
+   cp hooks/* .git/hooks
+   chmod +x .git/hooks/*
+else
+   fancy_echo "git-commit file found in .git/hooks. Skipping ..."
+fi
+
 
 ######### TODO: Code review:
 
@@ -1179,22 +1194,6 @@ fi
 # sudo easy_install pip
 # sudo pip install -U setuptools
 # sudo pip install git-review
-
-
-######### git local hooks 
-
-
-# Based https://wilsonmar.github.io/git-hooks/
-if [ ! -f ".git/hooks/git-commit" ]; then 
-   fancy_echo "git-commit file not found in .git/hooks. Copying ..."
-   cp hooks/* .git/hooks
-   chmod +x .git/hooks/*
-else
-   fancy_echo "git-commit file found in .git/hooks. Skipping ..."
-fi
-
-
-# For more, see https://github.com/git/git/tree/master/contrib/hooks
 
 
 ######### Git Signing:
@@ -1311,7 +1310,7 @@ fi
    # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for this:
    KEY=$(GPG_MAP_MAIL2KEY "$GIT_ID")  # 16 chars. 
 
-# TODO: Store your GPG key passphrase so you don't have to enter it every time you 
+# PROTIP: Store your GPG key passphrase so you don't have to enter it every time you 
 #       sign a commit by using https://gpgtools.org/
 
 # If key is not already set in .gitconfig, add it:
