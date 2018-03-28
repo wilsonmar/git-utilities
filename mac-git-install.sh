@@ -4,10 +4,12 @@
 # This establishes all the utilities related to use of Git,
 # customized based on specification in file .secrets.sh within the same repo.
 # See https://github.com/wilsonmar/git-utilities/blob/master/README.md
-
+# NOTE: This was run through https://www.shellcheck.net/
 # Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
+
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > Git clients > git users > Editors > git [core] > coloring > rerere > diff/merge > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > code review > git hooks > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
 
 set -a
 
@@ -18,7 +20,7 @@ set -a
 fancy_echo() {
   local fmt="$1"; shift
   # shellcheck disable=SC2059
-  printf "\n>>> $fmt\n" "$@"
+  printf "\\n>>> $fmt\\n" "$@"
 }
 
 # Add function to read in string and email, and return a KEY found for that email.
@@ -72,8 +74,8 @@ PYTHON_INSTALL(){
    else
       fancy_echo "$(python --version) already installed:"
    fi
-   which python
-   ls -al $(which python) # /usr/local/bin/python
+   command -v python
+   ls -al "$(command -v python)" # /usr/local/bin/python
 
    #python --version
       # Python 2.7.14
@@ -83,7 +85,7 @@ PYTHON_INSTALL(){
          fancy_echo "Python 2.7 alias already in $BASHFILE"
       else
          fancy_echo "Adding Python 2.7 alias in $BASHFILE ..."
-         echo "export alias python=/usr/local/bin/python2.7" >>$BASHFILE
+         echo "export alias python=/usr/local/bin/python2.7" >>"$BASHFILE"
       fi
    
    # To prevent the older MacOS default python being seen first in PATH ...
@@ -91,17 +93,17 @@ PYTHON_INSTALL(){
          fancy_echo "Python PATH already in $BASHFILE"
       else
          fancy_echo "Adding Python PATH in $BASHFILE..."
-         echo "export PATH=\"/usr/local/opt/python/libexec/bin:$PATH\"" >>$BASHFILE
+         echo "export PATH=\"/usr/local/opt/python/libexec/bin:$PATH\"" >>"$BASHFILE"
       fi
 
          # Run .bash_profile to have changes take, run $FILEPATH:
-         source $BASHFILE
-         echo $PATH
+         source "$BASHFILE"
+         echo "$PATH"
 
    # There is also a Enthought Python Distribution -- www.enthought.com
 }
 
-python3_install(){
+PYTHON3_INSTALL(){
    fancy_echo "Installing Python3 is a pre-requisite for AWS-CLI"
    # Python3 is a pre-requisite for aws.
    # Because there are two active versions of Python (2.7.4 and 3.6 now)...
@@ -124,11 +126,14 @@ python3_install(){
    else
       fancy_echo "$(python3 --version) already installed:"
    fi
-   which python3
-   ls -al $(which python3) # /usr/local/bin/python
+   command -v python3
+   ls -al "$(command -v python3)" # /usr/local/bin/python
 
    python3 --version
       # Python 3.6.4
+
+   # NOTE: To make "python" command reach Python3 instead of 2.7, per docs.python-guide.org/en/latest/starting/install3/osx/
+   # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
 }
 
 
@@ -151,7 +156,7 @@ if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then
 else
    fancy_echo "Reading from $SECRETSFILE ..."
    #chmod +x $SECRETSFILE
-   . ./$SECRETSFILE
+   source "$SECRETSFILE"
    echo "GIT_NAME=$GIT_NAME"
    echo "GIT_ID=$GIT_ID"
    echo "GIT_EMAIL=$GIT_EMAIL"
@@ -171,10 +176,14 @@ if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then # variable made lower case.
    echo "All packages here will be upgraded ..."
 fi
 
+
+######### OSX configuration:
+
+
 fancy_echo "Configure OSX Finder to show hidden files too:"
 defaults write com.apple.finder AppleShowAllFiles YES
-# NOTE: Additional dotfiles for Mac
-# NOTE: osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
+# NOTE: Additional config dotfiles for Mac?
+# NOTE: See osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
 #       installs other programs on Macs for developers.
 
 
@@ -194,16 +203,16 @@ pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
 ######### bash.profile configuration:
 
 
-BASHFILE=~/.bash_profile
+BASHFILE=$HOME/.bash_profile
 
 # if ~/.bash_profile has not been defined, create it:
 if [ ! -f "$BASHFILE" ]; then #  NOT found:
    fancy_echo "Creating blank \"${BASHFILE}\" ..."
-   touch $BASHFILE
-   echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>$BASHFILE
+   touch "$BASHFILE"
+   echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>"$BASHFILE"
    # El Capitan no longer allows modifications to /usr/bin, and /usr/local/bin is preferred over /usr/bin, by default.
 else
-   LINES=$(wc -l < ${BASHFILE})
+   LINES=$(wc -l < "${BASHFILE}")
    fancy_echo "\"${BASHFILE}\" already created with $LINES lines."
 
    fancy_echo "Backing up file $BASHFILE to $BASHFILE-$RANDOM.bak ..."
@@ -212,7 +221,7 @@ else
 fi
 
 
-###### Locale settings missing in OS X Lion+:
+###### bash.profile locale settings missing in OS X Lion+:
 
 
 # See https://stackoverflow.com/questions/7165108/in-os-x-lion-lang-is-not-set-to-utf-8-how-to-fix-it
@@ -222,13 +231,13 @@ if grep -q "LC_ALL" "$BASHFILE" ; then
    fancy_echo "LC_ALL Locale setting already in $BASHFILE"
 else
    fancy_echo "Adding LC_ALL Locale in $BASHFILE..."
-   echo "# Added by mac-git-install.sh ::" >>$BASHFILE
-   echo "export LC_ALL=en_US.utf-8" >>$BASHFILE
+   echo "# Added by mac-git-install.sh ::" >>"$BASHFILE"
+   echo "export LC_ALL=en_US.utf-8" >>"$BASHFILE"
    #export LANG="en_US.UTF-8"
    #export LC_CTYPE="en_US.UTF-8"
    
    # Run .bash_profile to have changes take, run $FILEPATH:
-   source $BASHFILE
+   source "$BASHFILE"
 fi 
 #locale
    # LANG="en_US.UTF-8"
@@ -270,6 +279,56 @@ brew --version
 #brew tap caskroom/cask
 # brew cask installs GUI apps (see https://caskroom.github.io/)
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+
+
+######### ~/.gitconfig initial settings:
+
+
+GITCONFIG=$HOME/.gitconfig
+
+if [ ! -f "$GITCONFIG" ]; then 
+   fancy_echo "$GITCONFIG! file not found."
+else
+   fancy_echo "Git is configured in new $GITCONFIG "
+   fancy_echo "Backing up $GITCONFIG file to $GITCONFIG-$RANDOM.bak ..."
+   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
+   cp "$GITCONFIG" "$GITCONFIG-$RANDOM.backup"
+   fancy_echo "git config command creates new $GITCONFIG file..."
+fi
+
+
+######### Git web browser setting:
+
+
+# TODO: New .secrets.sh variable BROWSER=google-chrome, etc.
+# TODO: Install browser as needed using Homebrew.
+
+# See Complications at
+# https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
+# [web]
+# browser = google-chrome
+#[browser "chrome"]
+#    cmd = C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
+#    path = C:/Program Files (x86)/Google/Chrome/Application/
+
+if grep -q "browser = " "$GITCONFIG" ; then    
+   fancy_echo "git config --global web.browser already defined:"
+   git config --global web.browser 
+else 
+   fancy_echo "git config --global web.browser google-chrome ..."
+   git config --global web.browser google-chrome
+
+   # google-chrome is the most tested and popular.
+   # Check to see if google-chrome is installed and if not:
+   # brew cask install google-chrome
+
+   # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
+   # The command line web browser:
+   # brew install links
+
+   #git config --global web.browser cygstart
+   #git config --global browser.cygstart.cmd cygstart
+fi
 
 
 ######### Git clients:
@@ -415,7 +474,7 @@ fi
 
 if [[ "$GIT_CLIENT" == *"tower"* ]]; then
     # Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
-    if [ ! -d "~/Applications/Tower.app" ]; then 
+    if [ ! -d "$HOME/Applications/Tower.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"tower\" using Homebrew ..."
         brew cask install --appdir="/Applications" tower
     else
@@ -512,17 +571,17 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
          fancy_echo "PATH to Sublime already in $BASHFILE"
       else
          fancy_echo "Adding PATH to SublimeText in $BASHFILE..."
-         echo "" >>$BASHFILE
-         echo "export PATH=\"\$PATH:/usr/local/bin/subl\"" >>$BASHFILE
-         source $BASHFILE
+         echo "" >>"$BASHFILE"
+         echo "export PATH=\"\$PATH:/usr/local/bin/subl\"" >>"$BASHFILE"
+         source "$BASHFILE"
       fi 
  
       if grep -q "alias subl=" "$BASHFILE" ; then
          fancy_echo "PATH to Sublime already in $BASHFILE"
       else
-         echo "" >>$BASHFILE
-         echo "alias subl='open -a \"/Applications/Sublime Text.app\"'" >>$BASHFILE
-         source $BASHFILE
+         echo "" >>"$BASHFILE"
+         echo "alias subl='open -a \"/Applications/Sublime Text.app\"'" >>"$BASHFILE"
+         source "$BASHFILE"
       fi 
       # Only install the following during initial install:
       # TODO: Configure Sublime for spell checker, etc.
@@ -594,12 +653,17 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
        fi
     fi
     git config --global core.editor atom
+
+   # Configure plug-ins:
+   #apm install linter-shellcheck
+
    atom --version
       # Atom    : 1.20.1
       # Electron: 1.6.9
       # Chrome  : 56.0.2924.87
       # Node    : 7.4.0
       # Wilsons-MacBook-Pro
+
    fancy_echo "Starting atom in background ..."
    atom &
 fi
@@ -647,13 +711,13 @@ if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
 
         # Per https://stackoverflow.com/questions/4011707/how-to-start-textmate-in-command-line
         # Create a symboling link to bin folder
-        ln -s /Applications/TextMate.app/Contents/Resources/mate ~/bin/mate
+        ln -s /Applications/TextMate.app/Contents/Resources/mate $HOME/bin/mate
 
         if grep -q "export EDITOR=" "$BASHFILE" ; then    
            fancy_echo "export EDITOR= already in $BASHFILE."
         else
            fancy_echo "Concatenating \"export EDITOR=\" in $BASHFILE..."
-           echo "export EDITOR=\"/usr/local/bin/mate -w\" " >>$BASHFILE
+           echo "export EDITOR=\"/usr/local/bin/mate -w\" " >>"$BASHFILE"
         fi 
    mate -v
       #mate 2.12 (2018-03-08) 
@@ -683,6 +747,8 @@ if [[ "$GIT_EDITOR" == *"emacs"* ]]; then
     git config --global core.editor emacs
     emacs --version
 
+    # Evaluate https://github.com/git/git/tree/master/contrib/emacs
+
    fancy_echo "Opening emacs in background ..."
    emacs &
 fi
@@ -711,8 +777,8 @@ if [[ "$GIT_EDITOR" == *"intellij"* ]]; then
            fancy_echo "alias idea= already in $BASHFILE."
         else
            fancy_echo "Concatenating \"alias idea=\" in $BASHFILE..."
-           echo "alias idea='open -a \"`ls -dt /Applications/IntelliJ\ IDEA*|head -1`\"'" >>$BASHFILE
-           source $BASHFILE
+           echo "alias idea='open -a \"`ls -dt /Applications/IntelliJ\ IDEA*|head -1`\"'" >>"$BASHFILE"
+           source "$BASHFILE"
         fi 
     git config --global core.editor idea
     # TODO: idea --version
@@ -749,9 +815,9 @@ if [[ "$GIT_EDITOR" == *"sts"* ]]; then
            fancy_echo "alias sts= already in $BASHFILE."
         else
            fancy_echo "Concatenating \"export sts=\" in $BASHFILE..."
-           echo " " >>$BASHFILE
-           echo "alias sts='open -a \"/Applications/STS.app\"'" >>$BASHFILE
-           source $BASHFILE
+           echo " " >>"$BASHFILE"
+           echo "alias sts='open -a \"/Applications/STS.app\"'" >>"$BASHFILE"
+           source "$BASHFILE"
         fi 
     git config --global core.editor sts
     # TODO: sts --version
@@ -785,8 +851,8 @@ if [[ "$GIT_EDITOR" == *"eclipse"* ]]; then
        fancy_echo "alias eclipse= already in $BASHFILE."
    else
        fancy_echo "Concatenating \"alias eclipse=\" in $BASHFILE..."
-       echo "alias eclipse='open \"/Applications/Eclipse.app\"'" >>$BASHFILE
-       source $BASHFILE
+       echo "alias eclipse='open \"/Applications/Eclipse.app\"'" >>"$BASHFILE"
+       source "$BASHFILE"
    fi 
    #git config --global core.editor eclipse
 
@@ -808,56 +874,8 @@ fi
 # http://www.codeaffine.com/2015/11/04/clean-sheet-an-ergonomic-eclipse-theme-for-windows-10/
 
 
-######### ~/.bash_profile prompt settings:
+######### ~/.gitconfig [user] and [core] settings:
 
-
-# https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
-# See http://maximomussini.com/posts/bash-git-prompt/
-
-# BTW, for completion of bash commands on MacOS:
-# brew install bash-completion
-# Also see https://github.com/barryclark/bashstrap
-
-if ! command -v brew >/dev/null; then
-   fancy_echo "Installing bash-git-prompt using Homebrew ..."
-   # From https://github.com/magicmonty/bash-git-prompt
-   brew install bash-git-prompt
-
-   if grep -q "gitprompt.sh" "$BASHFILE" ; then    
-      fancy_echo "gitprompt.sh already in $BASHFILE"
-   else
-      fancy_echo "Adding gitprompt.sh in $BASHFILE..."
-      echo "if [ -f \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" ]; then" >>$BASHFILE
-      echo "   __GIT_PROMPT_DIR=\"/usr/local/opt/bash-git-prompt/share\" " >>$BASHFILE
-      echo "   source \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" " >>$BASHFILE
-      echo "fi" >>$BASHFILE
-   fi
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       # ?  --version
-       fancy_echo "Brew already installed: UPGRADE requested..."
-       brew upgrade bash-git-prompt
-    else
-       fancy_echo "brew bash-git-prompt already installed:"
-    fi
-fi
-# ? --version
-
-
-######### ~/.gitconfig initial settings:
-
-
-GITCONFIG=~/.gitconfig
-
-if [ ! -f "$GITCONFIG" ]; then 
-   fancy_echo "$GITCONFIG! file not found."
-else
-   fancy_echo "Git is configured in new $GITCONFIG "
-   fancy_echo "Backing up $GITCONFIG file to $GITCONFIG-$RANDOM.bak ..."
-   RANDOM=$((1 + RANDOM % 1000));  # 5 digit randome number.
-   cp "$GITCONFIG" "$GITCONFIG-$RANDOM.backup"
-   fancy_echo "git config command creates new $GITCONFIG file..."
-fi
 
 # ~/.gitconfig file contain this examples:
 #[user]
@@ -871,9 +889,6 @@ fi
    git config --global user.id       "$GIT_ID"
    git config --global user.username "$GIT_USERNAME"
 
-   git config --global github.user   "$GITHUB_ACCOUNT"
-   git config --global github.token  token
-
 #[core]
 #	# Use custom `.gitignore`
 #	excludesfile = ~/.gitignore
@@ -885,7 +900,65 @@ fi
    # Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
    git config --global core.hitespace "space-before-tab,indent-with-non-tab,trailing-space"
 
-# cat $GITCONFIG
+
+######### Gitconfig command coloring in .gitconfig:
+
+
+# If git config color.ui returns true, skip:
+git config color.ui | grep 'true' &> /dev/null
+if [ $? == 0 ]; then
+   fancy_echo "git config --global color.ui already true (on)."
+else # false or blank response:
+   fancy_echo "Setting git config --global color.ui true (on)..."
+   git config --global color.ui true
+fi
+
+#[color]
+#	ui = true
+
+if grep -q "color.status=auto" "$GITCONFIG" ; then    
+   fancy_echo "color.status=auto already in $GITCONFIG"
+else
+   fancy_echo "Adding color.status=auto in $GITCONFIG..."
+   git config --global color.status auto
+   git config --global color.branch auto
+   git config --global color.interactive auto
+   git config --global color.diff auto
+   git config --global color.pager true
+
+   # normal, black, red, green, yellow, blue, magenta, cyan, white
+   # Attributes: bold, dim, ul, blink, reverse, italic, strike
+   git config --global color.status.added     "green   normal bold"
+   git config --global color.status.changed   "blue    normal bold"
+   git config --global color.status.header    "white   normal dim"
+   git config --global color.status.untracked "cyan    normal bold"
+
+   git config --global color.branch.current   "yellow  reverse"
+   git config --global color.branch.local     "yellow  normal bold"
+   git config --global color.branch.remote    "cyan    normal dim"
+
+   git config --global color.diff.meta        "yellow  normal bold"
+   git config --global color.diff.frag        "magenta normal bold"
+   git config --global color.diff.old         "blue    normal strike"
+   git config --global color.diff.new         "green   normal bold"
+   git config --global color.diff.whitespace  "red     normal bold"
+fi
+
+
+######### Reuse Recorded Resolution of conflicted merges
+
+
+# See https://git-scm.com/docs/git-rerere
+# and https://git-scm.com/book/en/v2/Git-Tools-Rerere
+
+#[rerere]
+#  enabled = 1
+#  autoupdate = 1
+   git config --global rerere.enabled  "1"
+   git config --global rerere.autoupdate  "1"
+
+
+######### Diff/merge tools:
 
 
 # Based on https://gist.github.com/tony4d/3454372 
@@ -917,6 +990,47 @@ else
 fi
 
 
+
+
+######### ~/.bash_profile prompt settings:
+
+
+# https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+# See http://maximomussini.com/posts/bash-git-prompt/
+
+# BTW, for completion of bash commands on MacOS:
+# brew install bash-completion
+# Also see https://github.com/barryclark/bashstrap
+
+if ! command -v brew >/dev/null; then
+   fancy_echo "Installing bash-git-prompt using Homebrew ..."
+   # From https://github.com/magicmonty/bash-git-prompt
+   brew install bash-git-prompt
+
+   if grep -q "gitprompt.sh" "$BASHFILE" ; then    
+      fancy_echo "gitprompt.sh already in $BASHFILE"
+   else
+      fancy_echo "Adding gitprompt.sh in $BASHFILE..."
+      echo "if [ -f \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" ]; then" >>"$BASHFILE"
+      echo "   __GIT_PROMPT_DIR=\"/usr/local/opt/bash-git-prompt/share\" " >>"$BASHFILE"
+      echo "   source \"/usr/local/opt/bash-git-prompt/share/gitprompt.sh\" " >>"$BASHFILE"
+      echo "fi" >>"$BASHFILE"
+   fi
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       # ?  --version
+       fancy_echo "Brew already installed: UPGRADE requested..."
+       brew upgrade bash-git-prompt
+    else
+       fancy_echo "brew bash-git-prompt already installed:"
+    fi
+fi
+# ? --version
+
+
+######### bash command completion 
+
+
 ######### Git command completion in ~/.bash_profile:
 
 
@@ -946,6 +1060,40 @@ fi
 # line=$(read -r FIRSTLINE < ~/.git-completion.bash )
 
 
+######### Git alias keys
+
+
+# If in verbose mode:
+fancy_echo "$GITCONFIG:"
+# cat $GITCONFIG  # List contents of ~/.gitconfig
+
+fancy_echo "git config --list:"
+git config --list
+
+# If git-completion.bash file is not already in  ~/.bash_profile, add it:
+if grep -q "$FILEPATH" "$BASHFILE" ; then    
+   fancy_echo "$FILEPATH already in $BASHFILE"
+else
+   fancy_echo "Adding code for $FILEPATH in $BASHFILE..."
+   echo "# Added by mac-git-install.sh ::" >>"$BASHFILE"
+   echo "if [ -f $FILEPATH ]; then" >>"$BASHFILE"
+   echo "   . $FILEPATH" >>"$BASHFILE"
+   echo "fi" >>"$BASHFILE"
+   cat $FILEPATH >>"$BASHFILE"
+fi 
+
+
+# If GPG suite is not used, add the GPG key to ~/.bash_profile:
+if grep -q "GPG_TTY" "$BASHFILE" ; then    
+   fancy_echo "GPG_TTY already in $BASHFILE."
+else
+   fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
+   echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
+      # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
+fi 
+
+# Run .bash_profile to have changes above take:
+   source "$BASHFILE"
 
 
 ######### Difference engine p4merge:
@@ -975,8 +1123,68 @@ if grep -q "alias p4merge=" "$BASHFILE" ; then
    fancy_echo "p4merge alias already in $BASHFILE"
 else
    fancy_echo "Adding p4merge alias in $BASHFILE..."
-   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>$BASHFILE
+   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>"$BASHFILE"
 fi 
+
+
+######### Git Repository:
+
+   git config --global github.user   "$GITHUB_ACCOUNT"
+   git config --global github.token  token
+
+# https://github.com/
+# https://gitlab.com/
+# https://bitbucket.org/
+# https://travis-ci.org/
+
+
+######### TODO: Git Flow helper:
+
+
+# GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
+# See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+# See https://datasift.github.io/gitflow/IntroducingGitFlow.html
+# https://danielkummer.github.io/git-flow-cheatsheet/
+# https://github.com/nvie/gitflow
+# https://vimeo.com/16018419
+# https://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow
+
+# Per https://github.com/nvie/gitflow/wiki/Mac-OS-X
+if ! command -v git-flow >/dev/null; then
+   fancy_echo "Installing git-flow ..."
+   brew install git-flow
+else
+   fancy_echo "git-flow already installed."
+fi
+
+#[gitflow "prefix"]
+#  feature = feature-
+#  release = release-
+#  hotfix = hotfix-
+#  support = support-
+#  versiontag = v
+
+#git clone --recursive git@github.com:<username>/gitflow.git
+#cd gitflow
+#git branch master origin/master
+#git flow init -d
+#git flow feature start <your feature>
+
+
+
+######### TODO: Code review:
+
+
+# Prerequisite: Python
+# sudo easy_install pip
+# sudo pip install -U setuptools
+# sudo pip install git-review
+
+
+######### TODO: git local hooks 
+
+# Based https://wilsonmar.github.io/git-hooks/
+# See https://github.com/git/git/tree/master/contrib/hooks
 
 
 ######### Git Signing:
@@ -1089,7 +1297,7 @@ EOF
 
 fi
 
-   fancy_echo "Retrieve from response Key for "$GIT_ID" ..."
+   fancy_echo "Retrieve from response Key for $GIT_ID ..."
    # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for this:
    KEY=$(GPG_MAP_MAIL2KEY "$GIT_ID")  # 16 chars. 
 
@@ -1114,6 +1322,7 @@ fi
 # in ANY/ALL repositories on your computer, run:
    # NOTE: This updates the "[commit]" section within ~/.gitconfig
 git config commit.gpgsign | grep 'true' &> /dev/null
+# if coding suggested by https://github.com/koalaman/shellcheck/wiki/SC2181
 if [ $? == 0 ]; then
    fancy_echo "git config commit.gpgsign already true (on)."
 else # false or blank response:
@@ -1135,15 +1344,6 @@ fi
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
 
-######### Repository:
-
-
-# https://github.com/
-# https://gitlab.com/
-# https://bitbucket.org/
-# https://travis-ci.org/
-
-
 #########  brew cleanup
 
 
@@ -1151,141 +1351,7 @@ fi
 #rm -f -r /Library/Caches/Homebrew/*
 
 
-######### Git web browser setting:
-
-
-# TODO: New .secrets.sh variable BROWSER=google-chrome, etc.
-# TODO: Install browser as needed using Homebrew.
-
-# See Complications at
-# https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
-# [web]
-# browser = google-chrome
-#[browser "chrome"]
-#    cmd = C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
-#    path = C:/Program Files (x86)/Google/Chrome/Application/
-
-if grep -q "browser = " "$GITCONFIG" ; then    
-   fancy_echo "git config --global web.browser already defined:"
-   git config --global web.browser 
-else 
-   fancy_echo "git config --global web.browser google-chrome ..."
-   git config --global web.browser google-chrome
-
-   # google-chrome is the most tested and popular.
-   # Check to see if google-chrome is installed and if not:
-   # brew cask install google-chrome
-
-   # Alternatives listed at https://git-scm.com/docs/git-web--browse.html
-   # The command line web browser:
-   # brew install links
-
-   #git config --global web.browser cygstart
-   #git config --global browser.cygstart.cmd cygstart
-fi
-
-
-######### Git code review:
-
-
-# Prerequisite: Python
-# sudo easy_install pip
-# sudo pip install -U setuptools
-# sudo pip install git-review
-
-
-######### Gitconfig command coloring in .gitconfig:
-
-
-# If git config color.ui returns true, skip:
-git config color.ui | grep 'true' &> /dev/null
-if [ $? == 0 ]; then
-   fancy_echo "git config --global color.ui already true (on)."
-else # false or blank response:
-   fancy_echo "Setting git config --global color.ui true (on)..."
-   git config --global color.ui true
-fi
-
-
-#[color]
-#	ui = true
-
-if grep -q "color.status=auto" "$GITCONFIG" ; then    
-   fancy_echo "color.status=auto already in $GITCONFIG"
-else
-   fancy_echo "Adding color.status=auto in $GITCONFIG..."
-   git config --global color.status auto
-   git config --global color.branch auto
-   git config --global color.interactive auto
-   git config --global color.diff auto
-   git config --global color.pager true
-
-   # normal, black, red, green, yellow, blue, magenta, cyan, white
-   # Attributes: bold, dim, ul, blink, reverse, italic, strike
-   git config --global color.status.added     "green   normal bold"
-   git config --global color.status.changed   "blue    normal bold"
-   git config --global color.status.header    "white   normal dim"
-   git config --global color.status.untracked "cyan    normal bold"
-
-   git config --global color.branch.current   "yellow  reverse"
-   git config --global color.branch.local     "yellow  normal bold"
-   git config --global color.branch.remote    "cyan    normal dim"
-
-   git config --global color.diff.meta        "yellow  normal bold"
-   git config --global color.diff.frag        "magenta normal bold"
-   git config --global color.diff.old         "blue    normal strike"
-   git config --global color.diff.new         "green   normal bold"
-   git config --global color.diff.whitespace  "red     normal bold"
-fi
-
-
-######### Reuse Recorded Resolution of conflicted merges
-
-
-# See https://git-scm.com/docs/git-rerere
-# and https://git-scm.com/book/en/v2/Git-Tools-Rerere
-
-#[rerere]
-#  enabled = 1
-#  autoupdate = 1
-   git config --global rerere.enabled  "1"
-   git config --global rerere.autoupdate  "1"
-
-
-######### Git Flow helper:
-
-
-# GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
-# See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
-# See https://datasift.github.io/gitflow/IntroducingGitFlow.html
-# https://danielkummer.github.io/git-flow-cheatsheet/
-# https://github.com/nvie/gitflow
-# https://vimeo.com/16018419
-# https://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow
-
-# Per https://github.com/nvie/gitflow/wiki/Mac-OS-X
-if ! command -v git-flow >/dev/null; then
-   fancy_echo "Installing git-flow ..."
-   brew install git-flow
-else
-   fancy_echo "git-flow already installed."
-fi
-
-#[gitflow "prefix"]
-#  feature = feature-
-#  release = release-
-#  hotfix = hotfix-
-#  support = support-
-#  versiontag = v
-
-#git clone --recursive git@github.com:<username>/gitflow.git
-#cd gitflow
-#git branch master origin/master
-#git flow init -d
-#git flow feature start <your feature>
-
-
-######### Google Cloud:
+######### Google Cloud CLI/SDK
 
 
 # See https://cloud.google.com/sdk/docs/
@@ -1313,7 +1379,7 @@ if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
          fancy_echo "alias gcs= already in $BASHFILE"
       else
          fancy_echo "Adding alias gcs in $BASHFILE ..."
-         echo "alias gcs='cd ~/.google-cloud-sdk;ls'" >>$BASHFILE
+         echo "alias gcs='cd ~/.google-cloud-sdk;ls'" >>"$BASHFILE"
       fi
 
    fancy_echo "Run \"gcloud init\" "
@@ -1329,7 +1395,7 @@ fi
 if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
    fancy_echo "awscli requires Python3."
    # See https://docs.aws.amazon.com/cli/latest/userguide/cli-install-macos.html#awscli-install-osx-pip
-   python3_install  # function defined at top of this file.
+   PYTHON3_INSTALL  # function defined at top of this file.
    # :  # break out immediately. Not execute the rest of the if strucutre.
 
    if ! command -v aws >/dev/null; then
@@ -1355,7 +1421,7 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    # Issues at https://github.com/Azure/azure-cli/issues
 
    # NOTE: The az CLI does not use a Python virtual environment. So ...
-   python3_install  # function defined at top of this file.
+   PYTHON3_INSTALL  # function defined at top of this file.
    # Python location '/usr/local/opt/python/bin/python3.6'
 
    if ! command -v az >/dev/null; then  # not installed.
@@ -1378,43 +1444,6 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
 fi
 
 
-######### Confirm
-
-
-# If in verbose mode:
-fancy_echo "$GITCONFIG:"
-# cat $GITCONFIG  # List contents of ~/.gitconfig
-
-fancy_echo "git config --list:"
-git config --list
-
-# If git-completion.bash file is not already in  ~/.bash_profile, add it:
-if grep -q "$FILEPATH" "$BASHFILE" ; then    
-   fancy_echo "$FILEPATH already in $BASHFILE"
-else
-   fancy_echo "Adding code for $FILEPATH in $BASHFILE..."
-   echo "# Added by mac-git-install.sh ::" >>$BASHFILE
-   echo "if [ -f $FILEPATH ]; then" >>$BASHFILE
-   echo "   . $FILEPATH" >>$BASHFILE
-   echo "fi" >>$BASHFILE
-   cat $FILEPATH >>$BASHFILE
-fi 
-
-
-# If GPG suite is not used, add the GPG key to ~/.bash_profile:
-if grep -q "GPG_TTY" "$BASHFILE" ; then    
-   fancy_echo "GPG_TTY already in $BASHFILE."
-else
-   fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
-   echo 'export GPG_TTY=$(tty)' >> $BASHFILE
-      # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
-fi 
-
-
-# Run .bash_profile to have changes above take:
-   source $BASHFILE
-
-
 ######### SSH-KeyGen:
 
 
@@ -1429,7 +1458,7 @@ if [ ! -d ".ssh" ]; then # found:
 fi
 
 pushd ~/.ssh  # specification of folder didn't work.
-FILEPATH="~/.ssh/$FILE"
+FILEPATH="$HOME/.ssh/$FILE"
 if [ -f "$FILE" ]; then # found:
    fancy_echo "File \"${FILEPATH}\" already exists."
 else
