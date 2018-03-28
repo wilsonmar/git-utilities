@@ -8,10 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > Git clients > git users > Editors > git [core] > coloring > rerere > diff/merge > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
-
-# NOTE: This was run through https://www.shellcheck.net/
-# shellcheck disable=SC1091
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
 
 set -a
 
@@ -166,6 +163,7 @@ else
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
    # DO NOT echo $GITHUB_PASSWORD
 #   echo "CLOUD=$CLOUD"
+#   echo "GIT_BROWSER=$GIT_BROWSER"
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
@@ -301,24 +299,34 @@ fi
 
 ######### Git web browser setting:
 
-
-# TODO: New .secrets.sh variable BROWSER=google-chrome, etc.
-# TODO: Install browser as needed using Homebrew.
+# Install browser using Homebrew to display GitHub to paste SSH key at the end.
+fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
+      echo "The last one installed is set as the Git browser."
 
 # See Complications at
 # https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
+
 # [web]
 # browser = google-chrome
 #[browser "chrome"]
 #    cmd = C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
 #    path = C:/Program Files (x86)/Google/Chrome/Application/
 
+# Check to see if browser is already specified in $GITCONFIG:
+BROWSER=$(git config web.browser) 
 if grep -q "browser = " "$GITCONFIG" ; then    
-   fancy_echo "git config --global web.browser already defined:"
-   git config --global web.browser 
+   fancy_echo "git config --global web.browser already defined for $BROWSER."
 else 
    fancy_echo "git config --global web.browser google-chrome ..."
    git config --global web.browser google-chrome
+
+# TODO: xxx
+if [ $? == 0 ]; then
+   fancy_echo "git config --global color.ui already true (on)."
+else # false or blank response:
+   fancy_echo "Setting git config --global color.ui true (on)..."
+   git config --global color.ui true
+fi
 
    # google-chrome is the most tested and popular.
    # Check to see if google-chrome is installed and if not:
@@ -331,6 +339,52 @@ else
    #git config --global web.browser cygstart
    #git config --global browser.cygstart.cmd cygstart
 fi
+
+
+
+######### Diff/merge tools:
+
+
+# Based on https://gist.github.com/tony4d/3454372 
+fancy_echo "Configuring to enable git mergetool..."
+if [[ $GITCONFIG = *"[difftool]"* ]]; then  # contains text.
+   fancy_echo "[difftool] p4merge already in $GITCONFIG"
+else
+   fancy_echo "Adding [difftool] p4merge in $GITCONFIG..."
+   git config --global merge.tool p4mergetool
+   git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
+   # false = prompting:
+   git config --global mergetool.p4mergetool.trustExitCode false
+   git config --global mergetool.keepBackup true
+
+   git config --global diff.tool p4mergetool
+   git config --global difftool.prompt false
+   git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
+
+   # Auto-type in "adduid":
+   # gpg --edit-key "$KEY" answer adduid"
+   # NOTE: By using git config command, repeated invocation would not duplicate lines.
+
+   # git mergetool
+   # You will be prompted to run "p4mergetool", hit enter and the visual merge editor will launch.
+
+   # See https://danlimerick.wordpress.com/2011/06/19/git-for-window-tip-use-p4merge-as-mergetool/
+   # git difftool
+
+fi
+
+
+######### Local Linter services:
+
+
+# This Bash file was run through online at https://www.shellcheck.net/
+
+# To ignore/override an error identified:
+# shellcheck disable=SC1091
+
+brew install shellcheck
+
+# This enables Git hooks to run on pre-commit to check Bash scripts being committed.
 
 
 ######### Git clients:
@@ -397,7 +451,7 @@ if [[ "$GIT_CLIENT" == *"cola"* ]]; then
 fi
 
 
-# GitHub Desktop is written by GitHub, Inc. 
+# GitHub Desktop is written by GitHub, Inc.,
 # open sourced at https://github.com/desktop/desktop
 # so people can just click a button on GitHub to download a repo from an internet browser.
 if [[ "$GIT_CLIENT" == *"github"* ]]; then
@@ -509,10 +563,8 @@ if [[ "$GIT_CLIENT" == *"magit"* ]]; then
            fancy_echo "GIT_CLIENT=\"magit\" already installed:"
         fi
     fi
-
    # TODO: magit -v
-   fancy_echo "Opening macvim ..."
-   open "/Applications/MacVim.app"
+   magit & 
 fi
 
 
@@ -586,7 +638,7 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
          source "$BASHFILE"
       fi 
       # Only install the following during initial install:
-      # TODO: Configure Sublime for spell checker, etc.
+      # TODO: Configure Sublime for spell checker, etc. https://github.com/SublimeLinter/SublimeLinter-shellcheck
       # install Package Control see https://gist.github.com/patriciogonzalezvivo/77da993b14a48753efda
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -616,10 +668,9 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           code --version
           fancy_echo "VS Code already installed: UPGRADE requested..."
-          # To avoid response "Error: git not installed" to brew upgrade git
+          # No upgrade - "Error: No available formula with the name "visual-studio-code" 
           brew uninstall visual-studio-code
           brew install visual-studio-code
-          # TODO: Configure visual-studio-code using bash shell commands.
        else
           fancy_echo "VS Code already installed:"
        fi
@@ -629,6 +680,9 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
       # 1.21.1
       # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
       # x64
+
+   # TODO: Configure visual-studio-code using bash shell commands.
+       # https://github.com/timonwong/vscode-shellcheck
 
    #fancy_echo "Opening Visual Studio Code ..."
    #open "/Applications/Visual Studio Code.app"
@@ -649,12 +703,13 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
           # To avoid response "Error: No available formula with the name "atom"
           brew uninstall atom
           brew install atom
-          # TODO: Configure atom text editor using bash shell commands.
        else
           fancy_echo "GIT_EDITOR=\"atom\" already installed:"
        fi
     fi
     git config --global core.editor atom
+
+    # TODO: Add plug-in https://github.com/AtomLinter/linter-shellcheck
 
    # Configure plug-ins:
    #apm install linter-shellcheck
@@ -960,38 +1015,6 @@ fi
    git config --global rerere.autoupdate  "1"
 
 
-######### Diff/merge tools:
-
-
-# Based on https://gist.github.com/tony4d/3454372 
-fancy_echo "Configuring to enable git mergetool..."
-if [[ $GITCONFIG = *"[difftool]"* ]]; then  # contains text.
-   fancy_echo "[difftool] p4merge already in $GITCONFIG"
-else
-   fancy_echo "Adding [difftool] p4merge in $GITCONFIG..."
-   git config --global merge.tool p4mergetool
-   git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
-   # false = prompting:
-   git config --global mergetool.p4mergetool.trustExitCode false
-   git config --global mergetool.keepBackup true
-
-   git config --global diff.tool p4mergetool
-   git config --global difftool.prompt false
-   git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
-
-   # Auto-type in "adduid":
-   # gpg --edit-key "$KEY" answer adduid"
-   # NOTE: By using git config command, repeated invocation would not duplicate lines.
-
-   # git mergetool
-   # You will be prompted to run "p4mergetool", hit enter and the visual merge editor will launch.
-
-   # See https://danlimerick.wordpress.com/2011/06/19/git-for-window-tip-use-p4merge-as-mergetool/
-   # git difftool
-
-fi
-
-
 
 
 ######### ~/.bash_profile prompt settings:
@@ -1179,9 +1202,9 @@ fi
 # Based https://wilsonmar.github.io/git-hooks/
 if [ ! -f ".git/hooks/git-commit" ]; then 
    fancy_echo "git-commit file not found in .git/hooks. Copying hooks folder ..."
-   rm .git/hooks/*.sample
+   rm .git/hooks/*.sample  # samples are not run
    cp hooks/* .git/hooks
-   chmod +x .git/hooks/*
+   chmod +x .git/hooks/*  # make executable
 else
    fancy_echo "git-commit file found in .git/hooks. Skipping ..."
 fi
