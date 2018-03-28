@@ -328,17 +328,18 @@ if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
          fancy_echo "GIT_BROWSER=\"google-chrome\" already installed."
       fi
    fi
+   # Check to see if browser is already specified in $GITCONFIG:
+   if grep -q "google-chrome" "$(git config web.browser)" ; then    
+      fancy_echo "git config --global web.browser google-chrome already defined."
+   else 
+      fancy_echo "git config --global web.browser google-chrome ..."
+      git config --global web.browser google-chrome
+   fi
+
    # fancy_echo "Opening Google Chrome ..."
    # open "/Applications/Google Chrome.app"
 fi
 
-# Check to see if browser is already specified in $GITCONFIG:
-if grep -q "google-chrome" "$(git config web.browser)" ; then    
-   fancy_echo "git config --global web.browser google-chrome already defined."
-else 
-   fancy_echo "git config --global web.browser google-chrome ..."
-   git config --global web.browser google-chrome
-fi
 
 
 
@@ -355,17 +356,19 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
          fancy_echo "GIT_BROWSER=\"firefox\" already installed."
       fi
    fi
+
+   # Check to see if browser is already specified in $GITCONFIG:
+   if grep -q "firefox" "$(git config web.browser)" ; then    
+      fancy_echo "git config --global web.browser firefox already defined."
+   else 
+      fancy_echo "git config --global web.browser firefox ..."
+      git config --global web.browser firefox
+   fi
+
    #fancy_echo "Opening firefox ..."
    #open "/Applications/Firefox.app"
 fi
 
-# Check to see if browser is already specified in $GITCONFIG:
-if grep -q "firefox" "$(git config web.browser)" ; then    
-   fancy_echo "git config --global web.browser firefox already defined."
-else 
-   fancy_echo "git config --global web.browser firefox ..."
-   git config --global web.browser firefox
-fi
 
 
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
@@ -381,18 +384,17 @@ if [[ "$GIT_BROWSER" == *"brave"* ]]; then
          fancy_echo "GIT_BROWSER=\"brave\" already installed."
       fi
    fi
+   # Check to see if browser is already specified in $GITCONFIG:
+   if grep -q "brave" "$(git config web.browser)" ; then    
+      fancy_echo "git config --global web.browser brave already defined."
+   else 
+      fancy_echo "git config --global web.browser brave ..."
+      git config --global web.browser brave
+   fi
+
    # fancy_echo "Opening brave ..."
    # open "/Applications/brave.app"
 fi
-
-# Check to see if browser is already specified in $GITCONFIG:
-if grep -q "brave" "$(git config web.browser)" ; then    
-   fancy_echo "git config --global web.browser brave already defined."
-else 
-   fancy_echo "git config --global web.browser brave ..."
-   git config --global web.browser brave
-fi
-
 
 # Other alternatives listed at https://git-scm.com/docs/git-web--browse.html
 
