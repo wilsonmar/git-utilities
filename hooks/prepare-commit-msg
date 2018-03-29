@@ -1,19 +1,9 @@
 #!/bin/sh
 # prepare-commit-msg
 
-COMMIT_MSG_FILE=$1  # ".git/COMMIT_EDITMSG"
-COMMIT_SOURCE=$2    # "message"
-SHA1=$3             # ?
-echo "prepare-commit-msg COMMIT_MSG_FILE=$COMMIT_MSG_FILE = $(cat .git/COMMIT_EDITMSG)"
-
+#COMMIT_MSG_FILE=$1  # ".git/COMMIT_EDITMSG"
+#COMMIT_SOURCE=$2    # "message"
+#SHA1=$3             # ?
+# echo "prepare-commit-msg: $(cat .git/COMMIT_EDITMSG)"
 # SHA1=$SHA1" 
-
-STOPWORD="#DONTPUSH"
-if grep -Fxq "$STOPWORD" "$COMMIT_MSG_FILE"
-then
-   echo "prepare-commit-msg: found stop word $STOPWORD. Aborting $SHA1."
-   exit 1  # code found.
-else
-   echo "prepare-commit-msg: $SHA1 OK."
-   exit 0  # code not found.
-fi
+exit 0  # OK
