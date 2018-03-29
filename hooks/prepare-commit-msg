@@ -4,8 +4,8 @@
 COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 SHA1=$3
-STOPWORD="#DONTPUSH"
 
+STOPWORD="#DONTPUSH"
 if grep -Fxq "$STOPWORD" "$COMMIT_MSG_FILE"
 then
    echo "prepare-commit-msg: found stop word $STOPWORD. Aborting $SHA1."

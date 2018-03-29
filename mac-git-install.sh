@@ -55,6 +55,11 @@ PYTHON_INSTALL(){
       fancy_echo "Installing Python, a pre-requisite for git-cola & GCP ..."
       brew install python
 
+      # brew cask install anaconda
+      # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
+      # variable, eg (for bash shell):
+      # export PATH=/usr/local/anaconda3/bin:"$PATH"
+
       # pip comes with brew install python
       pip --version
 
@@ -65,7 +70,7 @@ PYTHON_INSTALL(){
 
       #brew install freetype  # http://www.freetype.org to render fonts
       #fancy_echo "Installing other popular Python helper modules ..."
-      # anaconda?
+      #pip install jupyter
       #pip install numpy
       #pip install scipy
       #pip install matplotlib
@@ -114,13 +119,29 @@ PYTHON3_INSTALL(){
       fancy_echo "Installing Python3, a pre-requisite for awscli and azure ..."
       brew install python3
 
-      # pip comes with brew install python
-      pip3 --version
+      # brew cask install anaconda
+      # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
+      # variable, eg (for bash shell):
+      # export PATH=/usr/local/anaconda3/bin:"$PATH"
+      #brew doctor fails run here due to /usr/local/anaconda3/bin/curl-config, etc.
+      #Cask anaconda installs files under "/usr/local". The presence of such
+      #files can cause warnings when running "brew doctor", which is considered
+      #to be a bug in Homebrew-Cask.
 
+      # pip comes with brew install python:
       fancy_echo "Installing virtualenv to manage multiple Python versions ..."
       pip3 install virtualenv
       pip3 install virtualenvwrapper
       source /usr/local/bin/virtualenvwrapper.sh
+
+      #brew install freetype  # http://www.freetype.org to render fonts
+      #fancy_echo "Installing other popular Python helper modules ..."
+      #pip3 install jupyter
+      # anaconda?
+      #pip install numpy
+      #pip install scipy
+      #pip install matplotlib
+      #pip install ipython[all]
 	  
    else
       fancy_echo "$(python3 --version) already installed:"
@@ -130,6 +151,8 @@ PYTHON3_INSTALL(){
 
    python3 --version
       # Python 3.6.4
+   pip3 --version
+      # pip 9.0.3 from /usr/local/lib/python3.6/site-packages (python 3.6)
 
    # NOTE: To make "python" command reach Python3 instead of 2.7, per docs.python-guide.org/en/latest/starting/install3/osx/
    # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
