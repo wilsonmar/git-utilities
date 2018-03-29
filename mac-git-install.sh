@@ -197,7 +197,7 @@ else
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
-echo -e "\n$SECRETSFILE ::" >>$THISSCRIPT.log
+echo -e "\n   $SECRETSFILE ::" >>$THISSCRIPT.log
 echo -e "$(cat $SECRETSFILE)" >>$THISSCRIPT.log
 
 
@@ -370,7 +370,6 @@ if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
    # fancy_echo "Opening Google Chrome ..."
    # open "/Applications/Google Chrome.app"
 fi
-
 
 
 
@@ -1622,7 +1621,7 @@ else
    fancy_echo "$SSHCONFIG file already created with $OCCURENCES entries."
    # Do not delete $SSHCONFIG file!
 fi
-echo -e "\n$SSHCONFIG ::" >>$THISSCRIPT.log
+echo -e "\n   $SSHCONFIG ::" >>$THISSCRIPT.log
 echo -e "$(cat $SSHCONFIG)" >>$THISSCRIPT.log
 
 
@@ -1661,23 +1660,23 @@ pbcopy < "$FILE.pub"
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 
+#Listing of all brew cask installed (including dependencies automatically added):"
+echo -e "\n   brew info --all ::" >>$THISSCRIPT.log
+echo -e "$(brew info --all)" >>$THISSCRIPT.log
 #Listing of all brews installed (including dependencies automatically added):""
 # brew list
-echo -e "\~/Library/Caches/Homebrew ::" >>$THISSCRIPT.log
+echo -e "\n   ls ~/Library/Caches/Homebrew ::" >>$THISSCRIPT.log
 echo -e "$(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
-#Listing of all brew cask installed (including dependencies automatically added):"
-echo -e "\nbrew info --all ::" >>$THISSCRIPT.log
-echo -e "$(brew info --all)" >>$THISSCRIPT.log
 
 # List contents of ~/.gitconfig
-echo -e "\n$GITCONFIG ::" >>$THISSCRIPT.log
+echo -e "\n   $GITCONFIG ::" >>$THISSCRIPT.log
 echo -e "$(cat $GITCONFIG)" >>$THISSCRIPT.log
 # List using git config --list:
-echo -e "\ngit config --list ::" >>$THISSCRIPT.log
+echo -e "\n   git config --list ::" >>$THISSCRIPT.log
 echo -e "$(git config --list)" >>$THISSCRIPT.log
 
 # List ~/.bash_profile:
-echo -e "\n$BASHFILE ::" >>$THISSCRIPT.log
+echo -e "\n   $BASHFILE ::" >>$THISSCRIPT.log
 echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
 
 
