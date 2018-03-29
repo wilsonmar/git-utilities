@@ -76,7 +76,7 @@ PYTHON_INSTALL(){
       #pip install matplotlib
       #pip install ipython[all]
    else
-      fancy_echo "$(python --version) already installed:"
+      fancy_echo -e "\n $(python --version) already installed:"
    fi
    command -v python
    ls -al "$(command -v python)" # /usr/local/bin/python
@@ -144,7 +144,7 @@ PYTHON3_INSTALL(){
       #pip install ipython[all]
 	  
    else
-      fancy_echo "$(python3 --version) already installed:"
+      fancy_echo -e "\n $(python3 --version) already installed:"
    fi
    command -v python3
    ls -al "$(command -v python3)" # /usr/local/bin/python
@@ -166,6 +166,13 @@ TIME_START="$(date -u +%s)"
 fancy_echo "This is for Mac only! Starting elapsed timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
+
+THISSCRIPT="mac-git-install"
+fancy_echo "Creating $THISSCRIPT.log ..."
+# TODO: Add date
+echo "$THISSCRIPT.log $(date)" >$THISSCRIPT.log  # new file
+echo -e "\n $(sw_vers)"             >>$THISSCRIPT.log
+echo -e "\n $(uname -a)"            >>$THISSCRIPT.log
 
 ######### Read and use .secrets.sh file:
 
@@ -279,6 +286,7 @@ fi
 # Ruby comes with MacOS:
 fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
+echo -e "\n $(ruby -v)"      >>$THISSCRIPT.log
 
 
 if ! command -v brew >/dev/null; then
@@ -295,7 +303,8 @@ else
        fancy_echo "Bres already installed:"
     fi
 fi
-brew --version
+#brew --version
+echo -e "\n $(brew --version)"            >>$THISSCRIPT.log
    # Homebrew 1.5.12
    # Homebrew/homebrew-core (git revision 9a81e; last commit 2018-03-22)
 
@@ -486,7 +495,8 @@ else
        fancy_echo "Git already installed:"
     fi
 fi
-git --version
+echo -e "\n $(git --version)"            >>$THISSCRIPT.log
+#git --version
     # git version 2.14.3 (Apple Git-98)
 
 #[core]
@@ -731,7 +741,8 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
       fi
    fi
    git config --global core.editor code
-   subl --version
+   echo -e "\n $(subl --version)" >>$THISSCRIPT.log
+   #subl --version
       # Sublime Text Build 3143
 
    fancy_echo "Opening Sublime Text app in background ..."
@@ -755,7 +766,8 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
        fi
     fi
     git config --global core.editor code
-    code --version
+    echo "Visual Studio Code: $(code --version)" >>$THISSCRIPT.log
+    # code --version
       # 1.21.1
       # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
       # x64
@@ -793,7 +805,8 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
    # Configure plug-ins:
    #apm install linter-shellcheck
 
-   atom --version
+   echo -e "\n $(atom --version)"            >>$THISSCRIPT.log
+   #atom --version
       # Atom    : 1.20.1
       # Electron: 1.6.9
       # Chrome  : 56.0.2924.87
@@ -857,7 +870,8 @@ if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
            fancy_echo "Concatenating \"export EDITOR=\" in $BASHFILE..."
            echo "export EDITOR=\"/usr/local/bin/mate -w\" " >>"$BASHFILE"
         fi 
-   mate -v
+   echo -e "\n $(mate -v)" >>$THISSCRIPT.log
+   #mate -v
       #mate 2.12 (2018-03-08) 
    git config --global core.editor textmate
 
@@ -883,7 +897,8 @@ if [[ "$GIT_EDITOR" == *"emacs"* ]]; then
        fi
     fi
     git config --global core.editor emacs
-    emacs --version
+    echo -e "\n $(emacs --version)" >>$THISSCRIPT.log
+    #emacs --version
 
     # Evaluate https://github.com/git/git/tree/master/contrib/emacs
 
@@ -1172,13 +1187,6 @@ fi
 ######### Git alias keys
 
 
-# If in verbose mode:
-fancy_echo "$GITCONFIG:"
-# cat $GITCONFIG  # List contents of ~/.gitconfig
-
-#fancy_echo "git config --list:"
-#git config --list
-
 # If git-completion.bash file is not already in  ~/.bash_profile, add it:
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
    fancy_echo "$FILEPATH already in $BASHFILE"
@@ -1278,8 +1286,8 @@ fi
 if [ ! -f ".git/hooks/git-commit" ]; then 
    fancy_echo "git-commit file not found in .git/hooks. Copying hooks folder ..."
    rm .git/hooks/*.sample  # samples are not run
-   cp hooks/* .git/hooks
-   chmod +x .git/hooks/*  # make executable
+   cp hooks/* .git/hooks   # copy
+   chmod +x .git/hooks/*   # make executable
 else
    fancy_echo "git-commit file found in .git/hooks. Skipping ..."
 fi
@@ -1329,7 +1337,8 @@ else
        fancy_echo "GPG2 already installed:"
     fi
 fi
-gpg --version | grep gpg
+echo -e "\n $(gpg --version | grep gpg)" >>$THISSCRIPT.log
+#gpg --version | grep gpg
    # gpg (GnuPG) 2.2.5 and many lines!
 # NOTE: This creates folder ~/.gnupg
 
@@ -1530,7 +1539,8 @@ if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
          fancy_echo "awscli already installed."
       fi
    fi
-   aws --version
+   echo -e "\n $(aws --version)" >>$THISSCRIPT.log
+   # aws --version
             # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
 fi
 
@@ -1557,7 +1567,8 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
          fancy_echo "azure-cli already installed."
       fi
    fi
-   az --version | grep azure-cli
+   echo -e "\n $(az --version | grep azure-cli)" >>$THISSCRIPT.log
+   # az --version | grep azure-cli
       # azure-cli (2.0.30)
       # ... and many other lines.
 fi
@@ -1587,6 +1598,7 @@ if [ ! -d ".ssh" ]; then # found:
 fi
 
 pushd ~/.ssh  # specification of folder didn't work.
+
 FILEPATH="$HOME/.ssh/$FILE"
 if [ -f "$FILE" ]; then # found:
    fancy_echo "File \"${FILEPATH}\" already exists."
@@ -1609,7 +1621,8 @@ else
    fancy_echo "$SSHCONFIG file already created with $OCCURENCES entries."
    # Do not delete $SSHCONFIG file!
 fi
-cat "$SSHCONFIG"
+echo -e "\n $(cat $SSHCONFIG)" >>$THISSCRIPT.log
+
 
 
 # See https://www.saltycrane.com/blog/2008/11/creating-remote-server-nicknames-sshconfig/
@@ -1646,12 +1659,18 @@ pbcopy < "$FILE.pub"
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 
-#fancy_echo "Listing of all brews installed (including dependencies automatically added):"
+#Listing of all brews installed (including dependencies automatically added):""
 # brew list
-#ls ~/Library/Caches/Homebrew
+echo -e "\n $(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
 
-#fancy_echo "Listing of all brew cask installed (including dependencies automatically added):"
-#brew info --all
+#Listing of all brew cask installed (including dependencies automatically added):"
+echo -e "\n $(brew info --all)" >>$THISSCRIPT.log
+
+# List contents of ~/.gitconfig
+echo -e "\n$(cat $GITCONFIG)" >>$THISSCRIPT.log
+# List using git config --list:
+echo -e "\n$(git config --list)" >>$THISSCRIPT.log
+
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
