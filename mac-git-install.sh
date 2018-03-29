@@ -353,7 +353,7 @@ fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
 
 if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
    # google-chrome is the most tested and popular.
-   if [ ! -f "/Applications/Google Chrome.app" ]; then 
+   if [ ! -d "/Applications/Google Chrome.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"google-chrome\" using Homebrew ..."
       brew cask uninstall google-chrome
       brew cask install --appdir="/Applications" google-chrome
@@ -375,7 +375,7 @@ fi
 
 if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    # firefox is more respectful of user data.
-   if [ ! -f "/Applications/Firefox.app" ]; then 
+   if [ ! -d "/Applications/Firefox.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"firefox\" using Homebrew ..."
       exit #DONTPUSH
       brew cask uninstall firefox
@@ -398,7 +398,7 @@ exit #DONTPUSH
 
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # brave is more respectful of user data.
-   if [ ! -f "/Applications/Brave.app" ]; then 
+   if [ ! -d "/Applications/Brave.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"brave\" using Homebrew ..."
       brew cask uninstall brave
       brew cask install --appdir="/Applications" brave
@@ -540,7 +540,7 @@ fi
 # so people can just click a button on GitHub to download a repo from an internet browser.
 if [[ "$GIT_CLIENT" == *"github"* ]]; then
     # https://desktop.github.com/
-    if [ ! -f "/Applications/GitHub Desktop.app" ]; then 
+    if [ ! -d "/Applications/GitHub Desktop.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"github\" using Homebrew ..."
         brew cask uninstall github
         brew cask install --appdir="/Applications" github
@@ -560,7 +560,7 @@ fi
 
 if [[ "$GIT_CLIENT" == *"gitkraken"* ]]; then
     # GitKraken from https://www.gitkraken.com/ and https://blog.axosoft.com/gitflow/
-    if [ ! -f "/Applications/GitKraken.app" ]; then 
+    if [ ! -d "/Applications/GitKraken.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"gitkraken\" using Homebrew ..."
         brew cask uninstall gitkraken
         brew cask install --appdir="/Applications" gitkraken
@@ -579,7 +579,7 @@ fi
 
 if [[ "$GIT_CLIENT" == *"sourcetree"* ]]; then
     # See https://www.sourcetreeapp.com/
-    if [ ! -f "/Applications/Sourcetree.app" ]; then 
+    if [ ! -d "/Applications/Sourcetree.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"sourcetree\" using Homebrew ..."
         brew cask uninstall sourcetree
         brew cask install --appdir="/Applications" sourcetree
@@ -599,7 +599,7 @@ fi
 
 if [[ "$GIT_CLIENT" == *"smartgit"* ]]; then
     # SmartGit from https://syntevo.com/smartgit
-    if [ ! -f "/Applications/SmartGit.app" ]; then 
+    if [ ! -d "/Applications/SmartGit.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"smartgit\" using Homebrew ..."
         brew cask uninstall smartgit
         brew cask install --appdir="/Applications" smartgit
@@ -618,7 +618,7 @@ fi
 
 if [[ "$GIT_CLIENT" == *"tower"* ]]; then
     # Tower from https://www.git-tower.com/learn/git/ebook/en/desktop-gui/advanced-topics/git-flow
-    if [ ! -f "/Applications/Tower.app" ]; then 
+    if [ ! -d "/Applications/Tower.app" ]; then 
         fancy_echo "Installing GIT_CLIENT=\"tower\" using Homebrew ..."
         brew cask uninstall tower
         brew cask install --appdir="/Applications" tower
@@ -706,7 +706,7 @@ fi
 
 if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
    # /usr/local/bin/subl
-   if [ ! -f "/Applications/Sublime Text.app" ]; then 
+   if [ ! -d "/Applications/Sublime Text.app" ]; then 
       fancy_echo "Installing Sublime Text text editor using Homebrew ..."
       brew cask uninstall sublime-text
       brew cask install --appdir="/Applications" sublime-text
@@ -820,7 +820,7 @@ fi
 
 
 if [[ "$GIT_EDITOR" == *"macvim"* ]]; then
-    if [ ! -f "/Applications/MacVim.app" ]; then
+    if [ ! -d "/Applications/MacVim.app" ]; then
         fancy_echo "Installing GIT_EDITOR=\"macvim\" text editor using Homebrew ..."
         brew cask uninstall macvim
         brew cask install --appdir="/Applications" macvim
@@ -845,7 +845,7 @@ fi
 
 
 if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
-    if [ ! -f "/Applications/textmate.app" ]; then 
+    if [ ! -d "/Applications/textmate.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"textmate\" text editor using Homebrew ..."
         brew cask uninstall textmate
         brew cask install --appdir="/Applications" textmate
@@ -910,7 +910,7 @@ fi
 
 if [[ "$GIT_EDITOR" == *"intellij"* ]]; then
     # See http://macappstore.org/intellij-idea-ce/
-   if [ ! -f "/Applications/IntelliJ IDEA CE.app" ]; then 
+   if [ ! -d "/Applications/IntelliJ IDEA CE.app" ]; then 
        fancy_echo "Installing GIT_EDITOR=\"intellij\" text editor using Homebrew ..."
        brew cask uninstall intellij-idea-ce
        brew cask install --appdir="/Applications" intellij-idea-ce 
@@ -950,7 +950,7 @@ fi
 
 if [[ "$GIT_EDITOR" == *"sts"* ]]; then
     # See http://macappstore.org/sts/
-    if [ ! -f "/Applications/STS.app" ]; then 
+    if [ ! -d "/Applications/STS.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"sts\" text editor using Homebrew ..."
         brew cask uninstall sts
         brew cask install --appdir="/Applications" sts
@@ -987,7 +987,7 @@ fi
 
 if [[ "$GIT_EDITOR" == *"eclipse"* ]]; then
     # See http://macappstore.org/eclipse-ide/
-    if [ ! -f "/Applications/Eclipse.app" ]; then 
+    if [ ! -d "/Applications/Eclipse.app" ]; then 
         fancy_echo "Installing GIT_EDITOR=\"eclipse\" text editor using Homebrew ..."
         brew cask uninstall eclipse-ide
         brew cask install --appdir="/Applications" eclipse-ide
@@ -1210,7 +1210,7 @@ fi
 # TODO: Different diff/merge engines
 
 # See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
-if [ ! -f "/Applications/p4merge.app" ]; then 
+if [ ! -d "/Applications/p4merge.app" ]; then 
     fancy_echo "Installing p4merge diff engine app using Homebrew ..."
     brew cask uninstall p4merge
     brew cask install --appdir="/Applications" p4merge
@@ -1349,7 +1349,7 @@ echo -e "\n$(gpg --version | grep gpg)" >>$THISSCRIPT.log
 # See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
 
 # Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
-if [ ! -f "/Applications/GPG Keychain.app" ]; then 
+if [ ! -d "/Applications/GPG Keychain.app" ]; then 
    fancy_echo "Installing gpg-suite app to store GPG keys ..."
    brew cask uninstall gpg-suite
    brew cask install --appdir="/Applications" gpg-suite  # See http://macappstore.org/gpgtools/
