@@ -4,8 +4,7 @@
 COMMIT_MSG_FILE=$1  # ".git/COMMIT_EDITMSG"
 COMMIT_SOURCE=$2    # "message"
 SHA1=$3             # ?
-echo "prepare-commit-msg COMMIT_MSG_FILE=$COMMIT_MSG_FILE ="
-echo .git/COMMIT_EDITMSG
+echo "prepare-commit-msg COMMIT_MSG_FILE=$COMMIT_MSG_FILE = $(cat .git/COMMIT_EDITMSG)"
 
 # SHA1=$SHA1" 
 
