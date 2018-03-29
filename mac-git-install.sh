@@ -377,6 +377,7 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    # firefox is more respectful of user data.
    if [ ! -f "/Applications/Firefox.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"firefox\" using Homebrew ..."
+      exit #DONTPUSH
       brew cask uninstall firefox
       brew cask install --appdir="/Applications" firefox
    else
@@ -392,7 +393,7 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    #fancy_echo "Opening firefox ..."
    #open "/Applications/Firefox.app"
 fi
-
+exit #DONTPUSH
 
 
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
