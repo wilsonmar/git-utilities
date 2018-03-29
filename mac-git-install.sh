@@ -1306,7 +1306,7 @@ else
        fancy_echo "GPG2 already installed:"
     fi
 fi
-gpg --version 
+gpg --version | grep gpg
    # gpg (GnuPG) 2.2.5 and many lines!
 # NOTE: This creates folder ~/.gnupg
 
@@ -1546,7 +1546,7 @@ fi
 # The command is "bx login".
 # IBM's BlueMix cloud for AI has a pre-prequisite in NodeJs.
 # npm install watson-visual-recognition-utils -g
-* npm install watson-speech-to-text-utils -g
+# npm install watson-speech-to-text-utils -g
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
