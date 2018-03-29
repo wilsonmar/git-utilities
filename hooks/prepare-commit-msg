@@ -1,4 +1,16 @@
 #!/bin/sh
 # prepare-commit-msg
-echo "Hello from prepare-commit-msg"
-exit 0
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+STOPWORD="#DONTPUSH"
+
+if grep -Fxq "$STOPWORD" "$COMMIT_MSG_FILE"
+then
+   echo "prepare-commit-msg: found stop word $STOPWORD. Aborting $SHA1."
+   exit 1  # code found.
+else
+   echo "prepare-commit-msg: $SHA1 OK."
+   exit 0  # code not found.
+fi
