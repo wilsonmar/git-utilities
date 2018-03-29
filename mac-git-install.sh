@@ -76,7 +76,7 @@ PYTHON_INSTALL(){
       #pip install matplotlib
       #pip install ipython[all]
    else
-      fancy_echo -e "\n $(python --version) already installed:"
+      fancy_echo -e "\n$(python --version) already installed:"
    fi
    command -v python
    ls -al "$(command -v python)" # /usr/local/bin/python
@@ -144,7 +144,7 @@ PYTHON3_INSTALL(){
       #pip install ipython[all]
 	  
    else
-      fancy_echo -e "\n $(python3 --version) already installed:"
+      fancy_echo -e "\n$(python3 --version) already installed:"
    fi
    command -v python3
    ls -al "$(command -v python3)" # /usr/local/bin/python
@@ -171,8 +171,8 @@ THISSCRIPT="mac-git-install"
 fancy_echo "Creating $THISSCRIPT.log ..."
 # TODO: Add date
 echo "$THISSCRIPT.log $(date)" >$THISSCRIPT.log  # new file
-echo -e "\n $(sw_vers)"             >>$THISSCRIPT.log
-echo -e "\n $(uname -a)"            >>$THISSCRIPT.log
+echo -e "\n$(sw_vers)"             >>$THISSCRIPT.log
+echo -e "\n$(uname -a)"            >>$THISSCRIPT.log
 
 ######### Read and use .secrets.sh file:
 
@@ -197,6 +197,8 @@ else
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
+echo -e "\n$SECRETSFILE ::" >>$THISSCRIPT.log
+echo -e "$(cat $SECRETSFILE)" >>$THISSCRIPT.log
 
 
 # Read first parameter from command line supplied at runtime to invoke:
@@ -286,14 +288,13 @@ fi
 # Ruby comes with MacOS:
 fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
-echo -e "\n $(ruby -v)"      >>$THISSCRIPT.log
+echo -e "\n$(ruby -v)"      >>$THISSCRIPT.log
 
 
 if ! command -v brew >/dev/null; then
     fancy_echo "Installing homebrew using Ruby..."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
-    fancy_echo "Brew already installed:"
     # Upgrade if run-time attribute contains "upgrade":
     if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        brew --version
@@ -304,10 +305,10 @@ else
     fi
 fi
 #brew --version
-echo -e "\n $(brew --version)"            >>$THISSCRIPT.log
+echo -e "\n$(brew --version)"            >>$THISSCRIPT.log
    # Homebrew 1.5.12
    # Homebrew/homebrew-core (git revision 9a81e; last commit 2018-03-22)
-exit
+
 
 #brew tap caskroom/cask
 # Casks are GUI program installers defined in https://github.com/caskroom/homebrew-cask/tree/master/Casks
@@ -495,7 +496,7 @@ else
        fancy_echo "Git already installed:"
     fi
 fi
-echo -e "\n $(git --version)"            >>$THISSCRIPT.log
+echo -e "\n$(git --version)"            >>$THISSCRIPT.log
 #git --version
     # git version 2.14.3 (Apple Git-98)
 
@@ -741,7 +742,7 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
       fi
    fi
    git config --global core.editor code
-   echo -e "\n $(subl --version)" >>$THISSCRIPT.log
+   echo -e "\n$(subl --version)" >>$THISSCRIPT.log
    #subl --version
       # Sublime Text Build 3143
 
@@ -805,7 +806,7 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
    # Configure plug-ins:
    #apm install linter-shellcheck
 
-   echo -e "\n $(atom --version)"            >>$THISSCRIPT.log
+   echo -e "\n$(atom --version)"            >>$THISSCRIPT.log
    #atom --version
       # Atom    : 1.20.1
       # Electron: 1.6.9
@@ -870,7 +871,7 @@ if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
            fancy_echo "Concatenating \"export EDITOR=\" in $BASHFILE..."
            echo "export EDITOR=\"/usr/local/bin/mate -w\" " >>"$BASHFILE"
         fi 
-   echo -e "\n $(mate -v)" >>$THISSCRIPT.log
+   echo -e "\n$(mate -v)" >>$THISSCRIPT.log
    #mate -v
       #mate 2.12 (2018-03-08) 
    git config --global core.editor textmate
@@ -897,7 +898,7 @@ if [[ "$GIT_EDITOR" == *"emacs"* ]]; then
        fi
     fi
     git config --global core.editor emacs
-    echo -e "\n $(emacs --version)" >>$THISSCRIPT.log
+    echo -e "\n$(emacs --version)" >>$THISSCRIPT.log
     #emacs --version
 
     # Evaluate https://github.com/git/git/tree/master/contrib/emacs
@@ -1337,7 +1338,7 @@ else
        fancy_echo "GPG2 already installed:"
     fi
 fi
-echo -e "\n $(gpg --version | grep gpg)" >>$THISSCRIPT.log
+echo -e "\n$(gpg --version | grep gpg)" >>$THISSCRIPT.log
 #gpg --version | grep gpg
    # gpg (GnuPG) 2.2.5 and many lines!
 # NOTE: This creates folder ~/.gnupg
@@ -1539,7 +1540,7 @@ if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
          fancy_echo "awscli already installed."
       fi
    fi
-   echo -e "\n $(aws --version)" >>$THISSCRIPT.log
+   echo -e "\n$(aws --version)" >>$THISSCRIPT.log
    # aws --version
             # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
 fi
@@ -1567,7 +1568,7 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
          fancy_echo "azure-cli already installed."
       fi
    fi
-   echo -e "\n $(az --version | grep azure-cli)" >>$THISSCRIPT.log
+   echo -e "\n$(az --version | grep azure-cli)" >>$THISSCRIPT.log
    # az --version | grep azure-cli
       # azure-cli (2.0.30)
       # ... and many other lines.
@@ -1621,7 +1622,8 @@ else
    fancy_echo "$SSHCONFIG file already created with $OCCURENCES entries."
    # Do not delete $SSHCONFIG file!
 fi
-echo -e "\n $(cat $SSHCONFIG)" >>$THISSCRIPT.log
+echo -e "\n$SSHCONFIG ::" >>$THISSCRIPT.log
+echo -e "$(cat $SSHCONFIG)" >>$THISSCRIPT.log
 
 
 
@@ -1661,14 +1663,22 @@ pbcopy < "$FILE.pub"
 
 #Listing of all brews installed (including dependencies automatically added):""
 # brew list
-echo -e "\n $(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
+echo -e "\~/Library/Caches/Homebrew ::" >>$THISSCRIPT.log
+echo -e "$(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
 #Listing of all brew cask installed (including dependencies automatically added):"
-echo -e "\n $(brew info --all)" >>$THISSCRIPT.log
+echo -e "\nbrew info --all ::" >>$THISSCRIPT.log
+echo -e "$(brew info --all)" >>$THISSCRIPT.log
 
 # List contents of ~/.gitconfig
-echo -e "\n$(cat $GITCONFIG)" >>$THISSCRIPT.log
+echo -e "\n$GITCONFIG ::" >>$THISSCRIPT.log
+echo -e "$(cat $GITCONFIG)" >>$THISSCRIPT.log
 # List using git config --list:
-echo -e "\n$(git config --list)" >>$THISSCRIPT.log
+echo -e "\ngit config --list ::" >>$THISSCRIPT.log
+echo -e "$(git config --list)" >>$THISSCRIPT.log
+
+# List ~/.bash_profile:
+echo -e "\n$BASHFILE ::" >>$THISSCRIPT.log
+echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
 
 
 TIME_END=$(date -u +%s);
