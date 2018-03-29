@@ -12,6 +12,7 @@
 
 set -a
 
+#DONTPUSH # This should cause exit by hooks/prepare-commit-msg
 
 ######### Bash function definitions:
 
@@ -81,8 +82,10 @@ PYTHON_INSTALL(){
    command -v python
    ls -al "$(command -v python)" # /usr/local/bin/python
 
-   #python --version
-      # Python 2.7.14
+   echo -e "\n$(python --version)"            >>$THISSCRIPT.log
+         # Python 2.7.14
+   echo -e "\n$(pip --version)"            >>$THISSCRIPT.log
+         # pip 9.0.3 from /usr/local/lib/python2.7/site-packages (python 2.7)
 
    # Define command python as going to version 2.7:
       if grep -q "alias python=" "$BASHFILE" ; then    
@@ -149,9 +152,9 @@ PYTHON3_INSTALL(){
    command -v python3
    ls -al "$(command -v python3)" # /usr/local/bin/python
 
-   python3 --version
+   echo -e "\n$(python3 --version)"            >>$THISSCRIPT.log
       # Python 3.6.4
-   pip3 --version
+   echo -e "\n$(pip3 --version)"            >>$THISSCRIPT.log
       # pip 9.0.3 from /usr/local/lib/python3.6/site-packages (python 3.6)
 
    # NOTE: To make "python" command reach Python3 instead of 2.7, per docs.python-guide.org/en/latest/starting/install3/osx/
@@ -377,7 +380,6 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    # firefox is more respectful of user data.
    if [ ! -d "/Applications/Firefox.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"firefox\" using Homebrew ..."
-      exit #DONTPUSH
       brew cask uninstall firefox
       brew cask install --appdir="/Applications" firefox
    else
@@ -393,8 +395,6 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    #fancy_echo "Opening firefox ..."
    #open "/Applications/Firefox.app"
 fi
-exit #DONTPUSH
-
 
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # brave is more respectful of user data.

@@ -1,9 +1,9 @@
 #!/bin/sh
 # prepare-commit-msg
 
-COMMIT_MSG_FILE=$1
-COMMIT_SOURCE=$2
-SHA1=$3
+#COMMIT_MSG_FILE=$1
+#COMMIT_SOURCE=$2
+#SHA1=$3
 
 STOPWORD="#DONTPUSH"
 if grep -Fxq "$STOPWORD" "$COMMIT_MSG_FILE"

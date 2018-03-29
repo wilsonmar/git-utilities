@@ -3,7 +3,9 @@
 .secrets.sh
 temp
 tempfile
+temp.sh
 foo
+mac-git-install.log
 
 sisters
 git-sample-repo
