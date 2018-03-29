@@ -375,6 +375,7 @@ if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # brave is more respectful of user data.
    if [ ! -d "/Applications/Brave.app" ]; then 
       fancy_echo "Installing GIT_BROWSER=\"brave\" using Homebrew ..."
+      brew cask uninstall brave
       brew cask install --appdir="/Applications" brave
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -395,7 +396,7 @@ if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # fancy_echo "Opening brave ..."
    # open "/Applications/brave.app"
 fi
-
+exit
 # Other alternatives listed at https://git-scm.com/docs/git-web--browse.html
 
    # brew install links
@@ -454,7 +455,7 @@ brew install shellcheck
 
 
 fancy_echo "GIT_CLIENT=$GIT_CLIENT in .secrets.sh ..."
-echo "The last one installed is set as the Git editor."
+echo "The last one installed is set as the Git client."
 # See https://www.slant.co/topics/465/~best-git-clients-for-macos
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
           # See https://git-scm.com/download/gui/linux
@@ -1155,8 +1156,8 @@ fi
 fancy_echo "$GITCONFIG:"
 # cat $GITCONFIG  # List contents of ~/.gitconfig
 
-fancy_echo "git config --list:"
-git config --list
+#fancy_echo "git config --list:"
+#git config --list
 
 # If git-completion.bash file is not already in  ~/.bash_profile, add it:
 if grep -q "$FILEPATH" "$BASHFILE" ; then    
@@ -1168,16 +1169,6 @@ else
    echo "   . $FILEPATH" >>"$BASHFILE"
    echo "fi" >>"$BASHFILE"
    cat $FILEPATH >>"$BASHFILE"
-fi 
-
-
-# If GPG suite is not used, add the GPG key to ~/.bash_profile:
-if grep -q "GPG_TTY" "$BASHFILE" ; then    
-   fancy_echo "GPG_TTY already in $BASHFILE."
-else
-   fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
-   echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
-      # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
 fi 
 
 # Run .bash_profile to have changes above take:
@@ -1289,6 +1280,17 @@ fi
 # See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
    # from 2015 recommends gnupg instead
 # Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
+
+
+# If GPG suite is not used, add the GPG key to ~/.bash_profile:
+if grep -q "GPG_TTY" "$BASHFILE" ; then    
+   fancy_echo "GPG_TTY already in $BASHFILE."
+else
+   fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
+   echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
+      # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
+fi 
+
 # NOTE: gpg is the command even though the package is gpg2:
 if ! command -v gpg >/dev/null; then
   fancy_echo "Installing GPG2 for commit signing..."
@@ -1621,6 +1623,13 @@ pbcopy < "$FILE.pub"
    popd
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
+
+#fancy_echo "Listing of all brews installed (including dependencies automatically added):"
+# brew list
+#ls ~/Library/Caches/Homebrew
+
+#fancy_echo "Listing of all brew cask installed (including dependencies automatically added):"
+#brew info --all
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
