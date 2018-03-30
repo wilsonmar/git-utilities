@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > cloud CLI/SDK > GitHub > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub.
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > log
 
 set -a
 
@@ -112,7 +112,6 @@ PYTHON_INSTALL(){
 
 PYTHON3_INSTALL(){
    fancy_echo "Installing Python3 is a pre-requisite for AWS-CLI"
-   # Python3 is a pre-requisite for aws.
    # Because there are two active versions of Python (2.7.4 and 3.6 now)...
      # See https://docs.brew.sh/Homebrew-and-Python
    # See https://docs.python-guide.org/en/latest/starting/install3/osx/
@@ -161,6 +160,43 @@ PYTHON3_INSTALL(){
    # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
 }
 
+JAVA_INSTALL(){
+   # See https://wilsonmar.github.io/java-on-apple-mac-osx/
+   # and http://sourabhbajaj.com/mac-setup/Java/
+   if ! command -v java >/dev/null; then
+      # /usr/bin/java
+      fancy_echo "Installing Java, a pre-requisite for Selenium, JMeter, etc. ..."
+      # Don't rely on Oracle to install Java properly on your Mac.
+      brew tap caskroom/versions
+      brew cask install java8
+   else
+      # CAUTION: A specific version of JVM needs to be specified because code that use it need to be upgraded.
+          fancy_echo "Java already installed"
+   fi
+
+   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+   if [ ! -z ${JAVA_HOME+x} ]; then 
+      echo "$JAVA_HOME=$JAVA_HOME"
+   else 
+      echo "JAVA_HOME being set ..." # per http://sourabhbajaj.com/mac-setup/Java/
+      echo "export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)" >>$BASHFILE
+      #echo "export JAVA_HOME=$(/usr/libexec/java_home -v 9)" >>$BASHFILE
+      source $BASHFILE
+   fi
+
+   echo -e "\n$(java -version)" >>$THISSCRIPT.log
+      # java version "1.8.0_144"
+      # Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
+      # Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
+   echo -e "$($JAVA_HOME)" >>$THISSCRIPT.log
+      # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home is a directory
+
+    # Associated:
+    # Maven (mvn)
+}
+
+# TODO: NODE_INSTALL()
+
 
 ######### Starting:
 
@@ -189,19 +225,18 @@ else
    fancy_echo "Reading from $SECRETSFILE ..."
    #chmod +x $SECRETSFILE
    source "$SECRETSFILE"
-   echo "GIT_NAME=$GIT_NAME"
-   echo "GIT_ID=$GIT_ID"
-   echo "GIT_EMAIL=$GIT_EMAIL"
-   echo "GIT_USERNAME=$GIT_USERNAME"
-   echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT"
-   # DO NOT echo $GITHUB_PASSWORD
+   echo -e "\n   $SECRETSFILE ::" >>$THISSCRIPT.log
+   echo "GIT_NAME=$GIT_NAME">>$THISSCRIPT.log
+   echo "GIT_ID=$GIT_ID" >>$THISSCRIPT.log
+   echo "GIT_EMAIL=$GIT_EMAIL" >>$THISSCRIPT.log
+   echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
+   echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
+   # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
 #   echo "CLOUD=$CLOUD"
 #   echo "GIT_BROWSER=$GIT_BROWSER"
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
 fi 
-echo -e "\n   $SECRETSFILE ::" >>$THISSCRIPT.log
-echo -e "$(cat $SECRETSFILE)" >>$THISSCRIPT.log
 
 
 # Read first parameter from command line supplied at runtime to invoke:
@@ -297,6 +332,7 @@ echo -e "\n$(ruby -v)"      >>$THISSCRIPT.log
 if ! command -v brew >/dev/null; then
     fancy_echo "Installing homebrew using Ruby..."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    brew tap caskroom/cask
 else
     # Upgrade if run-time attribute contains "upgrade":
     if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -304,7 +340,7 @@ else
        fancy_echo "Brew already installed: UPGRADE requested..."
        brew upgrade
     else
-       fancy_echo "Bres already installed:"
+       fancy_echo "Brew already installed:"
     fi
 fi
 #brew --version
@@ -1480,7 +1516,7 @@ fi
 #rm -f -r /Library/Caches/Homebrew/*
 
 
-######### Google Cloud CLI/SDK
+######### Cloud CLI/SDK:
 
 
 # See https://cloud.google.com/sdk/docs/
@@ -1585,6 +1621,40 @@ fi
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
+######### Selenium:
+
+
+# To click and type on browser as if a human would do.
+# See http://seleniumhq.org/
+
+   JAVA_INSTALL  # function defined at top of this file.
+
+   if ! command -v az >/dev/null; then  # not installed.
+      fancy_echo "Installing selenium-server-standalone using Homebrew ..."
+      brew install selenium-server-standalone
+      # See http://macappstore.org/selenium-server-standalone/
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "azure-cli already installed: UPGRADE requested..."
+         # selenium --version
+            # azure-cli (2.0.18)
+         brew upgrade selenium-server-standalone
+      else
+         fancy_echo "selenium-server-standalone already installed."
+      fi
+   fi
+   # selenium --version
+      # azure-cli (2.0.30)
+      # ... and many other lines.
+
+#To have launchd start selenium-server-standalone now and restart at login:
+#  brew services start selenium-server-standalone
+#Or, if you don't want/need a background service you can just run:
+#  selenium-server -port 4444
+
+# Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
+
+
 ######### SSH-KeyGen:
 
 
@@ -1648,18 +1718,22 @@ else
    fi
 fi
 
+
+######### Paste SSH Keys in GitHub:
+
 # NOTE: pbcopy is a Mac-only command:
 pbcopy < "$FILE.pub"
 
    fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub, Settings, New SSH Key ..."
-   open https://github.com/settings/keys
+#   open https://github.com/settings/keys
    ## TODO: Add a token using GitHub API from credentials in .secrets.sh 
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
 
-# Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
+
+######### Log of versions:
 
 #Listing of all brew cask installed (including dependencies automatically added):"
 echo -e "\n   brew info --all ::" >>$THISSCRIPT.log
