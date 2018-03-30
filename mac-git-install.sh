@@ -1629,10 +1629,13 @@ fi
 
    JAVA_INSTALL  # function defined at top of this file.
 
-   if ! command -v az >/dev/null; then  # not installed.
+   # per https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
+
+   if ! command -v selenium >/dev/null; then  # not installed.
       fancy_echo "Installing selenium-server-standalone using Homebrew ..."
       brew install selenium-server-standalone
       # See http://macappstore.org/selenium-server-standalone/
+      # Node JavaScript edition at https://www.npmjs.com/package/selenium-standalone
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "azure-cli already installed: UPGRADE requested..."
@@ -1643,6 +1646,10 @@ fi
          fancy_echo "selenium-server-standalone already installed."
       fi
    fi
+
+   # install firefox
+   # install gekodriver
+
    # selenium --version
       # azure-cli (2.0.30)
       # ... and many other lines.
