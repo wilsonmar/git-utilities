@@ -55,6 +55,7 @@ PYTHON_INSTALL(){
       # No upgrade option.
       fancy_echo "Installing Python, a pre-requisite for git-cola & GCP ..."
       brew install python
+      # Not brew install pyenv  # Python environment manager.
 
       # brew cask install anaconda
       # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
@@ -191,8 +192,14 @@ JAVA_INSTALL(){
    echo -e "$($JAVA_HOME)" >>$THISSCRIPT.log
       # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home is a directory
 
-    # Associated:
-    # Maven (mvn)
+    # Associated: Maven (mvn) in /usr/local/opt/maven/bin/mvn
+   if ! command -v mvn >/dev/null; then
+      fancy_echo "Installing Maven for Java ..."
+      brew install maven
+   fi
+   echo -e "$(mvn --version)" >>$THISSCRIPT.log
+
+    # Alternative: ant, gradle
 }
 
 # TODO: NODE_INSTALL()
@@ -1621,43 +1628,82 @@ fi
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
-######### Selenium:
+######### Selenium Java:
 
 
 # To click and type on browser as if a human would do.
 # See http://seleniumhq.org/
 
-   JAVA_INSTALL  # function defined at top of this file.
-
    # per https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
 
-   if ! command -v selenium >/dev/null; then  # not installed.
-      fancy_echo "Installing selenium-server-standalone using Homebrew ..."
-      brew install selenium-server-standalone
-      # See http://macappstore.org/selenium-server-standalone/
-      # Node JavaScript edition at https://www.npmjs.com/package/selenium-standalone
-   else
-      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "azure-cli already installed: UPGRADE requested..."
-         # selenium --version
-            # azure-cli (2.0.18)
-         brew upgrade selenium-server-standalone
-      else
-         fancy_echo "selenium-server-standalone already installed."
+   # Download the latest webdrivers into folder /usr/bin: https://www.seleniumhq.org/about/platforms.jsp
+   # Edge:   	https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+   # Safari: 	https://webkit.org/blog/6900/webdriver-support-in-safari-10/
+      # See https://itisatechiesworld.wordpress.com/2015/04/15/steps-to-get-selenium-webdriver-running-on-safari-browser/
+      # says it's unstable since Yosemite
+   # Brave: https://github.com/brave/muon/blob/master/docs/tutorial/using-selenium-and-webdriver.md
+      # Much more complicated!
+   # PhantomJs headless
+
+   if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
+      # Chrome: 	https://sites.google.com/a/chromium.org/chromedriver/downloads
+      if ! command -v chromedriver >/dev/null; then  # not installed.
+         brew install chromedriver  # to /usr/local/bin/chromedriver
       fi
+      # chromedriver 2.36 is already installed
+      chromedriver & # invoke:
+         # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
+         # Only local connections are allowed.
+         # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
+      ps | grep chromedriver
    fi
 
-   # install firefox
-   # install gekodriver
+   if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
+      # Firefox: 	https://github.com/mozilla/geckodriver/releases
+      if ! command -v geckodriver >/dev/null; then  # not installed.
+         brew install geckodriver  # to /usr/local/bin/geckodriver
+      fi
 
-   # selenium --version
-      # azure-cli (2.0.30)
-      # ... and many other lines.
+      if grep -q "/usr/local/bin/chromedriver" "$BASHFILE" ; then    
+         fancy_echo "PATH to chromedriver already in $BASHFILE"
+      else
+         fancy_echo "Adding PATH to /usr/local/bin/chromedriver in $BASHFILE..."
+         echo "" >>"$BASHFILE"
+         echo "export PATH=\"\$PATH:/usr/local/bin/chromedriver\"" >>"$BASHFILE"
+         source "$BASHFILE"
+      fi 
 
-#To have launchd start selenium-server-standalone now and restart at login:
-#  brew services start selenium-server-standalone
-#Or, if you don't want/need a background service you can just run:
-#  selenium-server -port 4444
+      geckodriver & # invoke:
+      # 1522423621378	geckodriver	INFO	geckodriver 0.20.0
+      # 1522423621446	geckodriver	INFO	Listening on 127.0.0.1:4444
+      ps | grep geckodriver
+   fi
+
+   # install opencv for Selenium to recognize images
+   # install tesseract for Selenium to recognize text within images
+
+
+   if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
+      # Python:
+      # See https://saucelabs.com/resources/articles/getting-started-with-webdriver-in-python-on-osx
+      # Get bindings: http://selenium-python.readthedocs.io/installation.html
+      # TODO: Check aleady installed:
+         sudo pip install selenium   # password is requested. 
+            # selenium in /usr/local/lib/python2.7/site-packages
+         pip install webdriver
+
+      if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
+         python chrome_pycon_search.py chrome
+         # python chrome-google-search-quit.py
+      fi
+      if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
+         python firefox_pycon_search.py firefox
+         # python firefox_unittest.py  # not working due to indents
+         # python firefox-test-chromedriver.py
+      fi
+   fi
+   
+   # phantomjs --wd  # headless webdriver
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 
@@ -1729,7 +1775,7 @@ fi
 ######### Paste SSH Keys in GitHub:
 
 # NOTE: pbcopy is a Mac-only command:
-pbcopy < "$FILE.pub"
+pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public key.
 
    fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub, Settings, New SSH Key ..."
