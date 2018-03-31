@@ -62,7 +62,7 @@ PYTHON_INSTALL(){
       # variable, eg (for bash shell):
       # export PATH=/usr/local/anaconda3/bin:"$PATH"
 
-      # pip comes with brew install python
+      # pip comes with brew install Python 2 >=2.7.9 or Python 3 >=3.4
       pip --version
 
       fancy_echo "Installing virtualenv to manage multiple Python versions ..."
@@ -1679,8 +1679,8 @@ fi
       ps | grep geckodriver
    fi
 
-   # install opencv for Selenium to recognize images
-   # install tesseract for Selenium to recognize text within images
+   # TODO: install opencv for Selenium to recognize images
+   # TODO: install tesseract for Selenium to recognize text within images
 
 
    if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
