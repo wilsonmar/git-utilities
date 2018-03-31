@@ -221,6 +221,7 @@ echo -e "$(sw_vers)"               >>$THISSCRIPT.log
 echo -e "\n   uname -a"            >>$THISSCRIPT.log
 echo -e "$(uname -a)"              >>$THISSCRIPT.log
 
+
 ######### Read and use .secrets.sh file:
 
 
@@ -1854,6 +1855,7 @@ echo -e "\n$MSG" >>$THISSCRIPT.log
 ######### Open editor to show log:
 
 
+fancy_echo "Opening editor in background to display log ..."
 case "$GIT_EDITOR" in
         atom)
             echo atom
