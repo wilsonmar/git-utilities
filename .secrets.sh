@@ -3,7 +3,7 @@
 # referenced by mac-git-install.sh also in https://github.com/wilsonmar/git-utilities
 # This file name .secrets.sh should be specified in .gitignore so 
 #    it doesn't upload to a public GitHub/BitBucket, etc.
-# Command source .secrets.sh pull these variables in.
+# Command source .secrets.sh pull these variables in:
 # CAUTION: No spaces around = sign.
 GIT_NAME="Wilson Mar"
 GIT_ID="WilsonMar@gmail.com"
