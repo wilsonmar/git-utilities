@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > log
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > show log
 
 set -a
 
@@ -697,7 +697,7 @@ if [[ "$GIT_CLIENT" == *"magit"* ]]; then
         fi
     fi
    # TODO: magit -v
-   magit & 
+   # magit & 
 fi
 
 
@@ -720,7 +720,7 @@ if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
    # gitup -v
 
    fancy_echo "Starting GitUp in background ..."
-   gitup &
+   # gitup &
 fi
 
 
@@ -790,8 +790,8 @@ if [[ "$GIT_EDITOR" == *"sublime"* ]]; then
    #subl --version
       # Sublime Text Build 3143
 
-   fancy_echo "Opening Sublime Text app in background ..."
-   subl &
+   #fancy_echo "Opening Sublime Text app in background ..."
+   #subl &
 fi
 
 
@@ -834,8 +834,8 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
    code --install-extension timonwong.shellcheck
    #fancy_echo "Opening Visual Studio Code ..."
    #open "/Applications/Visual Studio Code.app"
-   fancy_echo "Starting code in background ..."
-   code &
+   #fancy_echo "Starting code in background ..."
+   #code &
 fi
 
 
@@ -870,8 +870,8 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
       # Node    : 7.4.0
       # Wilsons-MacBook-Pro
 
-   fancy_echo "Starting atom in background ..."
-   atom &
+   #fancy_echo "Starting atom in background ..."
+   #atom &
 fi
 
 
@@ -939,8 +939,8 @@ if [[ "$GIT_EDITOR" == *"textmate"* ]]; then
       #mate 2.12 (2018-03-08) 
    git config --global core.editor textmate
 
-   fancy_echo "Starting mate (textmate) in background ..."
-   mate &
+   #fancy_echo "Starting mate (textmate) in background ..."
+   #mate &
 fi
 
 
@@ -966,8 +966,8 @@ if [[ "$GIT_EDITOR" == *"emacs"* ]]; then
 
     # Evaluate https://github.com/git/git/tree/master/contrib/emacs
 
-   fancy_echo "Opening emacs in background ..."
-   emacs &
+   #fancy_echo "Opening emacs in background ..."
+   #emacs &
 fi
 
 
@@ -1003,8 +1003,8 @@ if [[ "$GIT_EDITOR" == *"intellij"* ]]; then
 
    #fancy_echo "Opening IntelliJ IDEA CE ..."
    #open "/Applications/IntelliJ IDEA CE.app"
-   fancy_echo "Opening (Intellij) idea in background ..."
-   idea &
+   #fancy_echo "Opening (Intellij) idea in background ..."
+   #idea &
 fi
 # See https://www.jetbrains.com/help/idea/using-git-integration.html
 
@@ -1043,8 +1043,8 @@ if [[ "$GIT_EDITOR" == *"sts"* ]]; then
 
    #fancy_echo "Opening STS ..."
    #open "/Applications/STS.app"
-   fancy_echo "Opening sts in background ..."
-   sts &
+   #fancy_echo "Opening sts in background ..."
+   #sts &
 fi
 
 
@@ -1082,8 +1082,8 @@ if [[ "$GIT_EDITOR" == *"eclipse"* ]]; then
    #git config --global core.editor eclipse
    # TODO: eclipse-ide --version
 
-   fancy_echo "Opening eclipse in background ..."
-   eclipse &
+   #fancy_echo "Opening eclipse in background ..."
+   #eclipse &
    # See https://www.cs.colostate.edu/helpdocs/eclipseCommLineArgs.html
 fi
 
@@ -1670,12 +1670,20 @@ fi
       if ! command -v chromedriver >/dev/null; then  # not installed.
          brew install chromedriver  # to /usr/local/bin/chromedriver
       fi
-      # chromedriver 2.36 is already installed
-      chromedriver & # invoke:
-         # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
-         # Only local connections are allowed.
-         # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
-      ps | grep chromedriver
+
+      PS_OUTPUT=$(ps | grep chromedriver)
+      if grep -q "chromedriver" "$PS_OUTFILE" ; then # chromedriver 2.36 is already installed
+         fancy_echo "chromedriver already running."
+      else
+         fancy_echo "Starting chromedriver in background ..."
+         chromedriver & # invoke:
+            # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
+            # Only local connections are allowed.
+            # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
+         ps | grep chromedriver
+            # 1522423621378	chromedriver	INFO	chromedriver 0.20.0
+            # 1522423621446	chromedriver	INFO	Listening on 127.0.0.1:4444
+      fi 
    fi
 
    if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
@@ -1693,10 +1701,16 @@ fi
          source "$BASHFILE"
       fi 
 
-      geckodriver & # invoke:
-      # 1522423621378	geckodriver	INFO	geckodriver 0.20.0
-      # 1522423621446	geckodriver	INFO	Listening on 127.0.0.1:4444
-      ps | grep geckodriver
+      PS_OUTPUT=$(ps | grep geckodriver)
+      if grep -q "geckodriver" "$PS_OUTFILE" ; then    
+         fancy_echo "geckodriver already running."
+      else
+         fancy_echo "Starting geckodriver in background ..."
+         geckodriver & # invoke:
+            # 1522423621378	geckodriver	INFO	geckodriver 0.20.0
+            # 1522423621446	geckodriver	INFO	Listening on 127.0.0.1:4444
+         ps | grep geckodriver
+      fi 
    fi
 
    # TODO: install opencv for Selenium to recognize images
@@ -1794,6 +1808,7 @@ fi
 
 ######### Paste SSH Keys in GitHub:
 
+
 # NOTE: pbcopy is a Mac-only command:
 pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public key.
 
@@ -1807,6 +1822,7 @@ pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public
 
 
 ######### Log of versions:
+
 
 #Listing of all brew cask installed (including dependencies automatically added):"
 echo -e "\n   brew info --all ::" >>$THISSCRIPT.log
@@ -1830,4 +1846,60 @@ echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
-fancy_echo "End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
+MSG = "End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
+fancy_echo "$MSG"
+echo -e "\n$MSG" >>$THISSCRIPT.log
+
+
+######### Open editor to show log:
+
+
+case "$GIT_EDITOR" in
+        atom)
+            echo atom
+            atom $THISSCRIPT.log &
+            ;;
+        code)
+            echo code
+            code $THISSCRIPT.log &
+            ;;
+        eclipse)
+            echo eclipse
+            eclipse $THISSCRIPT.log &
+            ;;
+        emacs)
+            echo emacs
+            emacs $THISSCRIPT.log &
+            ;;
+        macvim)
+            echo macvim
+            macvim $THISSCRIPT.log &
+            ;;
+        nano)
+            echo nano
+            nano $THISSCRIPT.log &
+            ;;
+        pico)
+            echo pico
+            pico $THISSCRIPT.log &
+            ;;
+        sublime)
+            echo sublime
+            subl $THISSCRIPT.log &
+            ;;
+        textedit)
+            echo textedit
+            textedit $THISSCRIPT.log &
+            ;;
+        textmate)
+            echo textmate
+            textmate $THISSCRIPT.log &
+            ;;
+        vim)
+            echo vim
+            vim $THISSCRIPT.log &
+            ;;
+        *)
+            echo "$GIT_EDITOR not recognized."
+            exit 1
+esac
