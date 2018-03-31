@@ -816,9 +816,9 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
       # 79b44aa704ce542d8ca4a3cc44cfca566e7720f1
       # x64
 
-   # TODO: Configure visual-studio-code using bash shell commands.
-       # https://github.com/timonwong/vscode-shellcheck
-
+   # https://github.com/timonwong/vscode-shellcheck
+   fancy_echo "Installing Visual Studio Code Shellcheck extension"
+   code --install-extension timonwong.shellcheck
    #fancy_echo "Opening Visual Studio Code ..."
    #open "/Applications/Visual Studio Code.app"
    fancy_echo "Starting code in background ..."
