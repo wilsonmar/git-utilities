@@ -202,6 +202,32 @@ JAVA_INSTALL(){
     # Alternative: ant, gradle
 }
 
+NODE_INSTALL(){
+   # See https://wilsonmar.github.io/node-starter/
+   if ! command -v node >/dev/null; then  # /usr/local/bin/node
+      fancy_echo "Installing node, a pre-requisite for Mocha"
+      brew cask install node
+   else
+      # specific to each MacOS version
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         node --version   # v9.7.1
+         fancy_echo "node already installed: UPGRADE requested..."
+         brew upgrade node  
+      else
+         fancy_echo "node already installed."
+      fi
+   fi
+   # npm (node package manager) installed with node.
+   # https://colorlib.com/wp/npm-packages-node-js/
+   npm install -g mocha
+   # Alternative: karma
+   # browserify, bower, grunt, webpack, aws-sdk 
+   # moment.js, graphicmagick, yeoman-generator
+   # less, UglifyJS2, eslint, jslint
+   # express, hapi, react, redux, angular, mongodb
+}
+
+
 # TODO: NODE_INSTALL()
 
 
@@ -245,6 +271,7 @@ else
 #   echo "GIT_BROWSER=$GIT_BROWSER"
 #   echo "GIT_CLIENT=$GIT_CLIENT"
 #   echo "GIT_EDITOR=$GIT_EDITOR"
+#   echo "GUI_TEST=$GUI_TEST"
 fi 
 
 
@@ -1639,7 +1666,7 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
 fi
 
 
-# IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
+# TODO: IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
 # page https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started
 # or curl -fsSL https://clis.ng.bluemix.net/install/osx | sh
 # The command is "bx login".
@@ -1654,8 +1681,9 @@ fi
 
 # To click and type on browser as if a human would do.
 # See http://seleniumhq.org/
+if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
 
-   # per https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
+   # per ttps://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
 
    # Download the latest webdrivers into folder /usr/bin: https://www.seleniumhq.org/about/platforms.jsp
    # Edge:   	https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
@@ -1718,29 +1746,38 @@ fi
    # TODO: install tesseract for Selenium to recognize text within images
 
 
+
+######### Python languge:
+
+
    if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
       # Python:
       # See https://saucelabs.com/resources/articles/getting-started-with-webdriver-in-python-on-osx
       # Get bindings: http://selenium-python.readthedocs.io/installation.html
+
       # TODO: Check aleady installed:
-         sudo pip install selenium   # password is requested. 
+         pip install selenium   # password is requested. 
             # selenium in /usr/local/lib/python2.7/site-packages
+
+      # TODO: If webdrive is installed:
          pip install webdriver
 
       if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
-         python chrome_pycon_search.py chrome
-         # python chrome-google-search-quit.py
+         python python-tests/chrome_pycon_search.py chrome
+         # python python-tests/chrome-google-search-quit.py
       fi
       if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
-         python firefox_pycon_search.py firefox
-         # python firefox_unittest.py  # not working due to indents
-         # python firefox-test-chromedriver.py
+         python python-tests/firefox_pycon_search.py firefox
+         # python python-tests/firefox_unittest.py  # not working due to indents
+         # python python-tests/firefox-test-chromedriver.py
       fi
-   fi
-   
+   fi   
+
    # phantomjs --wd  # headless webdriver
+fi # selenium
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
+# TODO: Protractor for AngularJS
 
 
 ######### SSH-KeyGen:
