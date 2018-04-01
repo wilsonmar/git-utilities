@@ -23,7 +23,7 @@ GIT_EDITOR="vim"
 CLOUD="azure"
      # none, aws, gcp, azure"
 GIT_LANG="python"
-        # python, ruby, javascript, java
+        # python, java, go
 GUI_TEST="selenium"
         # selenium, sikulix
         # Drivers for scripting language depend on what is defined in $GIT_LANG.

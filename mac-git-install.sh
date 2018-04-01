@@ -12,7 +12,6 @@
 
 set -a
 
-#DONTPUSH # This should cause exit by hooks/prepare-commit-msg
 
 ######### Bash function definitions:
 
@@ -204,31 +203,127 @@ JAVA_INSTALL(){
 
 NODE_INSTALL(){
    # See https://wilsonmar.github.io/node-starter/
-   if ! command -v node >/dev/null; then  # /usr/local/bin/node
-      fancy_echo "Installing node, a pre-requisite for Mocha"
-      brew cask install node
+
+   # We begin with NVM to install Node versions: https://www.airpair.com/javascript/node-js-tutorial
+   # in order to have several diffent versions of node installed simultaneously.
+   # See https://github.com/creationix/nvm
+   if [ ! -d "$HOME/.nvm" ]; then
+      mkdir $HOME/.nvm
+   fi
+
+   if grep -q "export NVM_DIR=" "$BASHFILE" ; then    
+      fancy_echo "export NVM_DIR= already in $BASHFILE"
    else
-      # specific to each MacOS version
+      fancy_echo "Adding export NVM_DIR= in $BASHFILE..."
+      echo "export NVM_DIR=\"$HOME/.nvm\"" >>$BASHFILE
+      source $BASHFILE
+   fi
+
+   if ! command -v nvm >/dev/null; then  # /usr/local/bin/node
+      fancy_echo "Installing nvm (to manage node versions)"
+      brew install nvm  # curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+
+      # TODO: How to tell if nvm.sh has run?
+      fancy_echo "Running /usr/local/opt/nvm/nvm.sh ..."
+      source "/usr/local/opt/nvm/nvm.sh"  # nothing returned.
+   else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         node --version   # v9.7.1
+         fancy_echo "nvm already installed: UPGRADE requested..."
+         brew upgrade nvm
+      else
+         fancy_echo "nvm already installed."
+      fi
+   fi
+   nvm --version
+      #0.33.8
+
+   if ! command -v node >/dev/null; then  # /usr/local/bin/node
+      fancy_echo "Installing node using nvm"
+      nvm install node  # use nvm to install the latest version of node.
+         # v9.10.1...
+      nvm install --lts # lastest Long Term Support version
+         # v8.11.1...
+
+      # nvm install 8.9.4  # install a specific version
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "node already installed: UPGRADE requested..."
-         brew upgrade node  
+         # nvm i nvm  # instead of brew upgrade node
       else
          fancy_echo "node already installed."
       fi
    fi
+   nvm on
+   # $NVM_HOME
+
+   nvm list
+      # v8.11.1
+      # v9.10.1
+      # node -> stable (-> v9.10.1) (default)
+      # stable -> 9.10 (-> v9.10.1) (default)
+      # iojs -> N/A (default)
+      # lts/* -> lts/carbon (-> v8.11.1)
+      # lts/argon -> v4.9.1 (-> N/A)
+      # lts/boron -> v6.14.1 (-> N/A)
+      # lts/carbon -> v8.11.1
+
+   nvm use --delete-prefix v9.10.1  # to unset it.
+   nvm use node
+      # nvm is not compatible with the npm config "prefix" option: currently set to "/usr/local/Cellar/nvm/0.33.8/versions/node/v9.10.1"
+   node --version   # v9.10.1...
+   npm --version    # 5.6.0
+
+   nvm use --delete-prefix v8.11.1
+   nvm use --lts
+      # Now using node v8.11.1 (npm v5.6.0)
+
+   node --version   # v8.11.1
+   npm --version    # 5.6.0
+
+   nvm run 8.11.1 --version
+
+   # nvm which 8.9.4
+
+   # $NODE_ENV 
+   
    # npm (node package manager) installed with node.
    # https://colorlib.com/wp/npm-packages-node-js/
-   npm install -g mocha
-   # Alternative: karma
-   # browserify, bower, grunt, webpack, aws-sdk 
+   npm install -g mocha  # testing framework
+   npm install -g chai   # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
+   # Alternative: karma, karma-cli
+   # browserify, bower, grunt, gulp/gulp-cli, webpack, aws-sdk 
    # moment.js, graphicmagick, yeoman-generator
-   # less, UglifyJS2, eslint, jslint
+   # less, UglifyJS2, eslint, jslint, cfn-lint
    # express, hapi, react, redux, angular, mongodb
+   # montebank
+   # nodemon
+   # npm install -g node-inspector
+
+   echo -e "\n  npm list -g --depth=0" >>$THISSCRIPT.log
+   echo -e "$(npm list -g --depth=0)" >>$THISSCRIPT.log
+
+   # npm start
+
+   # mocha
+   # See https://github.com/creationix/howtonode.org by Tim Caswell
 }
 
 
-# TODO: NODE_INSTALL()
+GO_INSTALL(){
+   if ! command -v go >/dev/null; then  # /usr/local/bin/node
+      fancy_echo "Installing go, a pre-requisite for ..."
+      brew install go
+   else
+      # specific to each MacOS version
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         go --version   # v9.7.1
+         fancy_echo "golang already installed: UPGRADE requested..."
+         brew upgrade go
+      else
+         fancy_echo "golang already installed."
+      fi
+   fi
+}
 
 
 ######### Starting:
@@ -293,7 +388,7 @@ defaults write com.apple.finder AppleShowAllFiles YES
 #       installs other programs on Macs for developers.
 
 
-# Ensure Apple's command line tools (such as cc) are installed:
+# Ensure Apple's command line tools (such as cc) are installed by node:
 if ! command -v cc >/dev/null; then
    fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
    xcode-select --install 
@@ -1747,7 +1842,7 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
 
 
 
-######### Python languge:
+######### Python test coding languge:
 
 
    if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
@@ -1778,6 +1873,7 @@ fi # selenium
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 # TODO: Protractor for AngularJS
+# For coding See http://www.techbeamers.com/selenium-webdriver-python-tutorial/
 
 
 ######### SSH-KeyGen:
