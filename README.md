@@ -21,7 +21,7 @@ Such scripts are being phased out in favor of cross-platform Python script for u
 <a name="mac-git-install.sh">
 <strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Bash code completion, GPG to enable code signing. Text editors Sublime Text, MacVim, and Microsoft's Code are installed. Git clients GitHub Desktop, GitKraken, or SmartGit are installed. These are installed based a setting in file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/.secrets.sh">.secrets.sh</a>.
 
-You begin by changing that file with your own information. That data is used to create SSH keys and config files. The script stops if the secrets file still contain default account info. The <secret>.gitignore</secret> file keeps local customizations (password) from being uploaded to GitHub. The script installs GPG utilities and uses them to encrypt the .secrets.sh file.
+You begin by changing that file with your own information. That data is used to create SSH keys and config files. The script stops if the secrets file still contain default account info. The <secret>.gitignore</secret> file keeps local customizations (password) from being uploaded to GitHub. The script installs GPG utilities and uses them to encrypt the .secrets.sh file before pushing it to GitHub. This happens automatically by a Git local hook. Your .secrets.sh file would be stored in GitHub in encrypted form. On git pull the file is unencrypted.
 
 If a component has already been installed, the "UPGRADE" parameter added when executing the script results in an upgrade to the latest version of each component.
 
