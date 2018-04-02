@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > show log
+# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > dump contents > disk space > show log
 
 set -a
 
@@ -310,19 +310,21 @@ NODE_INSTALL(){
 
 
 GO_INSTALL(){
-   if ! command -v go >/dev/null; then  # /usr/local/bin/node
-      fancy_echo "Installing go, a pre-requisite for ..."
+   if ! command -v go >/dev/null; then  # /usr/local/bin/go
+      fancy_echo "Installing go ..."
       brew install go
    else
       # specific to each MacOS version
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         go --version   # v9.7.1
-         fancy_echo "golang already installed: UPGRADE requested..."
+         go version   # upgrading from.
+         fancy_echo "go already installed: UPGRADE requested..."
          brew upgrade go
       else
-         fancy_echo "golang already installed."
+         fancy_echo "go already installed."
       fi
    fi
+   go version
+      # go version go1.10.1 darwin/amd64
 }
 
 
@@ -330,17 +332,23 @@ GO_INSTALL(){
 
 
 TIME_START="$(date -u +%s)"
-fancy_echo "This is for Mac only! Starting elapsed timer ..."
+fancy_echo "This is for MacOS only. Starting timer ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
-
 
 THISSCRIPT="$0"   # "mac-git-install"
 fancy_echo "Creating $THISSCRIPT.log ..."
 echo "$THISSCRIPT.log $TIME_START"  >$THISSCRIPT.log  # new file
-echo -e "\n   sw_vers"             >>$THISSCRIPT.log
+echo -e "\n   sw_vers ::"          >>$THISSCRIPT.log
 echo -e "$(sw_vers)"               >>$THISSCRIPT.log
-echo -e "\n   uname -a"            >>$THISSCRIPT.log
+echo -e "\n   uname -a ::"         >>$THISSCRIPT.log
 echo -e "$(uname -a)"              >>$THISSCRIPT.log
+
+# The Available space from 2nd line, 6th item: 190920080
+   #Filesystem   1024-blocks      Used Available Capacity iused               ifree %iused  Mounted on
+   # /dev/disk1s1   488245284 294551984 190920080    61% 2470677 9223372036852305130    0%   /
+FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+
+git clone https://github.com/rtyley/bfg-repo-cleaner --depth=1  # du -sh = 2.4MB
 
 
 ######### TODO: Install git-secrets utility to decrypt secrets.sh.secret stored in GitHub:
@@ -369,11 +377,12 @@ else
    echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
    # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
-#   echo "CLOUD=$CLOUD"
-#   echo "GIT_BROWSER=$GIT_BROWSER"
-#   echo "GIT_CLIENT=$GIT_CLIENT"
-#   echo "GIT_EDITOR=$GIT_EDITOR"
-#   echo "GUI_TEST=$GUI_TEST"
+   echo "CLOUD=$CLOUD" >>$THISSCRIPT.log
+   echo "GIT_BROWSER=$GIT_BROWSER" >>$THISSCRIPT.log
+   echo "GIT_CLIENT=$GIT_CLIENT" >>$THISSCRIPT.log
+   echo "GIT_EDITOR=$GIT_EDITOR" >>$THISSCRIPT.log
+   echo "GUI_TEST=$GUI_TEST" >>$THISSCRIPT.log
+   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
 fi 
 
 
@@ -854,7 +863,25 @@ if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
 fi
 
 
+######### BFG to identify and remove passwords and large or troublesome blobs.
+
+
+# See https://rtyley.github.io/bfg-repo-cleaner/ 
+
+# Install:
+# git clone https://github.com/rtyley/bfg-repo-cleaner --depth=0
+
+#git clone --mirror $WORK_REPO  # = git://example.com/some-big-repo.git
+
+#JAVA_INSTALL
+
+#java -jar bfg.jar --replace-text banned.txt \
+#    --strip-blobs-bigger-than 100M \
+#    $SECRETSFILE
+
+
 ######### Text editors:
+
 
 # Specified in .secrets.sh
           # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
@@ -1964,7 +1991,7 @@ pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public
    popd
 
 
-######### Log of versions:
+######### Dump of contents:
 
 
 #Listing of all brew cask installed (including dependencies automatically added):"
@@ -1987,6 +2014,17 @@ echo -e "\n   $BASHFILE ::" >>$THISSCRIPT.log
 echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
 
 
+######### Disk space consumed:
+
+
+FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
+echo -e "\n   $DIFF MB of disk space consumed during this script run." >>$THISSCRIPT.log
+# 380691344 / 182G = 2091710.681318681318681 blocks per GB
+# 182*1024=186368 MB
+# 380691344 / 186368 G = 2042 blocks per MB
+
+exit
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
 MSG = "End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
@@ -2047,3 +2085,6 @@ case "$GIT_EDITOR" in
             echo "$GIT_EDITOR not recognized."
             exit 1
 esac
+
+
+exit
