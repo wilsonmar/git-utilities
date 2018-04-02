@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > dump contents > disk space > show log
 
 set -a
 
@@ -24,7 +24,7 @@ fancy_echo() {
 
 # Add function to read in string and email, and return a KEY found for that email.
 # GPG_MAP_MAIL2KEY associates the key and email in an array
-GPG_MAP_MAIL2KEY(){
+function GPG_MAP_MAIL2KEY(){
 KEY_ARRAY=($(echo "$str" | awk -F'sec   rsa2048/|2018* [SC]' '{print $2}' | awk '{print $1}'))
 # Remove trailing blank: KEY="$(echo -e "${str}" | sed -e 's/[[:space:]]*$//')"
 MAIL_ARRAY=($(echo "$str" | awk -F'<|>' '{print $2}'))
@@ -43,7 +43,7 @@ else
 fi
 }
 
-PYTHON_INSTALL(){
+function PYTHON_INSTALL(){
    # Python2 is a pre-requisite for git-cola & GCP installed below.
    # Python3 is a pre-requisite for aws.
    # Because there are two active versions of Pythong (2.7.4 and 3.6 now)...
@@ -110,7 +110,7 @@ PYTHON_INSTALL(){
    # There is also a Enthought Python Distribution -- www.enthought.com
 }
 
-PYTHON3_INSTALL(){
+function PYTHON3_INSTALL(){
    fancy_echo "Installing Python3 is a pre-requisite for AWS-CLI"
    # Because there are two active versions of Python (2.7.4 and 3.6 now)...
      # See https://docs.brew.sh/Homebrew-and-Python
@@ -160,7 +160,7 @@ PYTHON3_INSTALL(){
    # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
 }
 
-JAVA_INSTALL(){
+function JAVA_INSTALL(){
    # See https://wilsonmar.github.io/java-on-apple-mac-osx/
    # and http://sourabhbajaj.com/mac-setup/Java/
    if ! command -v java >/dev/null; then
@@ -201,7 +201,7 @@ JAVA_INSTALL(){
     # Alternative: ant, gradle
 }
 
-NODE_INSTALL(){
+function NODE_INSTALL(){
    # See https://wilsonmar.github.io/node-starter/
 
    # We begin with NVM to install Node versions: https://www.airpair.com/javascript/node-js-tutorial
@@ -291,13 +291,15 @@ NODE_INSTALL(){
    npm install -g mocha  # testing framework
    npm install -g chai   # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
    # Alternative: karma, karma-cli
-   # browserify, bower, grunt, gulp/gulp-cli, webpack, aws-sdk 
+   # browserify, bower, grunt, gulp/gulp-cli, webpack, 
+   # web: express, hapi, 
+   # front-end: angular, react, redux, Ember.js, Marionette.js
    # moment.js, graphicmagick, yeoman-generator
+   # cloud: aws-sdk 
    # less, UglifyJS2, eslint, jslint, cfn-lint
-   # express, hapi, react, redux, angular, mongodb
-   # montebank
-   # nodemon
-   # npm install -g node-inspector
+   # database: mongodb, redis 
+   # montebank security app
+   # nodemon, node-inspector
 
    echo -e "\n  npm list -g --depth=0" >>$THISSCRIPT.log
    echo -e "$(npm list -g --depth=0)" >>$THISSCRIPT.log
@@ -309,7 +311,7 @@ NODE_INSTALL(){
 }
 
 
-GO_INSTALL(){
+function GO_INSTALL(){
    if ! command -v go >/dev/null; then  # /usr/local/bin/go
       fancy_echo "Installing go ..."
       brew install go
@@ -348,7 +350,6 @@ echo -e "$(uname -a)"              >>$THISSCRIPT.log
    # /dev/disk1s1   488245284 294551984 190920080    61% 2470677 9223372036852305130    0%   /
 FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
 
-git clone https://github.com/rtyley/bfg-repo-cleaner --depth=1  # du -sh = 2.4MB
 
 
 ######### TODO: Install git-secrets utility to decrypt secrets.sh.secret stored in GitHub:
@@ -376,13 +377,14 @@ else
    echo "GIT_EMAIL=$GIT_EMAIL" >>$THISSCRIPT.log
    echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
+   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
    # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
+   echo "GITHUB_REPO=$GITHUB_REPO" >>$THISSCRIPT.log
    echo "CLOUD=$CLOUD" >>$THISSCRIPT.log
    echo "GIT_BROWSER=$GIT_BROWSER" >>$THISSCRIPT.log
    echo "GIT_CLIENT=$GIT_CLIENT" >>$THISSCRIPT.log
    echo "GIT_EDITOR=$GIT_EDITOR" >>$THISSCRIPT.log
    echo "GUI_TEST=$GUI_TEST" >>$THISSCRIPT.log
-   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
 fi 
 
 
@@ -868,7 +870,7 @@ fi
 
 # See https://rtyley.github.io/bfg-repo-cleaner/ 
 
-# Install:
+# Install sub-folder under git-utilities:
 # git clone https://github.com/rtyley/bfg-repo-cleaner --depth=0
 
 #git clone --mirror $WORK_REPO  # = git://example.com/some-big-repo.git
@@ -1805,113 +1807,6 @@ fi
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
-######### Selenium Java:
-
-
-# To click and type on browser as if a human would do.
-# See http://seleniumhq.org/
-if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
-
-   # per ttps://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
-
-   # Download the latest webdrivers into folder /usr/bin: https://www.seleniumhq.org/about/platforms.jsp
-   # Edge:   	https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
-   # Safari: 	https://webkit.org/blog/6900/webdriver-support-in-safari-10/
-      # See https://itisatechiesworld.wordpress.com/2015/04/15/steps-to-get-selenium-webdriver-running-on-safari-browser/
-      # says it's unstable since Yosemite
-   # Brave: https://github.com/brave/muon/blob/master/docs/tutorial/using-selenium-and-webdriver.md
-      # Much more complicated!
-   # PhantomJs headless
-
-   if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
-      # Chrome: 	https://sites.google.com/a/chromium.org/chromedriver/downloads
-      if ! command -v chromedriver >/dev/null; then  # not installed.
-         brew install chromedriver  # to /usr/local/bin/chromedriver
-      fi
-
-      PS_OUTPUT=$(ps | grep chromedriver)
-      if grep -q "chromedriver" "$PS_OUTFILE" ; then # chromedriver 2.36 is already installed
-         fancy_echo "chromedriver already running."
-      else
-         fancy_echo "Starting chromedriver in background ..."
-         chromedriver & # invoke:
-            # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
-            # Only local connections are allowed.
-            # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
-         ps | grep chromedriver
-            # 1522423621378	chromedriver	INFO	chromedriver 0.20.0
-            # 1522423621446	chromedriver	INFO	Listening on 127.0.0.1:4444
-      fi 
-   fi
-
-   if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
-      # Firefox: 	https://github.com/mozilla/geckodriver/releases
-      if ! command -v geckodriver >/dev/null; then  # not installed.
-         brew install geckodriver  # to /usr/local/bin/geckodriver
-      fi
-
-      if grep -q "/usr/local/bin/chromedriver" "$BASHFILE" ; then    
-         fancy_echo "PATH to chromedriver already in $BASHFILE"
-      else
-         fancy_echo "Adding PATH to /usr/local/bin/chromedriver in $BASHFILE..."
-         echo "" >>"$BASHFILE"
-         echo "export PATH=\"\$PATH:/usr/local/bin/chromedriver\"" >>"$BASHFILE"
-         source "$BASHFILE"
-      fi 
-
-      PS_OUTPUT=$(ps | grep geckodriver)
-      if grep -q "geckodriver" "$PS_OUTFILE" ; then    
-         fancy_echo "geckodriver already running."
-      else
-         fancy_echo "Starting geckodriver in background ..."
-         geckodriver & # invoke:
-            # 1522423621378	geckodriver	INFO	geckodriver 0.20.0
-            # 1522423621446	geckodriver	INFO	Listening on 127.0.0.1:4444
-         ps | grep geckodriver
-      fi 
-   fi
-
-   # TODO: install opencv for Selenium to recognize images
-   # TODO: install tesseract for Selenium to recognize text within images
-
-
-
-######### Python test coding languge:
-
-
-   if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
-      # Python:
-      # See https://saucelabs.com/resources/articles/getting-started-with-webdriver-in-python-on-osx
-      # Get bindings: http://selenium-python.readthedocs.io/installation.html
-
-      # TODO: Check aleady installed:
-         pip install selenium   # password is requested. 
-            # selenium in /usr/local/lib/python2.7/site-packages
-
-      # TODO: If webdrive is installed:
-         pip install webdriver
-
-      if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
-         python python-tests/chrome_pycon_search.py chrome
-         # python python-tests/chrome-google-search-quit.py
-      fi
-      if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
-         python python-tests/firefox_pycon_search.py firefox
-         # python python-tests/firefox_unittest.py  # not working due to indents
-         # python python-tests/firefox-test-chromedriver.py
-      fi
-   fi   
-
-   # phantomjs --wd  # headless webdriver
-fi # selenium
-
-# Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
-# TODO: Protractor for AngularJS
-# For coding See http://www.techbeamers.com/selenium-webdriver-python-tutorial/
-
-# TODO: Java Selenium script
-
-
 ######### SSH-KeyGen:
 
 
@@ -1976,6 +1871,13 @@ else
 fi
 
 
+######### Download GITHUB_REPO_URL
+
+GITHUB_REPO_URL="https://github.com/$GITHUB_ACCOUNT/$GITHUB_REPO.git"
+fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
+
+
+
 ######### Paste SSH Keys in GitHub:
 
 
@@ -1989,6 +1891,117 @@ pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
+
+
+######### Selenium Java:
+
+
+# To click and type on browser as if a human would do.
+# See http://seleniumhq.org/
+if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
+
+   # per ttps://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
+
+   # Download the latest webdrivers into folder /usr/bin: https://www.seleniumhq.org/about/platforms.jsp
+   # Edge:     https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+   # Safari:   https://webkit.org/blog/6900/webdriver-support-in-safari-10/
+      # See https://itisatechiesworld.wordpress.com/2015/04/15/steps-to-get-selenium-webdriver-running-on-safari-browser/
+      # says it's unstable since Yosemite
+   # Brave: https://github.com/brave/muon/blob/master/docs/tutorial/using-selenium-and-webdriver.md
+      # Much more complicated!
+   # PhantomJs headless
+
+   if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
+      # Chrome:   https://sites.google.com/a/chromium.org/chromedriver/downloads
+      if ! command -v chromedriver >/dev/null; then  # not installed.
+         brew install chromedriver  # to /usr/local/bin/chromedriver
+      fi
+
+      PS_OUTPUT=$(ps | grep chromedriver)
+      if grep -q "chromedriver" "$PS_OUTFILE" ; then # chromedriver 2.36 is already installed
+         fancy_echo "chromedriver already running."
+      else
+         fancy_echo "Deleting chromedriver.log from previous session ..."
+         rm chromedriver.log
+
+         fancy_echo "Starting chromedriver in background ..."
+         chromedriver & # invoke:
+            # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
+            # Only local connections are allowed.
+            # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
+         ps | grep chromedriver
+            # 1522423621378   chromedriver   INFO  chromedriver 0.20.0
+            # 1522423621446   chromedriver   INFO  Listening on 127.0.0.1:4444
+      fi 
+   fi
+
+
+   if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
+      # Firefox:  https://github.com/mozilla/geckodriver/releases
+      if ! command -v geckodriver >/dev/null; then  # not installed.
+         brew install geckodriver  # to /usr/local/bin/geckodriver
+      fi
+
+      if grep -q "/usr/local/bin/chromedriver" "$BASHFILE" ; then    
+         fancy_echo "PATH to chromedriver already in $BASHFILE"
+      else
+         fancy_echo "Adding PATH to /usr/local/bin/chromedriver in $BASHFILE..."
+         echo "" >>"$BASHFILE"
+         echo "export PATH=\"\$PATH:/usr/local/bin/chromedriver\"" >>"$BASHFILE"
+         source "$BASHFILE"
+      fi 
+
+      PS_OUTPUT=$(ps | grep geckodriver)
+      if grep -q "geckodriver" "$PS_OUTFILE" ; then    
+         fancy_echo "geckodriver already running."
+      else
+         fancy_echo "Starting geckodriver in background ..."
+         geckodriver & # invoke:
+            # 1522423621378   geckodriver INFO  geckodriver 0.20.0
+            # 1522423621446   geckodriver INFO  Listening on 127.0.0.1:4444
+         ps | grep geckodriver
+      fi 
+   fi
+
+   # TODO: install opencv for Selenium to recognize images
+   # TODO: install tesseract for Selenium to recognize text within images
+
+
+
+######### Python test coding languge:
+
+
+   if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
+      # Python:
+      # See https://saucelabs.com/resources/articles/getting-started-with-webdriver-in-python-on-osx
+      # Get bindings: http://selenium-python.readthedocs.io/installation.html
+
+      # TODO: Check aleady installed:
+         pip install selenium   # password is requested. 
+            # selenium in /usr/local/lib/python2.7/site-packages
+
+      # TODO: If webdrive is installed:
+         pip install webdriver
+
+      if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
+         python python-tests/chrome_pycon_search.py chrome
+         # python python-tests/chrome-google-search-quit.py
+      fi
+      if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
+         python python-tests/firefox_github_ssh_add.py
+         # python python-tests/firefox_unittest.py  # not working due to indents
+         # python python-tests/firefox-test-chromedriver.py
+      fi
+   fi   
+
+   # phantomjs --wd  # headless webdriver
+fi # selenium
+
+# Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
+# TODO: Protractor for AngularJS
+# For coding See http://www.techbeamers.com/selenium-webdriver-python-tutorial/
+
+# TODO: Java Selenium script
 
 
 ######### Dump of contents:

@@ -9,18 +9,18 @@ from selenium.webdriver.common.keys import Keys
 
 # https://www.python-course.eu/python3_history_and_philosophy.php
 
-def main(argv):
+#def main(argv):
 #	parser = argparse.ArgumentParser()
 #	parser.add_argument("square", help="display a square of a given number")
 #	args = parser.parse_args()
 #	print(args.square**2)
 
-	print ('Number of arguments:', len(sys.argv), 'arguments.')
-	print ('Argument List:', str(sys.argv))
+#	print ('Number of arguments:', len(sys.argv), 'arguments.')
+#	print ('Argument List:', str(sys.argv))
 
-parser = argparse.ArgumentParser(description='Process selenium.')
-parser.add_argument('browser', help='browser type')
-args = parser.parse_args()
+#parser = argparse.ArgumentParser(description='Process selenium.')
+#parser.add_argument('browser', help='browser type')
+#args = parser.parse_args()
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
 #                    help='an integer for the accumulator')
 #parser.add_argument('--sum', dest='accumulate', action='store_const',
@@ -33,7 +33,7 @@ args = parser.parse_args()
 #    for opt, arg in opts:
 #       if opt == 'firefox':
 #          print  ("webdriver.Firefox")
-#          driver = webdriver.Firefox()
+driver = webdriver.Firefox()
 #       elif opt == 'chrome':
 #         # get the path of ChromeDriverServer;
 #         dir = os.path.dirname(__file__)
@@ -48,18 +48,18 @@ args = parser.parse_args()
 #         driver = webdriver.Chrome()
 
 
-#driver.implicitly_wait(30)
-#driver.maximize_window()
+driver.implicitly_wait(1)  # seconds for network delays
+#driver.maximize_window()   # so positions are consistent across sessions.
 
 ### Navigate to the application home/landing page:
-#	driver.get("https://www.github.com/")
-#	assert "The world's leading" in driver.title
+driver.get("https://www.github.com/")
+assert "The world's leading" in driver.title
 
 #search_field = driver.find_element_by_id("lst-ib")
 #search_field.clear()
 
 ### get the number of elements found:
-#print (“Found “ + str(len(lists)) + “searches:”)
+#print ("Found " + str(len(lists)) + "searches:")
 
 ### Get to Sign-in page:
 #	elem = driver.find_element_by_name("Sign in")
@@ -87,7 +87,8 @@ args = parser.parse_args()
 #elem.send_keys(Keys.RETURN)
 
 	#assert "No results found." not in driver.page_source
-#	driver.close()
 
-if __name__ == "__main__":
-   main(sys.argv[1:])
+#driver.quit()
+
+#if __name__ == "__main__":
+#   main(sys.argv[1:])

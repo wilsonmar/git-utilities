@@ -12,7 +12,9 @@ GIT_USERNAME="hotwilson"
 GPG_PASSPHRASE="only you know this 2 well"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
-# The last one in a list is the Git default:
+GITHUB_REPO="sample"
+
+# Lists can be specified below. The last one in a list is the Git default:
 GIT_BROWSER="firefox"
            # chrome, firefox, brave
 GIT_CLIENT="git"
