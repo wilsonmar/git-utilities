@@ -343,12 +343,19 @@ echo -e "\n   uname -a"            >>$THISSCRIPT.log
 echo -e "$(uname -a)"              >>$THISSCRIPT.log
 
 
+######### TODO: Install git-secrets utility to decrypt secrets.sh.secret stored in GitHub:
+
+
+# git clone https://github.com/wilsonmar/git-secret
+# video: https://asciinema.org/a/41811?autoplay=1
+
+
 ######### Read and use .secrets.sh file:
 
 
 # If the file still contains defaults, it should not be used:
 SECRETSFILE=".secrets.sh"
-if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then    
+if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then  # not customized:
    fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
    exit  # so script ends now
 else
@@ -1874,6 +1881,8 @@ fi # selenium
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 # TODO: Protractor for AngularJS
 # For coding See http://www.techbeamers.com/selenium-webdriver-python-tutorial/
+
+# TODO: Java Selenium script
 
 
 ######### SSH-KeyGen:
