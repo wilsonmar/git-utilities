@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > tig > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -865,6 +865,37 @@ if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
 fi
 
 
+
+######### Git tig repo viewer:
+
+
+
+if ! command -v tig >/dev/null; then  # in /usr/local/bin/tig
+  fancy_echo "Installing tig for formatting git logs ..."
+  brew install tig
+  # See https://jonas.github.io/tig/
+  # A sample of the default configuration has been installed to:
+  #   /usr/local/opt/tig/share/tig/examples/tigrc
+  # to override the system-wide default configuration, copy the sample to:
+  #   /usr/local/etc/tigrc
+  # Bash completion has been installed to:
+  #   /usr/local/etc/bash_completion.d
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       tig version | grep tig  
+          # git version 2.16.3
+          # tig version 2.2.9
+       fancy_echo "tig already installed: UPGRADE requested..."
+       brew upgrade tig 
+    else
+       fancy_echo "tig already installed:"
+    fi
+fi
+echo -e "\n   tig --version:" >>$THISSCRIPT.log
+echo -e "$(tig --version)" >>$THISSCRIPT.log
+   # tig version 2.3.3
+
+
 ######### BFG to identify and remove passwords and large or troublesome blobs.
 
 
@@ -1534,7 +1565,7 @@ fi
 # Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
 
 
-# If GPG suite is not used, add the GPG key to ~/.bash_profile:
+# If GPG suite is used, add the GPG key to ~/.bash_profile:
 if grep -q "GPG_TTY" "$BASHFILE" ; then    
    fancy_echo "GPG_TTY already in $BASHFILE."
 else
@@ -1542,6 +1573,7 @@ else
    echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
       # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
 fi 
+
 
 # NOTE: gpg is the command even though the package is gpg2:
 if ! command -v gpg >/dev/null; then
@@ -1695,11 +1727,24 @@ fi
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
 
-#########  brew cleanup
+######### TODO: manage secrets in a git repository?
 
 
-#brew cleanup --force
-#rm -f -r /Library/Caches/Homebrew/*
+
+if ! command -v git-secret >/dev/null; then
+  fancy_echo "Installing git-secret for managing secrets in a Git repo ..."
+  brew install git-secret
+  # See https://github.com/sobolevn/git-secret
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       git-secret --version  # 0.2.2
+       fancy_echo "git-secret already installed: UPGRADE requested..."
+       brew upgrade git-secret 
+    else
+       fancy_echo "git-secret already installed:"
+    fi
+fi
+echo -e "\n$(git-secret --version | grep gpg)" >>$THISSCRIPT.log
 
 
 ######### Cloud CLI/SDK:
@@ -1967,6 +2012,31 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
    # TODO: install tesseract for Selenium to recognize text within images
 
 
+######### GitHub hub:
+
+
+GO_INSTALL  # prerequiste
+if ! command -v hub >/dev/null; then  # in /usr/local/bin/hub
+  fancy_echo "Installing hub for managing GitHub from a Git client ..."
+  brew install hub
+  # See https://hub.github.com/
+
+   # fancy_echo "Adding git hub in $BASHFILE..."
+   # echo "alias git=hub" >>"$BASHFILE"
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       hub version | grep hub  
+          # git version 2.16.3
+          # hub version 2.2.9
+       fancy_echo "hub already installed: UPGRADE requested..."
+       brew upgrade hub 
+    else
+       fancy_echo "hub already installed:"
+    fi
+fi
+echo -e "\n   hub git version:" >>$THISSCRIPT.log
+echo -e "$(hub version)" >>$THISSCRIPT.log
+
 
 ######### Python test coding languge:
 
@@ -2004,7 +2074,7 @@ fi # selenium
 # TODO: Java Selenium script
 
 
-######### Dump of contents:
+######### Dump contents:
 
 
 #Listing of all brew cask installed (including dependencies automatically added):"
@@ -2025,6 +2095,13 @@ echo -e "$(git config --list)" >>$THISSCRIPT.log
 # List ~/.bash_profile:
 echo -e "\n   $BASHFILE ::" >>$THISSCRIPT.log
 echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
+
+
+#########  brew cleanup
+
+
+#brew cleanup --force
+#rm -f -r /Library/Caches/Homebrew/*
 
 
 ######### Disk space consumed:
