@@ -1813,6 +1813,26 @@ if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
 fi
 
 
+if [[ $CLOUD == *"terraform"* ]]; then  # contains aws.
+   if ! command -v terraform >/dev/null; then
+      fancy_echo "Installing terraform ..."
+      brew install terraform 
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "terraform already installed: UPGRADE requested..."
+         terraform --version
+            # terraform-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+         pip3 upgrade terraform 
+      else
+         fancy_echo "terraform already installed."
+      fi
+   fi
+   echo -e "\n$(terraform --version)" >>$THISSCRIPT.log
+   # terraform --version
+            # Terraform v0.11.5
+fi
+
+
 if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    # See https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-macos?view=azure-cli-latest
    # Issues at https://github.com/Azure/azure-cli/issues
