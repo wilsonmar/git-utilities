@@ -24,7 +24,7 @@ GIT_EDITOR="vim"
           # atom, code, eclipse, emacs, intellij, macvim, nano, pico, sts, sublime, textmate, textedit, vim
           # NOTE: pico, nano, and vim are built into MacOS, so no install.
 CLOUD="azure, terraform"
-     # none, aws, gcp, azure, terraform
+     # none, aws, gcp, azure, terraform, serverless
 
 GIT_LANG="python"
         # python, java, node, go

@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -258,31 +258,21 @@ function NODE_INSTALL(){
    nvm on
    # $NVM_HOME
 
-   nvm list
-      # v8.11.1
-      # v9.10.1
-      # node -> stable (-> v9.10.1) (default)
-      # stable -> 9.10 (-> v9.10.1) (default)
-      # iojs -> N/A (default)
-      # lts/* -> lts/carbon (-> v8.11.1)
-      # lts/argon -> v4.9.1 (-> N/A)
-      # lts/boron -> v6.14.1 (-> N/A)
-      # lts/carbon -> v8.11.1
 
-   nvm use --delete-prefix v9.10.1  # to unset it.
-   nvm use node
+   #nvm use --delete-prefix v9.10.1  # to unset it.
+   #nvm use node
       # nvm is not compatible with the npm config "prefix" option: currently set to "/usr/local/Cellar/nvm/0.33.8/versions/node/v9.10.1"
-   node --version   # v9.10.1...
-   npm --version    # 5.6.0
+   #node --version   # v9.10.1...
+   #npm --version    # 5.6.0
 
-   nvm use --delete-prefix v8.11.1
-   nvm use --lts
+   #nvm use --delete-prefix v8.11.1
+   #nvm use --lts
       # Now using node v8.11.1 (npm v5.6.0)
 
-   node --version   # v8.11.1
-   npm --version    # 5.6.0
+   #node --version   # v8.11.1
+   #npm --version    # 5.6.0
 
-   nvm run 8.11.1 --version
+   #nvm run 8.11.1 --version
 
    # nvm which 8.9.4
 
@@ -290,8 +280,8 @@ function NODE_INSTALL(){
    
    # npm (node package manager) installed with node.
    # https://colorlib.com/wp/npm-packages-node-js/
-   npm install -g mocha  # testing framework
-   npm install -g chai   # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
+   #npm install -g mocha  # testing framework
+   #npm install -g chai   # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
    # Alternative: karma, karma-cli
    # browserify, bower, grunt, gulp/gulp-cli, webpack, 
    # web: express, hapi, 
@@ -305,6 +295,15 @@ function NODE_INSTALL(){
 
    echo -e "\n  npm list -g --depth=0" >>$THISSCRIPT.log
    echo -e "$(npm list -g --depth=0)" >>$THISSCRIPT.log
+      # v8.11.1
+      # v9.10.1
+      # node -> stable (-> v9.10.1) (default)
+      # stable -> 9.10 (-> v9.10.1) (default)
+      # iojs -> N/A (default)
+      # lts/* -> lts/carbon (-> v8.11.1)
+      # lts/argon -> v4.9.1 (-> N/A)
+      # lts/boron -> v6.14.1 (-> N/A)
+      # lts/carbon -> v8.11.1
 
    # npm start
 
@@ -959,7 +958,14 @@ echo -e "$(git-lfs version)" >>$THISSCRIPT.log
 # LFS kicks into action based on file name extensions such as *.psd.
 #  git lfs track "*.psd"
 # amends your repository's .gitattributes file (https://git-scm.com/docs/gitattributes)
-#Make sure .gitattributes is tracked
+
+
+
+######### TODO: .gitattributes
+
+
+# See https://github.com/alexkaratarakis/gitattributes for templates
+# Make sure .gitattributes is tracked
 # git add .gitattributes
 
 
@@ -1416,8 +1422,6 @@ fi
 #  autoupdate = 1
    git config --global rerere.enabled  "1"
    git config --global rerere.autoupdate  "1"
-
-
 
 
 ######### ~/.bash_profile prompt settings:
@@ -1923,6 +1927,7 @@ fi
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
+
 ######### SSH-KeyGen:
 
 
@@ -2015,7 +2020,7 @@ fi
    popd
 
 
-######### Selenium Java:
+######### Selenium browser drivers:
 
 
 # To click and type on browser as if a human would do.
