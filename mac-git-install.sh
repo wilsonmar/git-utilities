@@ -1917,7 +1917,8 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
 fi
 
 
-# TODO: IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
+# TODO: IBM's Cloud CLI from brew? brew search did not find it.
+# is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
 # page https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started
 # or curl -fsSL https://clis.ng.bluemix.net/install/osx | sh
 # Once installed, the command is "bx login".
@@ -1927,6 +1928,25 @@ fi
 # See https://www.ibm.com/blogs/bluemix/2017/02/command-line-tools-watson-services/
 
 
+if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
+   if ! command -v cf >/dev/null; then
+      fancy_echo "Installing cf (Cloud Foundry CLI) ..."
+      brew install cloudfoundry/tap/cf-cli
+      # see https://github.com/cloudfoundry/cli
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "cf already installed: UPGRADE requested..."
+         cf --version
+            # cf version 6.35.2+88a03e995.2018-03-15
+         brew upgrade cloudfoundry/tap/cf-cli
+      else
+         fancy_echo "cf already installed."
+      fi
+   fi
+   echo -e "\n$(cf --version)" >>$THISSCRIPT.log
+   cf --version
+      # cf version 6.35.2+88a03e995.2018-03-15
+fi
 
 ######### SSH-KeyGen:
 
