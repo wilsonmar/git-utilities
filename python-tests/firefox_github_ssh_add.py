@@ -2,7 +2,7 @@
 # firefox_github_ssh_add.py in https://github.com/wilsonmar/git-utilities
 # Invokes python Firefox driver to open GitHub, SSH Keys, insert what waw pbcopy to clipboard.
 
-import sys, argparse  # getopt
+import time, sys, argparse  # getopt
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys

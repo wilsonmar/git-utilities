@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > tig > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -95,7 +95,7 @@ function PYTHON_INSTALL(){
          echo "export alias python=/usr/local/bin/python2.7" >>"$BASHFILE"
       fi
    
-   # To prevent the older MacOS default python being seen first in PATH ...
+      # To prevent the older MacOS default python being seen first in PATH ...
       if grep -q "/usr/local/opt/python/libexec/bin" "$BASHFILE" ; then    
          fancy_echo "Python PATH already in $BASHFILE"
       else
@@ -190,6 +190,8 @@ function JAVA_INSTALL(){
       # Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
    echo -e "$($JAVA_HOME)" >>$THISSCRIPT.log
       # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home is a directory
+
+   export JAVA_VERSION=$(java -version)
 
     # Associated: Maven (mvn) in /usr/local/opt/maven/bin/mvn
    if ! command -v mvn >/dev/null; then
@@ -327,6 +329,16 @@ function GO_INSTALL(){
    fi
    go version
       # go version go1.10.1 darwin/amd64
+
+      if grep -q "export GOPATH=" "$BASHFILE" ; then    
+         fancy_echo "GOPATH already in $BASHFILE"
+      else
+         fancy_echo "Adding GOPATH in $BASHFILE..."
+         echo "export GOPATH=$HOME/golang" >>"$BASHFILE"
+      fi
+   
+   # export GOROOT=$HOME/go
+   # export PATH=$PATH:$GOROOT/bin
 }
 
 
@@ -376,10 +388,11 @@ else
    echo "GIT_ID=$GIT_ID" >>$THISSCRIPT.log
    echo "GIT_EMAIL=$GIT_EMAIL" >>$THISSCRIPT.log
    echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
+   echo "GITS_PATH=$GITS_PATH" >>$THISSCRIPT.log
    echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
-   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
-   # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
    echo "GITHUB_REPO=$GITHUB_REPO" >>$THISSCRIPT.log
+   # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
+   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
    echo "CLOUD=$CLOUD" >>$THISSCRIPT.log
    echo "GIT_BROWSER=$GIT_BROWSER" >>$THISSCRIPT.log
    echo "GIT_CLIENT=$GIT_CLIENT" >>$THISSCRIPT.log
@@ -911,6 +924,43 @@ echo -e "$(tig --version)" >>$THISSCRIPT.log
 #java -jar bfg.jar --replace-text banned.txt \
 #    --strip-blobs-bigger-than 100M \
 #    $SECRETSFILE
+
+
+######### Git Large File Storage:
+
+
+# See https://git-lfs.github.com/
+# Git Large File Storage (LFS) replaces large files such as audio samples, videos, datasets, and graphics with text pointers inside Git, while storing the file contents on a remote server like GitHub.com or GitHub Enterprise.
+
+if ! command -v git-lfs >/dev/null; then  # in /usr/local/bin/git-lfs
+   fancy_echo "Installing git-lfs for managing large files in git ..."
+   brew install git-lfs
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       git-lfs version 
+          # git-lfs/2.4.0 (GitHub; darwin amd64; go 1.10)
+       fancy_echo "git-lfs already installed: UPGRADE requested..."
+       brew upgrade git-lfs 
+    else
+       fancy_echo "git-lfs already installed:"
+    fi
+fi
+echo -e "\n   git-lfs version:" >>$THISSCRIPT.log
+echo -e "$(git-lfs version)" >>$THISSCRIPT.log
+   # git-lfs/2.4.0 (GitHub; darwin amd64; go 1.10)
+
+  # Update global git config (creates hooks pre-push, post-checkout, post-commit, post-merge)
+#  git lfs install
+
+  # Update system git config:
+#  git lfs install --system
+
+# See https://help.github.com/articles/configuring-git-large-file-storage/
+# LFS kicks into action based on file name extensions such as *.psd.
+#  git lfs track "*.psd"
+# amends your repository's .gitattributes file (https://git-scm.com/docs/gitattributes)
+#Make sure .gitattributes is tracked
+# git add .gitattributes
 
 
 ######### Text editors:
@@ -1817,6 +1867,7 @@ if [[ $CLOUD == *"terraform"* ]]; then  # contains aws.
    if ! command -v terraform >/dev/null; then
       fancy_echo "Installing terraform ..."
       brew install terraform 
+      # see https://www.terraform.io/
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "terraform already installed: UPGRADE requested..."
@@ -1865,7 +1916,7 @@ fi
 # TODO: IBM's Cloud CLI is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
 # page https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started
 # or curl -fsSL https://clis.ng.bluemix.net/install/osx | sh
-# The command is "bx login".
+# Once installed, the command is "bx login".
 # IBM's BlueMix cloud for AI has a pre-prequisite in NodeJs.
 # npm install watson-visual-recognition-utils -g
 # npm install watson-speech-to-text-utils -g
@@ -1938,6 +1989,9 @@ fi
 
 ######### Download GITHUB_REPO_URL
 
+
+# TODO: Setup GITS_PATH
+
 GITHUB_REPO_URL="https://github.com/$GITHUB_ACCOUNT/$GITHUB_REPO.git"
 fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
 
@@ -1947,7 +2001,10 @@ fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
 
 
 # NOTE: pbcopy is a Mac-only command:
-pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public key.
+if [ "$(uname)" == "Darwin" ]; then
+   pbcopy < "$FILE.pub"  # in future pbcopy of password and file transfer of public key.
+#elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+fi
 
    fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub, Settings, New SSH Key ..."
@@ -2032,7 +2089,7 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
    # TODO: install tesseract for Selenium to recognize text within images
 
 
-######### GitHub hub:
+######### GitHub hub to manage GitHub functions:
 
 
 GO_INSTALL  # prerequiste

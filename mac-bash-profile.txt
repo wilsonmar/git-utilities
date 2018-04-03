@@ -6,7 +6,7 @@ alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
 alias dir='ls -alr'
-alias ll='ls -lri'
+alias ll='ls -FalhG'
 
 alias gs='git status -s -b'
 alias grm='git rm $(git ls-files --deleted)'

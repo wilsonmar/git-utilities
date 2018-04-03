@@ -10,7 +10,7 @@ GIT_ID="WilsonMar@gmail.com"
 GIT_EMAIL="WilsonMar+GitHub@gmail.com"
 GIT_USERNAME="hotwilson"
 GPG_PASSPHRASE="only you know this 2 well"
-GITS_PATH=gits
+GITS_PATH="gits"
 GITHUB_ACCOUNT="hotwilson"
 GITHUB_PASSWORD="change this to your GitHub account password"
 GITHUB_REPO="sample"
@@ -25,8 +25,9 @@ GIT_EDITOR="vim"
           # NOTE: pico, nano, and vim are built into MacOS, so no install.
 CLOUD="azure, terraform"
      # none, aws, gcp, azure, terraform
+
 GIT_LANG="python"
-        # python, java, go
+        # python, java, node, go
 GUI_TEST="selenium"
         # selenium, sikulix
         # Drivers for scripting language depend on what is defined in $GIT_LANG.
