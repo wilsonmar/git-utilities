@@ -8,7 +8,7 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -201,6 +201,8 @@ function JAVA_INSTALL(){
    echo -e "$(mvn --version)" >>$THISSCRIPT.log
 
     # Alternative: ant, gradle
+
+   # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
 }
 
 function NODE_INSTALL(){
@@ -928,8 +930,9 @@ echo -e "$(tig --version)" >>$THISSCRIPT.log
 ######### Git Large File Storage:
 
 
+# Git Large File Storage (LFS) replaces large files such as audio samples, videos, datasets, and graphics with text pointers inside Git, while storing the file contents on a remote server like GitHub.com or GitHub Enterprise. During install .gitattributes are defined.
 # See https://git-lfs.github.com/
-# Git Large File Storage (LFS) replaces large files such as audio samples, videos, datasets, and graphics with text pointers inside Git, while storing the file contents on a remote server like GitHub.com or GitHub Enterprise.
+# See https://help.github.com/articles/collaboration-with-git-large-file-storage/
 
 if ! command -v git-lfs >/dev/null; then  # in /usr/local/bin/git-lfs
    fancy_echo "Installing git-lfs for managing large files in git ..."
@@ -951,15 +954,29 @@ echo -e "$(git-lfs version)" >>$THISSCRIPT.log
   # Update global git config (creates hooks pre-push, post-checkout, post-commit, post-merge)
 #  git lfs install
 
+
   # Update system git config:
 #  git lfs install --system
 
 # See https://help.github.com/articles/configuring-git-large-file-storage/
-# LFS kicks into action based on file name extensions such as *.psd.
-#  git lfs track "*.psd"
-# amends your repository's .gitattributes file (https://git-scm.com/docs/gitattributes)
+# Set LFS to kick into action based on file name extensions such as *.psd by
+# running command:  (See https://git-scm.com/docs/gitattributes)
+# git lfs track "*.psd"
+#    The command appends to the repository's .gitattributes file:
+# *.psd filter=lfs diff=lfs merge=lfs -text
 
+#  git lfs track "*.mp4"
+#  git lfs track "*.mp3"
+#  git lfs track "*.jpeg"
+#  git lfs track "*.jpg"
+#  git lfs track "*.png"
+#  git lfs track "*.ogg"
+# CAUTION: Quotes are important in the entries above.
+# CAUTION: Git clients need to be LFS-aware.
 
+# Define alias to stop # https://www.atlassian.com/git/tutorials/git-lfs
+#git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
+#$ git plfs
 
 ######### TODO: .gitattributes
 
@@ -967,6 +984,7 @@ echo -e "$(git-lfs version)" >>$THISSCRIPT.log
 # See https://github.com/alexkaratarakis/gitattributes for templates
 # Make sure .gitattributes is tracked
 # git add .gitattributes
+# TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Common.gitattributes
 
 
 ######### Text editors:
@@ -1336,6 +1354,7 @@ fi
 
 ######### Eclipse settings:
 
+
 # Add the "clean-sheet" Ergonomic Eclipse Theme for Windows 10 and Mac OS X.
 # http://www.codeaffine.com/2015/11/04/clean-sheet-an-ergonomic-eclipse-theme-for-windows-10/
 
@@ -1367,7 +1386,7 @@ fi
    git config --global core.hitespace "space-before-tab,indent-with-non-tab,trailing-space"
 
 
-######### Gitconfig command coloring in .gitconfig:
+######### Git coloring in .gitconfig:
 
 
 # If git config color.ui returns true, skip:
@@ -1407,8 +1426,42 @@ else
    git config --global color.diff.frag        "magenta normal bold"
    git config --global color.diff.old         "blue    normal strike"
    git config --global color.diff.new         "green   normal bold"
-   git config --global color.diff.whitespace  "red     normal bold"
+   git config --global color.diff.whitespace  "red     normal reverse"
 fi
+
+
+######### diff-so-fancy color:
+
+
+if [[ "$GIT_TOOLS" == *"diff-so-fancy"* ]]; then
+   if ! command -v diff-so-fancy >/dev/null; then
+      fancy_echo "Installing GIT_TOOLS=\"diff-so-fancy\" using Homebrew ..."
+      brew install diff-so-fancy
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "GIT_EDITOR=\"diff-so-fancy\" already installed: UPGRADE requested..."
+         brew cask upgrade diff-so-fancy
+      else
+         fancy_echo "GIT_EDITOR=\"diff-so-fancy\" already installed:"
+      fi
+   fi
+   # Configuring based on https://github.com/so-fancy/diff-so-fancy
+   git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+
+   # Default Git colors are not optimal. We suggest the following colors instead.
+   git config --global color.diff-highlight.oldNormal    "red bold"
+   git config --global color.diff-highlight.oldHighlight "red bold 52"
+   git config --global color.diff-highlight.newNormal    "green bold"
+   git config --global color.diff-highlight.newHighlight "green bold 22"
+
+   git config --global color.diff.meta       "yellow"
+   git config --global color.diff.frag       "magenta bold"
+   git config --global color.diff.commit     "yellow bold"
+   git config --global color.diff.old        "red bold"
+   git config --global color.diff.new        "green bold"
+   git config --global color.diff.whitespace "red reverse"
+fi
+
 
 
 ######### Reuse Recorded Resolution of conflicted merges
@@ -1864,6 +1917,9 @@ if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
    echo -e "\n$(aws --version)" >>$THISSCRIPT.log
    # aws --version
             # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+
+   # TODO: https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_aws
+   # https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_cfnl
 fi
 
 
@@ -1885,6 +1941,16 @@ if [[ $CLOUD == *"terraform"* ]]; then  # contains aws.
    echo -e "\n$(terraform --version)" >>$THISSCRIPT.log
    # terraform --version
             # Terraform v0.11.5
+
+      if grep -q "=\"terraform" "$BASHFILE" ; then    
+         fancy_echo "Terraform already in $BASHFILE"
+      else
+         fancy_echo "Adding Terraform aliases in $BASHFILE ..."
+         echo "alias tf=\"terraform \$1\"" >>"$BASHFILE"
+         echo "alias tfa=\"terraform apply\"" >>"$BASHFILE"
+         echo "alias tfd=\"terraform destroy\"" >>"$BASHFILE"
+         echo "alias tfs=\"terraform show\"" >>"$BASHFILE"
+      fi
 fi
 
 
@@ -1929,10 +1995,13 @@ fi
 
 
 if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
+   # See https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
    if ! command -v cf >/dev/null; then
       fancy_echo "Installing cf (Cloud Foundry CLI) ..."
       brew install cloudfoundry/tap/cf-cli
       # see https://github.com/cloudfoundry/cli
+
+      # To uninstall on Mac OS, delete the binary /usr/local/bin/cf, and the directory /usr/local/share/doc/cf-cli.
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "cf already installed: UPGRADE requested..."
@@ -1947,6 +2016,11 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
    cf --version
       # cf version 6.35.2+88a03e995.2018-03-15
 fi
+
+
+# Docker:
+# https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
+
 
 ######### SSH-KeyGen:
 
@@ -2164,6 +2238,8 @@ echo -e "$(hub version)" >>$THISSCRIPT.log
          # python python-tests/firefox_unittest.py  # not working due to indents
          # python python-tests/firefox-test-chromedriver.py
       fi
+
+      # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Python.gitattributes
    fi   
 
    # phantomjs --wd  # headless webdriver
