@@ -8,7 +8,8 @@
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
 
-# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > diff/merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > 
+# Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -1551,8 +1552,15 @@ fi
 # ? --version
 
 
-######### bash command completion 
+######### bash colors:
 
+
+   if grep -q "export CLICOLOR" "$BASHFILE" ; then    
+      fancy_echo "export CLICOLOR already in $BASHFILE"
+   else
+      fancy_echo "Adding export CLICOLOR in $BASHFILE..."
+      echo "export CLICOLOR=1" >>"$BASHFILE"
+   fi
 
 ######### Git command completion in ~/.bash_profile:
 
@@ -1692,6 +1700,56 @@ if [ ! -f ".git/hooks/git-commit" ]; then
    chmod +x .git/hooks/*   # make executable
 else
    fancy_echo "git-commit file found in .git/hooks. Skipping ..."
+fi
+
+######### JAVA_TOOLS:
+
+if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
+   if ! command -v gcviewer >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS=gcviewer ..."
+      brew install gcviewer
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         gcviewer --version
+         fancy_echo "JAVA_TOOLS=gcviewer already installed: UPGRADE requested..."
+         brew install gcviewer 
+      else
+         fancy_echo "gcviewer already installed:"
+      fi
+      echo -e "\n$(gcviewer --version)" >>$THISSCRIPT.log
+   fi
+fi
+
+if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
+   if ! command -v jmeter >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS=jmeter ..."
+      brew install jmeter
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         jmeter --version
+         fancy_echo "JAVA_TOOLS=jmeter already installed: UPGRADE requested..."
+         brew install jmeter 
+      else
+         fancy_echo "jmeter already installed:"
+      fi
+   echo -e "\n$(jmeter --version)" >>$THISSCRIPT.log
+   fi
+fi
+
+if [[ "$JAVA_TOOLS" == *"jprofiler"* ]]; then
+   if ! command -v jprofiler >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS=jprofiler ..."
+      brew install jprofiler
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         jprofiler --version
+         fancy_echo "JAVA_TOOLS=jprofiler already installed: UPGRADE requested..."
+         brew install jprofiler 
+      else
+         fancy_echo "jprofiler already installed:"
+      fi
+   fi
+   echo -e "\n$(jprofiler --version)" >>$THISSCRIPT.log
 fi
 
 
@@ -1872,7 +1930,7 @@ fi
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
 
-######### TODO: manage secrets in a git repository?
+######### Use git-secret to manage secrets in a git repository:
 
 
 if [[ "$GIT_TOOLS" == *"secret"* ]]; then
@@ -1891,6 +1949,7 @@ if [[ "$GIT_TOOLS" == *"secret"* ]]; then
    fi
    echo -e "\n$(git-secret --version | grep gpg)" >>$THISSCRIPT.log
 fi
+   # QUESTION: Supply passphrase or create keys without passphrase
 
 
 ######### Cloud CLI/SDK:

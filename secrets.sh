@@ -30,6 +30,8 @@ CLOUD="azure, terraform"
 
 GIT_LANG="python"
         # python, java, node, go
+JAVA_TOOLS="none"
+        # gcviewer, jmeter, jprofiler
 GUI_TEST="selenium"
         # selenium, sikulix
         # Drivers for scripting language depend on what is defined in $GIT_LANG.
