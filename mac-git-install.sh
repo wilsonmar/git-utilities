@@ -288,6 +288,7 @@ function NODE_INSTALL(){
    # browserify, bower, grunt, gulp/gulp-cli, webpack, 
    # web: express, hapi, 
    # front-end: angular, react, redux, Ember.js, Marionette.js
+   # Test React using Jest https://medium.com/@mathieux51/jest-selenium-webdriver-e25604969c6
    # moment.js, graphicmagick, yeoman-generator
    # cloud: aws-sdk 
    # less, UglifyJS2, eslint, jslint, cfn-lint
@@ -544,6 +545,20 @@ fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
       echo "The last one installed is set as the Git browser."
 
 
+if [[ "$GIT_BROWSER" == *"safari"* ]]; then
+   if ! command -v safari >/dev/null; then
+      fancy_echo "No install needed on MacOS for GIT_BROWSER=\"safari\"."
+      # /usr/bin/safaridriver
+   else
+      fancy_echo "No upgrade on MacOS for GIT_BROWSER=\"safari\"."
+   fi
+   git config --global web.browser safari
+
+   #fancy_echo "Opening safari ..."
+   #safari
+fi
+
+
 # See Complications at
 # https://stackoverflow.com/questions/19907152/how-to-set-google-chrome-as-git-default-browser
 
@@ -574,7 +589,6 @@ if [[ "$GIT_BROWSER" == *"chrome"* ]]; then
 fi
 
 
-
 if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    # firefox is more respectful of user data.
    if [ ! -d "/Applications/Firefox.app" ]; then 
@@ -594,6 +608,7 @@ if [[ "$GIT_BROWSER" == *"firefox"* ]]; then
    #fancy_echo "Opening firefox ..."
    #open "/Applications/Firefox.app"
 fi
+
 
 if [[ "$GIT_BROWSER" == *"brave"* ]]; then
    # brave is more respectful of user data.
@@ -883,31 +898,32 @@ fi
 ######### Git tig repo viewer:
 
 
-
-if ! command -v tig >/dev/null; then  # in /usr/local/bin/tig
-  fancy_echo "Installing tig for formatting git logs ..."
-  brew install tig
-  # See https://jonas.github.io/tig/
-  # A sample of the default configuration has been installed to:
-  #   /usr/local/opt/tig/share/tig/examples/tigrc
-  # to override the system-wide default configuration, copy the sample to:
-  #   /usr/local/etc/tigrc
-  # Bash completion has been installed to:
-  #   /usr/local/etc/bash_completion.d
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       tig version | grep tig  
+if [[ "$GIT_TOOLS" == *"tig"* ]]; then
+   if ! command -v tig >/dev/null; then  # in /usr/local/bin/tig
+      fancy_echo "Installing tig for formatting git logs ..."
+      brew install tig
+      # See https://jonas.github.io/tig/
+      # A sample of the default configuration has been installed to:
+      #   /usr/local/opt/tig/share/tig/examples/tigrc
+      # to override the system-wide default configuration, copy the sample to:
+      #   /usr/local/etc/tigrc
+      # Bash completion has been installed to:
+      #   /usr/local/etc/bash_completion.d
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         tig version | grep tig  
           # git version 2.16.3
           # tig version 2.2.9
-       fancy_echo "tig already installed: UPGRADE requested..."
-       brew upgrade tig 
-    else
-       fancy_echo "tig already installed:"
-    fi
-fi
-echo -e "\n   tig --version:" >>$THISSCRIPT.log
-echo -e "$(tig --version)" >>$THISSCRIPT.log
+         fancy_echo "tig already installed: UPGRADE requested..."
+         brew upgrade tig 
+      else
+         fancy_echo "tig already installed:"
+      fi
+  fi
+  echo -e "\n   tig --version:" >>$THISSCRIPT.log
+  echo -e "$(tig --version)" >>$THISSCRIPT.log
    # tig version 2.3.3
+fi
 
 
 ######### BFG to identify and remove passwords and large or troublesome blobs.
@@ -933,50 +949,56 @@ echo -e "$(tig --version)" >>$THISSCRIPT.log
 # Git Large File Storage (LFS) replaces large files such as audio samples, videos, datasets, and graphics with text pointers inside Git, while storing the file contents on a remote server like GitHub.com or GitHub Enterprise. During install .gitattributes are defined.
 # See https://git-lfs.github.com/
 # See https://help.github.com/articles/collaboration-with-git-large-file-storage/
+# https://www.atlassian.com/git/tutorials/git-lfs
+# https://www.youtube.com/watch?v=p3Pse1UkEhI
 
-if ! command -v git-lfs >/dev/null; then  # in /usr/local/bin/git-lfs
-   fancy_echo "Installing git-lfs for managing large files in git ..."
-   brew install git-lfs
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       git-lfs version 
-          # git-lfs/2.4.0 (GitHub; darwin amd64; go 1.10)
-       fancy_echo "git-lfs already installed: UPGRADE requested..."
-       brew upgrade git-lfs 
-    else
-       fancy_echo "git-lfs already installed:"
-    fi
-fi
-echo -e "\n   git-lfs version:" >>$THISSCRIPT.log
-echo -e "$(git-lfs version)" >>$THISSCRIPT.log
+if [[ "$GIT_TOOLS" == *"lfs"* ]]; then
+   if ! command -v git-lfs >/dev/null; then  # in /usr/local/bin/git-lfs
+      fancy_echo "Installing git-lfs for managing large files in git ..."
+      brew install git-lfs
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         git-lfs version 
+            # git-lfs/2.4.0 (GitHub; darwin amd64; go 1.10)
+         fancy_echo "git-lfs already installed: UPGRADE requested..."
+         brew upgrade git-lfs 
+      else
+         fancy_echo "git-lfs already installed:"
+      fi
+   fi
+   echo -e "\n   git-lfs version:" >>$THISSCRIPT.log
+   echo -e "$(git-lfs version)" >>$THISSCRIPT.log
    # git-lfs/2.4.0 (GitHub; darwin amd64; go 1.10)
 
-  # Update global git config (creates hooks pre-push, post-checkout, post-commit, post-merge)
-#  git lfs install
+   # Update global git config (creates hooks pre-push, post-checkout, post-commit, post-merge)
+   #  git lfs install
 
+   # Update system git config:
+   #  git lfs install --system
 
-  # Update system git config:
-#  git lfs install --system
+   # See https://help.github.com/articles/configuring-git-large-file-storage/
+   # Set LFS to kick into action based on file name extensions such as *.psd by
+   # running command:  (See https://git-scm.com/docs/gitattributes)
+   # git lfs track "*.psd"
+   #    The command appends to the repository's .gitattributes file:
+   # *.psd filter=lfs diff=lfs merge=lfs -text
 
-# See https://help.github.com/articles/configuring-git-large-file-storage/
-# Set LFS to kick into action based on file name extensions such as *.psd by
-# running command:  (See https://git-scm.com/docs/gitattributes)
-# git lfs track "*.psd"
-#    The command appends to the repository's .gitattributes file:
-# *.psd filter=lfs diff=lfs merge=lfs -text
+   #  git lfs track "*.mp4"
+   #  git lfs track "*.mp3"
+   #  git lfs track "*.jpeg"
+   #  git lfs track "*.jpg"
+   #  git lfs track "*.png"
+   #  git lfs track "*.ogg"
+   # CAUTION: Quotes are important in the entries above.
+   # CAUTION: Git clients need to be LFS-aware.
 
-#  git lfs track "*.mp4"
-#  git lfs track "*.mp3"
-#  git lfs track "*.jpeg"
-#  git lfs track "*.jpg"
-#  git lfs track "*.png"
-#  git lfs track "*.ogg"
-# CAUTION: Quotes are important in the entries above.
-# CAUTION: Git clients need to be LFS-aware.
+   # Based on https://github.com/git-lfs/git-lfs/issues/1720
+   git config lfs.transfer.maxretries 10
 
-# Define alias to stop # https://www.atlassian.com/git/tutorials/git-lfs
-#git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
-#$ git plfs
+   # Define alias to stop lfs
+   #git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
+   #$ git plfs
+fi
 
 ######### TODO: .gitattributes
 
@@ -1460,6 +1482,21 @@ if [[ "$GIT_TOOLS" == *"diff-so-fancy"* ]]; then
    git config --global color.diff.old        "red bold"
    git config --global color.diff.new        "green bold"
    git config --global color.diff.whitespace "red reverse"
+
+   # Should the first block of an empty line be colored. (Default: true)
+   git config --bool --global diff-so-fancy.markEmptyLines false
+
+   # Simplify git header chunks to a more human readable format. (Default: true)
+   git config --bool --global diff-so-fancy.changeHunkIndicators false
+
+   # stripLeadingSymbols - Should the pesky + or - at line-start be removed. (Default: true)
+   git config --bool --global diff-so-fancy.stripLeadingSymbols false
+
+   # useUnicodeRuler By default the separator for the file header uses Unicode line drawing characters. If this is causing output errors on your terminal set this to false to use ASCII characters instead. (Default: true)
+   git config --bool --global diff-so-fancy.useUnicodeRuler false
+
+   # To bypass diff-so-fancy. Use --no-pager for that:
+   #git --no-pager diff
 fi
 
 
@@ -1475,6 +1512,7 @@ fi
 #  autoupdate = 1
    git config --global rerere.enabled  "1"
    git config --global rerere.autoupdate  "1"
+
 
 
 ######### ~/.bash_profile prompt settings:
@@ -1567,33 +1605,34 @@ fi
 ######### Difference engine p4merge:
 
 
-# TODO: Different diff/merge engines
+if [[ "$GIT_TOOLS" == *"p4merge"* ]]; then
+   # See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
+   if [ ! -d "/Applications/p4merge.app" ]; then 
+      fancy_echo "Installing p4merge diff engine app using Homebrew ..."
+      brew cask uninstall p4merge
+      brew cask install --appdir="/Applications" p4merge
+      # TODO: Configure p4merge using shell commands.
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         # p4merge --version
+         fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
+         # To avoid response "Error: git not installed" to brew upgrade git
+         brew cask reinstall p4merge
+      else
+         fancy_echo "p4merge diff engine app already installed:"
+      fi
+   fi
+   # TODO: p4merge --version err in pop-up
 
-# See https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge
-if [ ! -d "/Applications/p4merge.app" ]; then 
-    fancy_echo "Installing p4merge diff engine app using Homebrew ..."
-    brew cask uninstall p4merge
-    brew cask install --appdir="/Applications" p4merge
-    # TODO: Configure p4merge using shell commands.
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       # p4merge --version
-       fancy_echo "p4merge diff engine app already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew cask reinstall p4merge
-    else
-       fancy_echo "p4merge diff engine app already installed:"
-    fi
+   if grep -q "alias p4merge=" "$BASHFILE" ; then    
+      fancy_echo "p4merge alias already in $BASHFILE"
+   else
+      fancy_echo "Adding p4merge alias in $BASHFILE..."
+      echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>"$BASHFILE"
+   fi 
 fi
-# TODO: p4merge --version
-   # ?
 
-if grep -q "alias p4merge=" "$BASHFILE" ; then    
-   fancy_echo "p4merge alias already in $BASHFILE"
-else
-   fancy_echo "Adding p4merge alias in $BASHFILE..."
-   echo "alias p4merge='/Applications/p4merge.app/Contents/MacOS/p4merge'" >>"$BASHFILE"
-fi 
+# TODO: Different diff/merge engines
 
 
 ######### Git Repository:
@@ -1610,34 +1649,36 @@ fi
 ######### TODO: Git Flow helper:
 
 
-# GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
-# See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
-# See https://datasift.github.io/gitflow/IntroducingGitFlow.html
-# https://danielkummer.github.io/git-flow-cheatsheet/
-# https://github.com/nvie/gitflow
-# https://vimeo.com/16018419
-# https://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow
+if [[ "$GIT_TOOLS" == *"git-flow"* ]]; then
+   # GitFlow is a branching model for scaling collaboration using Git, created by Vincent Driessen. 
+   # See https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+   # See https://datasift.github.io/gitflow/IntroducingGitFlow.html
+   # https://danielkummer.github.io/git-flow-cheatsheet/
+   # https://github.com/nvie/gitflow
+   # https://vimeo.com/16018419
+   # https://buildamodule.com/video/change-management-and-version-control-deploying-releases-features-and-fixes-with-git-how-to-use-a-scalable-git-branching-model-called-gitflow
 
-# Per https://github.com/nvie/gitflow/wiki/Mac-OS-X
-if ! command -v git-flow >/dev/null; then
-   fancy_echo "Installing git-flow ..."
-   brew install git-flow
-else
-   fancy_echo "git-flow already installed."
+   # Per https://github.com/nvie/gitflow/wiki/Mac-OS-X
+   if ! command -v git-flow >/dev/null; then
+      fancy_echo "Installing git-flow ..."
+      brew install git-flow
+   else
+      fancy_echo "git-flow already installed."
+   fi
+
+   #[gitflow "prefix"]
+   #  feature = feature-
+   #  release = release-
+   #  hotfix = hotfix-
+   #  support = support-
+   #  versiontag = v
+
+   #git clone --recursive git@github.com:<username>/gitflow.git
+   #cd gitflow
+   #git branch master origin/master
+   #git flow init -d
+   #git flow feature start <your feature>
 fi
-
-#[gitflow "prefix"]
-#  feature = feature-
-#  release = release-
-#  hotfix = hotfix-
-#  support = support-
-#  versiontag = v
-
-#git clone --recursive git@github.com:<username>/gitflow.git
-#cd gitflow
-#git branch master origin/master
-#git flow init -d
-#git flow feature start <your feature>
 
 
 ######### git local hooks 
@@ -1665,70 +1706,67 @@ fi
 
 ######### Git Signing:
 
+if [[ "$GIT_TOOLS" == *"signing"* ]]; then
 
-# About http://notes.jerzygangi.com/the-best-pgp-tutorial-for-mac-os-x-ever/
-# See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
-   # from 2015 recommends gnupg instead
-# Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
+   # About http://notes.jerzygangi.com/the-best-pgp-tutorial-for-mac-os-x-ever/
+   # See http://blog.ghostinthemachines.com/2015/03/01/how-to-use-gpg-command-line/
+      # from 2015 recommends gnupg instead
+   # Cheat sheet of commands at http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
 
+   # If GPG suite is used, add the GPG key to ~/.bash_profile:
+   if grep -q "GPG_TTY" "$BASHFILE" ; then    
+      fancy_echo "GPG_TTY already in $BASHFILE."
+   else
+      fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
+      echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
+         # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
+   fi 
 
-# If GPG suite is used, add the GPG key to ~/.bash_profile:
-if grep -q "GPG_TTY" "$BASHFILE" ; then    
-   fancy_echo "GPG_TTY already in $BASHFILE."
-else
-   fancy_echo "Concatenating GPG_TTY export in $BASHFILE..."
-   echo "export GPG_TTY=$(tty)" >> "$BASHFILE"
-      # echo $(tty) results in: -bash: /dev/ttys003: Permission denied
-fi 
+   # NOTE: gpg is the command even though the package is gpg2:
+   if ! command -v gpg >/dev/null; then
+      fancy_echo "Installing GPG2 for commit signing..."
+      brew install gpg2
+      # See https://www.gnupg.org/faq/whats-new-in-2.1.html
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         gpg --version  # outputs many lines!
+         fancy_echo "GPG2 already installed: UPGRADE requested..."
+         # To avoid response "Error: git not installed" to brew upgrade git
+         brew uninstall GPG2 
+         # NOTE: This does not remove .gitconfig file.
+         brew install GPG2 
+      else
+         fancy_echo "GPG2 already installed:"
+      fi
+   fi
+   echo -e "\n$(gpg --version | grep gpg)" >>$THISSCRIPT.log
+   #gpg --version | grep gpg
+      # gpg (GnuPG) 2.2.5 and many lines!
+   # NOTE: This creates folder ~/.gnupg
 
+   # Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
+   # https://gpgtools.org/
+   # See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
 
-# NOTE: gpg is the command even though the package is gpg2:
-if ! command -v gpg >/dev/null; then
-  fancy_echo "Installing GPG2 for commit signing..."
-  brew install gpg2
-  # See https://www.gnupg.org/faq/whats-new-in-2.1.html
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       gpg --version  # outputs many lines!
-       fancy_echo "GPG2 already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew uninstall GPG2 
-       # NOTE: This does not remove .gitconfig file.
-       brew install GPG2 
-    else
-       fancy_echo "GPG2 already installed:"
-    fi
-fi
-echo -e "\n$(gpg --version | grep gpg)" >>$THISSCRIPT.log
-#gpg --version | grep gpg
-   # gpg (GnuPG) 2.2.5 and many lines!
-# NOTE: This creates folder ~/.gnupg
+   # Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
+   if [ ! -d "/Applications/GPG Keychain.app" ]; then 
+      fancy_echo "Installing gpg-suite app to store GPG keys ..."
+      brew cask uninstall gpg-suite
+      brew cask install --appdir="/Applications" gpg-suite  # See http://macappstore.org/gpgtools/
+      # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
+      # See https://gpgtools.org/
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "gpg-suite app already installed: UPGRADE requested..."
+         brew cask reinstall gpg-suite 
+      else
+         fancy_echo "gpg-suite app already installed:"
+      fi
+   fi
+   # TODO: How to gpg-suite --version
 
-
-# Mac users can store GPG key passphrase in the Mac OS Keychain using the GPG Suite:
-# https://gpgtools.org/
-# See https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
-
-# Like https://gpgtools.tenderapp.com/kb/how-to/first-steps-where-do-i-start-where-do-i-begin-setup-gpgtools-create-a-new-key-your-first-encrypted-mail
-if [ ! -d "/Applications/GPG Keychain.app" ]; then 
-   fancy_echo "Installing gpg-suite app to store GPG keys ..."
-   brew cask uninstall gpg-suite
-   brew cask install --appdir="/Applications" gpg-suite  # See http://macappstore.org/gpgtools/
-   # Renamed from gpgtools https://github.com/caskroom/homebrew-cask/issues/39862
-   # See https://gpgtools.org/
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       fancy_echo "gpg-suite app already installed: UPGRADE requested..."
-       brew cask reinstall gpg-suite 
-    else
-       fancy_echo "gpg-suite app already installed:"
-    fi
-fi
-# TODO: How to gpg-suite --version
-
-
-# Per https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
-# git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
+   # Per https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
+   # git config --global gpg.program /usr/local/MacGPG2/bin/gpg2
 
 
    fancy_echo "Looking in ${#str} byte key chain for GIT_ID=$GIT_ID ..."
@@ -1736,89 +1774,89 @@ fi
    # RESPONSE FIRST TIME: gpg: /Users/wilsonmar/.gnupg/trustdb.gpg: trustdb created
    echo "$str"
    # Using regex per http://tldp.org/LDP/abs/html/bashver3.html#REGEXMATCHREF
-if [[ "$str" =~ "$GIT_ID" ]]; then 
-   fancy_echo "A GPG key for $GIT_ID already generated."
-else  # generate:
-   # See https://help.github.com/articles/generating-a-new-gpg-key/
-  fancy_echo "Generate a GPG2 pair for $GIT_ID in batch mode ..."
-  # Instead of manual: gpg --gen-key  or --full-generate-key
-  # See https://superuser.com/questions/1003403/how-to-use-gpg-gen-key-in-a-script
-  # And https://gist.github.com/woods/8970150
-  # And http://www.gnupg.org/documentation/manuals/gnupg-devel/Unattended-GPG-key-generation.html
-cat >foo <<EOF
-     %echo Generating a default key
-     Key-Type: default
-     Subkey-Type: default
-     Name-Real: $GIT_NAME
-     Name-Comment: 2 long enough passphrase
-     Name-Email: $GIT_ID
-     Expire-Date: 0
-     Passphrase: $GPG_PASSPHRASE
-     # Do a commit here, so that we can later print "done" :-)
-     %commit
-     %echo done
+   if [[ "$str" =~ "$GIT_ID" ]]; then 
+      fancy_echo "A GPG key for $GIT_ID already generated."
+   else  # generate:
+      # See https://help.github.com/articles/generating-a-new-gpg-key/
+      fancy_echo "Generate a GPG2 pair for $GIT_ID in batch mode ..."
+      # Instead of manual: gpg --gen-key  or --full-generate-key
+      # See https://superuser.com/questions/1003403/how-to-use-gpg-gen-key-in-a-script
+      # And https://gist.github.com/woods/8970150
+      # And http://www.gnupg.org/documentation/manuals/gnupg-devel/Unattended-GPG-key-generation.html
+      cat >foo <<EOF
+      %echo Generating a default key
+      Key-Type: default
+      Subkey-Type: default
+      Name-Real: $GIT_NAME
+      Name-Comment: 2 long enough passphrase
+      Name-Email: $GIT_ID
+      Expire-Date: 0
+      Passphrase: $GPG_PASSPHRASE
+      # Do a commit here, so that we can later print "done" :-)
+      %commit
+      %echo done
 EOF
-  gpg --batch --gen-key foo
-  rm foo  # temp intermediate work file.
-# Sample output from above command:
-#gpg: Generating a default key
-#gpg: key AC3D4CED03B81E02 marked as ultimately trusted
-#gpg: revocation certificate stored as '/Users/wilsonmar/.gnupg/openpgp-revocs.d/B66D9BD36CC672341E419283AC3D4CED03B81E02.rev'
-#gpg: done
+    gpg --batch --gen-key foo
+    rm foo  # temp intermediate work file.
+    # Sample output from above command:
+    #gpg: Generating a default key
+   #gpg: key AC3D4CED03B81E02 marked as ultimately trusted
+   #gpg: revocation certificate stored as '/Users/wilsonmar/.gnupg/openpgp-revocs.d/B66D9BD36CC672341E419283AC3D4CED03B81E02.rev'
+   #gpg: done
 
-  fancy_echo "List GPG2 pairs just generated ..."
+   fancy_echo "List GPG2 pairs just generated ..."
    str="$(gpg --list-secret-keys --keyid-format LONG )"
    # IF BLANK: gpg: checking the trustdb & gpg: no ultimately trusted keys found
    echo "$str"
    # RESPONSE AFTER a key is created:
-# Sample output:
-#sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]
-#      B66D9BD36CC672341E419283AC3D4CED03B81E02
-#uid                 [ultimate] Wilson Mar (2 long enough passphrase) <WilsonMar+GitHub@gmail.com>
-#ssb   rsa2048/31653F7418AEA6DD 2018-03-22 [E]
+   # Sample output:
+   #sec   rsa2048/7FA75CBDD0C5721D 2018-03-22 [SC]
+   #      B66D9BD36CC672341E419283AC3D4CED03B81E02
+   #uid                 [ultimate] Wilson Mar (2 long enough passphrase) <WilsonMar+GitHub@gmail.com>
+   #ssb   rsa2048/31653F7418AEA6DD 2018-03-22 [E]
 
-# To delete a key pair:
-#gpg --delete-secret-key 7FA75CBDD0C5721D
-    # Delete this key from the keyring? (y/N) y
-    # This is a secret key! - really delete? (y/N) y
-    # Click <delete key> in the GUI. Twice.
-#gpg --delete-key 7FA75CBDD0C5721D
-    # Delete this key from the keyring? (y/N) y
+   # To delete a key pair:
+   #gpg --delete-secret-key 7FA75CBDD0C5721D
+       # Delete this key from the keyring? (y/N) y
+       # This is a secret key! - really delete? (y/N) y
+       # Click <delete key> in the GUI. Twice.
+   #gpg --delete-key 7FA75CBDD0C5721D
+       # Delete this key from the keyring? (y/N) y
 
-fi
+   fi
 
    fancy_echo "Retrieve from response Key for $GIT_ID ..."
    # Thanks to Wisdom Hambolu (wisyhambolu@gmail.com) for this:
    KEY=$(GPG_MAP_MAIL2KEY "$GIT_ID")  # 16 chars. 
 
-# PROTIP: Store your GPG key passphrase so you don't have to enter it every time you 
-#       sign a commit by using https://gpgtools.org/
+   # PROTIP: Store your GPG key passphrase so you don't have to enter it every time you 
+   #       sign a commit by using https://gpgtools.org/
 
-# If key is not already set in .gitconfig, add it:
-if grep -q "$KEY" "$GITCONFIG" ; then    
-   fancy_echo "Signing Key \"$KEY\" already in $GITCONFIG"
-else
-   fancy_echo "Adding SigningKey=$KEY in $GITCONFIG..."
-   git config --global user.signingkey "$KEY"
+   # If key is not already set in .gitconfig, add it:
+   if grep -q "$KEY" "$GITCONFIG" ; then    
+      fancy_echo "Signing Key \"$KEY\" already in $GITCONFIG"
+   else
+      fancy_echo "Adding SigningKey=$KEY in $GITCONFIG..."
+      git config --global user.signingkey "$KEY"
 
-   # Auto-type in "adduid":
-   # gpg --edit-key "$KEY" <"adduid"
-   # NOTE: By using git config command, repeated invocation would not duplicate lines.
-fi 
+      # Auto-type in "adduid":
+      # gpg --edit-key "$KEY" <"adduid"
+      # NOTE: By using git config command, repeated invocation would not duplicate lines.
+   fi 
 
-
-# See https://help.github.com/articles/signing-commits-using-gpg/
-# Configure Git client to sign commits by default for a local repository,
-# in ANY/ALL repositories on your computer, run:
-   # NOTE: This updates the "[commit]" section within ~/.gitconfig
-git config commit.gpgsign | grep 'true' &> /dev/null
-# if coding suggested by https://github.com/koalaman/shellcheck/wiki/SC2181
-if [ $? == 0 ]; then
-   fancy_echo "git config commit.gpgsign already true (on)."
-else # false or blank response:
-   fancy_echo "Setting git config commit.gpgsign false (off)..."
-   git config --global commit.gpgsign false
-   fancy_echo "To activate: git config --global commit.gpgsign true"
+   # See https://help.github.com/articles/signing-commits-using-gpg/
+   # Configure Git client to sign commits by default for a local repository,
+   # in ANY/ALL repositories on your computer, run:
+      # NOTE: This updates the "[commit]" section within ~/.gitconfig
+   git config commit.gpgsign | grep 'true' &> /dev/null
+   # if coding suggested by https://github.com/koalaman/shellcheck/wiki/SC2181
+   if [ $? == 0 ]; then
+      fancy_echo "git config commit.gpgsign already true (on)."
+   else # false or blank response:
+      fancy_echo "Setting git config commit.gpgsign false (off)..."
+      git config --global commit.gpgsign false
+      fancy_echo "To activate: git config --global commit.gpgsign true"
+   fi
 fi
 
 
@@ -1837,21 +1875,22 @@ fi
 ######### TODO: manage secrets in a git repository?
 
 
-
-if ! command -v git-secret >/dev/null; then
-  fancy_echo "Installing git-secret for managing secrets in a Git repo ..."
-  brew install git-secret
-  # See https://github.com/sobolevn/git-secret
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       git-secret --version  # 0.2.2
-       fancy_echo "git-secret already installed: UPGRADE requested..."
-       brew upgrade git-secret 
-    else
-       fancy_echo "git-secret already installed:"
-    fi
+if [[ "$GIT_TOOLS" == *"secret"* ]]; then
+   if ! command -v git-secret >/dev/null; then
+      fancy_echo "Installing git-secret for managing secrets in a Git repo ..."
+      brew install git-secret
+      # See https://github.com/sobolevn/git-secret
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         git-secret --version  # 0.2.2
+         fancy_echo "git-secret already installed: UPGRADE requested..."
+         brew upgrade git-secret 
+      else
+         fancy_echo "git-secret already installed:"
+      fi
+   fi
+   echo -e "\n$(git-secret --version | grep gpg)" >>$THISSCRIPT.log
 fi
-echo -e "\n$(git-secret --version | grep gpg)" >>$THISSCRIPT.log
 
 
 ######### Cloud CLI/SDK:
@@ -2190,28 +2229,29 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
 
 ######### GitHub hub to manage GitHub functions:
 
+if [[ "$GIT_TOOLS" == *"hub"* ]]; then
+   GO_INSTALL  # prerequiste
+   if ! command -v hub >/dev/null; then  # in /usr/local/bin/hub
+      fancy_echo "Installing hub for managing GitHub from a Git client ..."
+      brew install hub
+      # See https://hub.github.com/
 
-GO_INSTALL  # prerequiste
-if ! command -v hub >/dev/null; then  # in /usr/local/bin/hub
-  fancy_echo "Installing hub for managing GitHub from a Git client ..."
-  brew install hub
-  # See https://hub.github.com/
-
-   # fancy_echo "Adding git hub in $BASHFILE..."
-   # echo "alias git=hub" >>"$BASHFILE"
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       hub version | grep hub  
-          # git version 2.16.3
-          # hub version 2.2.9
-       fancy_echo "hub already installed: UPGRADE requested..."
-       brew upgrade hub 
-    else
-       fancy_echo "hub already installed:"
-    fi
+      # fancy_echo "Adding git hub in $BASHFILE..."
+      # echo "alias git=hub" >>"$BASHFILE"
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         hub version | grep hub  
+           # git version 2.16.3
+           # hub version 2.2.9
+         fancy_echo "hub already installed: UPGRADE requested..."
+         brew upgrade hub 
+      else
+         fancy_echo "hub already installed:"
+      fi
+   fi
+   echo -e "\n   hub git version:" >>$THISSCRIPT.log
+   echo -e "$(hub version)" >>$THISSCRIPT.log
 fi
-echo -e "\n   hub git version:" >>$THISSCRIPT.log
-echo -e "$(hub version)" >>$THISSCRIPT.log
 
 
 ######### Python test coding languge:
@@ -2237,6 +2277,9 @@ echo -e "$(hub version)" >>$THISSCRIPT.log
          python python-tests/firefox_github_ssh_add.py
          # python python-tests/firefox_unittest.py  # not working due to indents
          # python python-tests/firefox-test-chromedriver.py
+      fi
+      if [[ $GIT_BROWSER == *"safari"* ]]; then  # contains azure.
+         fancy_echo "Need python python-tests/safari_github_ssh_add.py"
       fi
 
       # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Python.gitattributes

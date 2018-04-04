@@ -16,10 +16,10 @@ GITHUB_PASSWORD="change this to your GitHub account password"
 GITHUB_REPO="sample"
 
 # Lists can be specified below. The last one in a list is the Git default:
-GIT_TOOLS="none"
-         # none, 
-GIT_BROWSER="firefox"
-           # chrome, firefox, brave
+GIT_TOOLS="tig, lfs, diff-so-fancy, p4merge"
+         # none, tig, lfs, diff-so-fancy, grip, p4merge, git-flow, signing, hub
+GIT_BROWSER="firefox, safari"
+           # chrome, firefox, brave, safari
 GIT_CLIENT="git"
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
 GIT_EDITOR="vim"
