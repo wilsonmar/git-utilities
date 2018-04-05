@@ -2,6 +2,7 @@
 
 *.log
 secrets.sh
+.gitsecret/
 temp
 tempfile
 temp.sh
