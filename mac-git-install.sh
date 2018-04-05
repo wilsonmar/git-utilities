@@ -49,6 +49,35 @@ else
 fi
 }
 
+function VIRTUALBOX_INSTALL(){
+   if [ ! -d "/Applications/VirtualBox.app" ]; then 
+   #if ! command -v virtualbox >/dev/null; then  # /usr/local/bin/virtualbox
+      fancy_echo "Installing virtualbox ..."
+      brew cask install --appdir="/Applications" virtualbox
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "virtualbox already installed: UPGRADE requested..."
+         # virtualbox --version
+         brew cask upgrade virtualbox
+      else
+         fancy_echo "virtualbox already installed."
+      fi
+   fi
+   #echo -e "\n$(virtualbox --version)" >>$THISSCRIPT.log
+
+   if [ ! -d "/Applications/Vagrant Manager.app" ]; then 
+      fancy_echo "Installing vagrant-manager ..."
+      brew cask install --appdir="/Applications" vagrant-manager
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "vagrant-manager already installed: UPGRADE requested..."
+         brew cask upgrade vagrant-manager
+      else
+         fancy_echo "vagrant-manager already installed."
+      fi
+   fi
+}
+
 function PYTHON_INSTALL(){
    # Python2 is a pre-requisite for git-cola & GCP installed below.
    # Python3 is a pre-requisite for aws.
@@ -551,8 +580,13 @@ echo -e "\n$(git --version)"            >>$THISSCRIPT.log
     # git version 2.14.3 (Apple Git-98)
 
 
-######### Download/clone git-utility repo:
+######### Download/clone GITHUB_REPO_URL git-utility repo:
 
+
+# TODO: Setup GITS_PATH
+
+GITHUB_REPO_URL="https://github.com/$GITHUB_ACCOUNT/$GITHUB_REPO.git"
+fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
 
 UTIL_REPO="git-utilities"
 if [ ! -d "$UTIL_REPO" ]; then #  directory NOT found:
@@ -1776,15 +1810,42 @@ fi
 ######### git local hooks 
 
 
-# Based https://wilsonmar.github.io/git-hooks/
-if [ ! -f ".git/hooks/git-commit" ]; then 
-   fancy_echo "git-commit file not found in .git/hooks. Copying hooks folder ..."
-   rm .git/hooks/*.sample  # samples are not run
-   cp hooks/* .git/hooks   # copy
-   chmod +x .git/hooks/*   # make executable
+if [[ "$GIT_TOOLS" == *"hooks"* ]]; then
+   # # TODO: Install link per https://wilsonmar.github.io/git-hooks/
+   if [ ! -f ".git/hooks/git-commit" ]; then 
+      fancy_echo "git-commit file not found in .git/hooks. Copying hooks folder ..."
+      rm .git/hooks/*.sample  # samples are not run
+      cp hooks/* .git/hooks   # copy
+      chmod +x .git/hooks/*   # make executable
+   else
+      fancy_echo "git-commit file found in .git/hooks. Skipping ..."
+   fi
+
+   if [[ $TRYOUT == *"hooks"* ]]; then
+      if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
+         PYTHON_PGM="hooks/basic-python2"
+         if [[ $TRYOUT == *"cleanup"* ]]; then
+            fancy_echo "$PYTHON_PGM TRYOUT == cleanup ..."
+            python "hooks/$PYTHON_PGM"  # run
+            rm -rf $PYTHON_PGM
+         fi
+      fi
+
+      if [[ $GIT_LANG == *"python3"* ]]; then  # contains azure.
+         PYTHON_PGM="hooks/basic-python3"
+         if [[ $TRYOUT == *"cleanup"* ]]; then
+            fancy_echo "$PYTHON_PGM TRYOUT == cleanup ..."
+            python3 "hooks/$PYTHON_PGM"  # run
+            rm -rf $PYTHON_PGM
+         fi
+      fi
+   fi
 else
-   fancy_echo "git-commit file found in .git/hooks. Skipping ..."
+   if [[ $TRYOUT == *"hooks"* ]]; then
+      fancy_echo "ERROR: \"hooks\" needs to be in GIT_TOOLS for TRYOUT."
+   fi
 fi
+
 
 
 ######### JAVA_TOOLS:
@@ -1913,6 +1974,7 @@ fi
 
 # https://www.bonusbits.com/wiki/HowTo:Setup_Charles_Proxy_on_Mac
 # brew install nmap
+
 
 ######### TODO: Code review:
 
@@ -2082,7 +2144,7 @@ fi
 ######### TODO: Insert GPG in GitHub:
 
 
-# https://help.github.com/articles/telling-git-about-your-gpg-key/
+# TODO: https://help.github.com/articles/telling-git-about-your-gpg-key/
 # From https://gist.github.com/danieleggert/b029d44d4a54b328c0bac65d46ba4c65
 # Add public GPG key to GitHub
 # open https://github.com/settings/keys
@@ -2120,6 +2182,7 @@ fi
 echo "CLOUD=$CLOUD"
 
 if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
+   VIRTUALBOX_INSTALL # pre-requisite
    if ! command -v vagrant >/dev/null; then
       fancy_echo "Installing vagrant ..."
       brew cask install --appdir="/Applications" vagrant
@@ -2136,34 +2199,23 @@ if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
    echo -e "\n$(vagrant --version)" >>$THISSCRIPT.log
 
 
-   if [ ! -d "/Applications/VirtualBox.app" ]; then 
-   #if ! command -v virtualbox >/dev/null; then  # /usr/local/bin/virtualbox
-      fancy_echo "Installing virtualbox ..."
-      brew cask install --appdir="/Applications" virtualbox
-   else
-      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "virtualbox already installed: UPGRADE requested..."
-         # virtualbox --version
-         brew cask upgrade virtualbox
-      else
-         fancy_echo "virtualbox already installed."
-      fi
-   fi
-   #echo -e "\n$(virtualbox --version)" >>$THISSCRIPT.log
+   if [[ $TRYOUT == *"hooks"* ]]; then
+      if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
+         PYTHON_PGM="hooks/basic-python2"
 
-
-   if [ ! -d "/Applications/Vagrant Manager.app" ]; then 
-      fancy_echo "Installing vagrant-manager ..."
-      brew cask install --appdir="/Applications" vagrant-manager
-   else
-      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "vagrant-manager already installed: UPGRADE requested..."
-         brew cask upgrade vagrant-manager
-      else
-         fancy_echo "vagrant-manager already installed."
+         if [[ $TRYOUT == *"cleanup"* ]]; then
+            fancy_echo "$PYTHON_PGM TRYOUT == cleanup ..."
+            rm -rf $PYTHON_PGM
+         fi
       fi
-   fi
-   
+      if [[ $GIT_LANG == *"python3"* ]]; then  # contains azure.
+         PYTHON_PGM="hooks/basic-python3"
+         if [[ $TRYOUT == *"cleanup"* ]]; then
+            fancy_echo "$PYTHON_PGM TRYOUT == cleanup ..."
+            rm -rf $PYTHON_PGM
+         fi
+      fi
+
    # Create a test directory and cd into the test directory.
    #vagrant init precise64  # http://files.vagrantup.com/precise64.box
    #vagrant up
@@ -2172,54 +2224,8 @@ if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
    #vagrant halt
    #vagrant destroy 
 fi
+xxx
 
-
-if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
-   # First remove boot2docker and Kitematic https://github.com/boot2docker/boot2docker/issues/437
-   if ! command -v docker >/dev/null; then  # /usr/local/bin/docker
-      fancy_echo "Installing docker ..."
-      brew install docker  docker-compose  docker-machine  xhyve  docker-machine-driver-xhyve
-      # This creates folder ~/.docker
-      # Docker images are stored in $HOME/Library/Containers/com.docker.docker
-      brew link --overwrite docker
-      # /usr/local/bin/docker -> /Applications/Docker.app/Contents/Resources/bin/docker
-      brew link --overwrite docker-machine
-      brew link --overwrite docker-compose
-   else
-      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "docker already installed: UPGRADE requested..."
-         docker version
-         brew upgrade docker-machine-driver-xhyve
-         brew upgrade xhyve
-         brew upgrade docker-compose  
-         brew upgrade docker-machine 
-         brew upgrade docker 
-      else
-         fancy_echo "docker already installed."
-      fi
-   fi
-   echo -e "\n$(docker --version)" >>$THISSCRIPT.log
-      # Docker version 18.03.0-ce, build 0520e24
-   echo -e "\n$(docker version)" >>$THISSCRIPT.log
-      # Client:
-       # Version:	18.03.0-ce
-       # API version:	1.37
-       # Go version:	go1.9.4
-       # Git commit:	0520e24
-       # Built:	Wed Mar 21 23:06:22 2018
-       # OS/Arch:	darwin/amd64
-       # Experimental:	false
-       # Orchestrator:	swarm
-
-   # docker-machine --help
-   # Create a machine:
-   # docker-machine create default --driver xhyve --xhyve-experimental-nfs-share
-   # docker-machine create -d virtualbox dev1
-   # eval $(docker-machine env default)
-   # docker-machine upgrade dev1
-   # docker-machine rm dev2fi
-   # https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
-fi
 
 
 # See https://wilsonmar.github.io/gcp
@@ -2385,12 +2391,92 @@ if [[ $CLOUD == *"openstack"* ]]; then  # contains openstack.
       # Test a non-destructive Open Stack command:
       openstack image list
    fi
+else
+   if [[ $TRYOUT == *"openstack"* ]]; then
+      fancy_echo "ERROR: \"openstack\" needs to be in CLOUD for TRYOUT."
+   fi
 fi
 
 
+if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
+   # First remove boot2docker and Kitematic https://github.com/boot2docker/boot2docker/issues/437
+   if ! command -v docker >/dev/null; then  # /usr/local/bin/docker
+      fancy_echo "Installing docker ..."
+      brew install docker  docker-compose  docker-machine  xhyve  docker-machine-driver-xhyve
+      # This creates folder ~/.docker
+      # Docker images are stored in $HOME/Library/Containers/com.docker.docker
+      brew link --overwrite docker
+      # /usr/local/bin/docker -> /Applications/Docker.app/Contents/Resources/bin/docker
+      brew link --overwrite docker-machine
+      brew link --overwrite docker-compose
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "docker already installed: UPGRADE requested..."
+         docker version
+         brew upgrade docker-machine-driver-xhyve
+         brew upgrade xhyve
+         brew upgrade docker-compose  
+         brew upgrade docker-machine 
+         brew upgrade docker 
+      else
+         fancy_echo "docker already installed."
+      fi
+   fi
+   echo -e "\n$(docker --version)" >>$THISSCRIPT.log
+      # Docker version 18.03.0-ce, build 0520e24
+   echo -e "\n$(docker version)" >>$THISSCRIPT.log
+      # Client:
+       # Version:	18.03.0-ce
+       # API version:	1.37
+       # Go version:	go1.9.4
+       # Git commit:	0520e24
+       # Built:	Wed Mar 21 23:06:22 2018
+       # OS/Arch:	darwin/amd64
+       # Experimental:	false
+       # Orchestrator:	swarm
+
+   if [[ $TRYOUT == *"docker"* ]]; then  # run docker
+      fancy_echo "TRYOUT run docker ..."
+      # See https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
+      # https://www.upcloud.com/support/how-to-configure-docker-swarm/
+      # docker-machine --help
+      # Create a machine:
+      # docker-machine create default --driver xhyve --xhyve-experimental-nfs-share
+      # docker-machine create -d virtualbox dev1
+      # eval $(docker-machine env default)
+      # docker-machine upgrade dev1
+      # docker-machine rm dev2fi
+
+      # docker run -d dockerswarm/swarm:master join --advertise=192.168.1.105:2375 consul://192.168.1.103:8500
+      # sudo docker run -d dockerswarm/swarm:master join --advertise=192.168.1.105:2375 consul://192.168.1.103:8500
+   fi
+else
+   if [[ $TRYOUT == *"docker"* ]]; then
+      fancy_echo "ERROR: \"docker\" needs to be in CLOUD for TRYOUT."
+   fi
+fi
+
 if [[ $CLOUD == *"minikube"* ]]; then 
-   # See https://kubernetes.io/docs/getting-started-guides/minikube/
+   # See https://kubernetes.io/docs/tasks/tools/install-minikube/
    PYTHON_INSTALL  # function defined at top of this file.
+   VIRTUALBOX_INSTALL # pre-requisite
+
+   if ! command -v kubectl >/dev/null; then  # not in /usr/local/bin/minikube
+      fancy_echo "Installing kubectl using Homebrew ..."
+      #  https://kubernetes.io/docs/tasks/tools/install-kubectl/
+      brew install kubectl
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "kubectl already installed: UPGRADE requested..."
+         kubectl version  # minikube version: v0.25.2 
+            # ... and many other lines.
+         brew upgrade kubectl
+      else
+         fancy_echo "kubectl already installed."
+      fi
+   fi
+   echo -e "\n$(kubectl version)" >>$THISSCRIPT.log  # version: v0.25.2 
+
    if ! command -v minikube >/dev/null; then  # not in /usr/local/bin/minikube
       fancy_echo "Installing minikube using Homebrew ..."
       brew cask install minikube
@@ -2407,6 +2493,8 @@ if [[ $CLOUD == *"minikube"* ]]; then
    echo -e "\n$(minikube version)" >>$THISSCRIPT.log  # version: v0.25.2 
 
    if [[ $TRYOUT == *"minikube"* ]]; then  # run minikube
+      fancy_echo "TRYOUT run minikube ..."
+      # See https://kubernetes.io/docs/getting-started-guides/minikube/
       # minikube start
          # Starting local Kubernetes cluster...
          # Running pre-create checks...
@@ -2415,12 +2503,12 @@ if [[ $CLOUD == *"minikube"* ]]; then
 
       # kubectl run hello-minikube --image=k8s.gcr.io/echoserver:1.4 --port=8080
          # deployment "hello-minikube" created
-      $ kubectl expose deployment hello-minikube --type=NodePort
+      # kubectl expose deployment hello-minikube --type=NodePort
          # service "hello-minikube" exposed
    fi
 else
    if [[ $TRYOUT == *"minikube"* ]]; then
-      fancy_echo "ERROR: CLOUD != \"minikube\" but TRYOUT contains minikube."
+      fancy_echo "ERROR: \"minikube\" needs to be in CLOUD for TRYOUT."
    fi
 fi
 
@@ -2459,6 +2547,15 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
    echo -e "\n$(cf --version)" >>$THISSCRIPT.log
    cf --version
       # cf version 6.35.2+88a03e995.2018-03-15
+
+   if [[ $TRYOUT == *"cf"* ]]; then  # run minikube
+      fancy_echo "TRYOUT run cf ..."
+   fi
+   
+else
+   if [[ $TRYOUT == *"cf"* ]]; then
+      fancy_echo "ERROR: \"cf\" needs to be in CLOUD for TRYOUT."
+   fi
 fi
 
 
@@ -2466,7 +2563,7 @@ fi
 
 
    # virtualenv supports both Python2 and Python3.
-   # virtualenv -p "$(command -v python)" python-tests/basic-python2
+   # virtualenv -p "$(command -v python)" hooks/basic-python2
       #New python executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python2.7
       #Also creating executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python
       # Installing setuptools, pip, wheel...
@@ -2483,7 +2580,12 @@ fi
       fi
       #fancy_echo "Opening virtualenv ..."
       #virtualenv
+   else
+      if [[ $TRYOUT == *"virtualenv"* ]]; then
+         fancy_echo "ERROR: \"virtualenv\" needs to be in PYTHON_TOOLS for TRYOUT."
+      fi
    fi
+fi
 
 
 ######### SSH-KeyGen:
@@ -2548,16 +2650,6 @@ else
    echo "    IdentityFile $FILEPATH" >> $SSHCONFIG
    fi
 fi
-
-
-######### Download GITHUB_REPO_URL
-
-
-# TODO: Setup GITS_PATH
-
-GITHUB_REPO_URL="https://github.com/$GITHUB_ACCOUNT/$GITHUB_REPO.git"
-fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
-
 
 
 ######### Paste SSH Keys in GitHub:
