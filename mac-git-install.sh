@@ -3,6 +3,8 @@
 # mac-git-install.sh in https://github.com/wilsonmar/git-utilities
 # This establishes all the utilities related to use of Git,
 # customized based on specification in file secrets.sh within the same repo.
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/mac-git-install.sh)"
+
 # See https://github.com/wilsonmar/git-utilities/blob/master/README.md
 # Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 # and https://git-scm.com/docs/git-config
@@ -10,7 +12,7 @@
 # https://www.bonusbits.com/wiki/Reference:Mac_OS_DevOps_Workstation_Setup_Check_List
 
 # TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > 
-# Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > gitignore > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
 set -a
 
@@ -58,26 +60,11 @@ function PYTHON_INSTALL(){
       brew install python
       # Not brew install pyenv  # Python environment manager.
 
-      # brew cask install --appdir="/Applications" anaconda
-      # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
-      # variable, eg (for bash shell):
-      # export PATH=/usr/local/anaconda3/bin:"$PATH"
+	  #brew linkapps python
 
       # pip comes with brew install Python 2 >=2.7.9 or Python 3 >=3.4
       pip --version
 
-      fancy_echo "Installing virtualenv to manage multiple Python versions ..."
-      pip install virtualenv
-      pip install virtualenvwrapper
-      source /usr/local/bin/virtualenvwrapper.sh
-
-      #brew install freetype  # http://www.freetype.org to render fonts
-      #fancy_echo "Installing other popular Python helper modules ..."
-      #pip install jupyter
-      #pip install numpy
-      #pip install scipy
-      #pip install matplotlib
-      #pip install ipython[all]
    else
       fancy_echo -e "\n$(python --version) already installed:"
    fi
@@ -107,7 +94,15 @@ function PYTHON_INSTALL(){
 
          # Run .bash_profile to have changes take, run $FILEPATH:
          source "$BASHFILE"
-         echo "$PATH"
+         #echo "$PATH"
+
+      #brew install freetype  # http://www.freetype.org to render fonts
+      #fancy_echo "Installing other popular Python helper modules ..."
+      #pip install jupyter
+      #pip install numpy
+      #pip install scipy
+      #pip install matplotlib
+      #pip install ipython[all]	  
 
    # There is also a Enthought Python Distribution -- www.enthought.com
 }
@@ -123,7 +118,7 @@ function PYTHON3_INSTALL(){
       fancy_echo "Installing Python3, a pre-requisite for awscli and azure ..."
       brew install python3
 
-      # brew cask install --appdir="/Applications" anaconda
+      # 
       # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
       # variable, eg (for bash shell):
       # export PATH=/usr/local/anaconda3/bin:"$PATH"
@@ -132,21 +127,6 @@ function PYTHON3_INSTALL(){
       #files can cause warnings when running "brew doctor", which is considered
       #to be a bug in Homebrew-Cask.
 
-      # pip comes with brew install python:
-      fancy_echo "Installing virtualenv to manage multiple Python versions ..."
-      pip3 install virtualenv
-      pip3 install virtualenvwrapper
-      source /usr/local/bin/virtualenvwrapper.sh
-
-      #brew install freetype  # http://www.freetype.org to render fonts
-      #fancy_echo "Installing other popular Python helper modules ..."
-      #pip3 install jupyter
-      # anaconda?
-      #pip install numpy
-      #pip install scipy
-      #pip install matplotlib
-      #pip install ipython[all]
-	  
    else
       fancy_echo -e "\n$(python3 --version) already installed:"
    fi
@@ -160,6 +140,40 @@ function PYTHON3_INSTALL(){
 
    # NOTE: To make "python" command reach Python3 instead of 2.7, per docs.python-guide.org/en/latest/starting/install3/osx/
    # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
+
+   if [[ "$PYTHON_TOOLS" == *"anaconda"* ]]; then
+      if [ ! -d "/Applications/Google Chrome.app" ]; then 
+      # if ! command -v anaconda >/dev/null; then  # /usr/bin/anacondadriver
+         fancy_echo "Installing PYTHON_TOOLS=\"anaconda\" for libraries ..."
+         brew cask install --appdir="/Applications" anaconda
+      else
+         if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+            fancy_echo "PYTHON_TOOLS=\"anaconda already installed: UPGRADE requested..."
+            anaconda --version  # anaconda 5.1.0
+            brew cask upgrade anaconda
+         else
+            fancy_echo "PYTHON_TOOLS=\"anaconda already installed."
+         fi
+      fi
+      #fancy_echo "Opening PYTHON_TOOLS=\" ..."
+      #anaconda
+      echo -e "\n  anaconda" >>$THISSCRIPT.log
+      echo -e "$(anaconda --version)" >>$THISSCRIPT.log
+      echo -e "$(conda list)" >>$THISSCRIPT.log
+
+      if grep -q "/usr/local/anaconda3/bin" "$BASHFILE" ; then    
+         fancy_echo "anaconda3 PATH already in $BASHFILE"
+      else
+         fancy_echo "Adding anaconda3 PATH in $BASHFILE..."
+         echo "export PATH=\"/usr/local/anaconda3/bin:$PATH\"" >>"$BASHFILE"
+      fi
+
+   # QUESTION: What is the MacOS equivalent to pipe every .py file to anaconda's python:
+   # assoc .py=Python.File
+   # ftype Python.File=C:\path\to\Anaconda\python.exe "%1" %*
+
+   fi
+
 }
 
 function JAVA_INSTALL(){
@@ -207,8 +221,17 @@ function JAVA_INSTALL(){
    fi
    echo -e "$(mvn --version)" >>$THISSCRIPT.log
 
-    # Alternative: ant, gradle
+   if ! command -v ant >/dev/null; then
+     fancy_echo "Installing ant utlity ..."
+     brew install ant
+     ant -v
+   else
+     fancy_echo "ant already installed. Skipping install."
+     ant -v
+   fi
+   # Ant can pick up the Test.jmx file, execute it, and generate an easily-readable HTML report.
 
+   # TODO: gradle
    # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
 }
 
@@ -264,7 +287,8 @@ function NODE_INSTALL(){
          fancy_echo "node already installed."
       fi
    fi
-   nvm on
+
+   # TODO: nvm on
    # $NVM_HOME
 
 
@@ -351,7 +375,7 @@ function GO_INSTALL(){
 }
 
 
-######### Starting:
+######### Starting time stamp, OS versions, command attributes:
 
 
 TIME_START="$(date -u +%s)"
@@ -370,49 +394,8 @@ echo -e "$(uname -a)"              >>$THISSCRIPT.log
    #Filesystem   1024-blocks      Used Available Capacity iused               ifree %iused  Mounted on
    # /dev/disk1s1   488245284 294551984 190920080    61% 2470677 9223372036852305130    0%   /
 FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+echo -e "\n  FREE_DISKBLOCKS_START=$FREE_DISKBLOCKS_START" >>$THISSCRIPT.log
 
-
-
-######### TODO: Install git-secrets utility to decrypt secrets.sh.secret stored in GitHub:
-
-
-# git clone https://github.com/wilsonmar/git-secret
-# video: https://asciinema.org/a/41811?autoplay=1
-
-
-######### Read and use secrets.sh file:
-
-
-# If the file still contains defaults, it should not be used:
-SECRETSFILE="secrets.sh"
-if [ ! -f "$SECRETSFILE" ]; then #  NOT found:
-   fancy_echo "$SECRETSFILE not found. Aborting run ..."
-   exit
-fi
-
-if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then  # not customized:
-   fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
-   exit  # so script ends now
-else
-   fancy_echo "Reading from $SECRETSFILE ..."
-   #chmod +x $SECRETSFILE
-   source "$SECRETSFILE"
-   echo -e "\n   $SECRETSFILE ::" >>$THISSCRIPT.log
-   echo "GIT_NAME=$GIT_NAME">>$THISSCRIPT.log
-   echo "GIT_ID=$GIT_ID" >>$THISSCRIPT.log
-   echo "GIT_EMAIL=$GIT_EMAIL" >>$THISSCRIPT.log
-   echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
-   echo "GITS_PATH=$GITS_PATH" >>$THISSCRIPT.log
-   echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
-   echo "GITHUB_REPO=$GITHUB_REPO" >>$THISSCRIPT.log
-   # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
-   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
-   echo "CLOUD=$CLOUD" >>$THISSCRIPT.log
-   echo "GIT_BROWSER=$GIT_BROWSER" >>$THISSCRIPT.log
-   echo "GIT_CLIENT=$GIT_CLIENT" >>$THISSCRIPT.log
-   echo "GIT_EDITOR=$GIT_EDITOR" >>$THISSCRIPT.log
-   echo "GUI_TEST=$GUI_TEST" >>$THISSCRIPT.log
-fi 
 
 
 # Read first parameter from command line supplied at runtime to invoke:
@@ -496,6 +479,15 @@ fi
    # LC_ALL=
 
 
+if grep -q "export ARCHFLAGS=" "$BASHFILE" ; then    
+   fancy_echo "ARCHFLAGS setting already in $BASHFILE"
+else
+   fancy_echo "Adding ARCHFLAGS in $BASHFILE..."
+   echo "export ARCHFLAGS=\"-arch x86_64\"" >>"$BASHFILE"
+   source "$BASHFILE"
+fi 
+
+
 ###### Install homebrew using whatever Ruby is installed:
 
 
@@ -504,6 +496,8 @@ fancy_echo "Using whatever Ruby version comes with MacOS:"
 ruby -v  # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
 echo -e "\n$(ruby -v)"      >>$THISSCRIPT.log
 
+# Set the permissions that Brew expects	
+# sudo chflags norestricted /usr/local && sudo chown $(whoami):admin /usr/local && sudo chown -R $(whoami):admin /usr/local
 
 if ! command -v brew >/dev/null; then
     fancy_echo "Installing homebrew using Ruby..."
@@ -532,6 +526,92 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 
 
+######### Install git client to download the rest:
+
+
+if ! command -v git >/dev/null; then
+    fancy_echo "Installing git using Homebrew ..."
+    brew install git
+else
+    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+       git --version
+       fancy_echo "Git already installed: UPGRADE requested..."
+       # To avoid response "Error: git not installed" to brew upgrade git
+       brew uninstall git
+       # QUESTION: This removes .gitconfig file?
+       brew install git
+    else
+       fancy_echo "Git already installed:"
+    fi
+fi
+echo -e "\n$(git --version)"            >>$THISSCRIPT.log
+#git --version
+    # git version 2.14.3 (Apple Git-98)
+
+
+######### Download/clone git-utility repo:
+
+
+UTIL_REPO="git-utilities"
+if [ ! -d "$UTIL_REPO" ]; then #  directory NOT found:
+   fancy_echo "$(pwd)"
+   echo "Creating $UTIL_REPO repo under $(pwd)" >>$THISSCRIPT.log
+   
+   brew install wget  # rather than the curl utility that comes with MacOS:
+   # TODO: create folder then
+   #wget "https://github.com/wilsonmar/$REPO"
+   # or:
+   git clone https://github.com/wilsonmar/git-utilities.git --depth=1  # only master branche, no history
+   # see video: https://asciinema.org/a/41811?autoplay=1
+fi
+
+
+######### Read and use secrets.sh file:
+
+
+# If the file still contains defaults, it should not be used:
+SECRETSFILE="secrets.sh"
+if [ ! -f "$SECRETSFILE" ]; then #  NOT found:
+   fancy_echo "$SECRETSFILE not found. Aborting run ..."
+   exit
+fi
+
+if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then  # not customized:
+   fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
+   exit  # so script ends now
+else
+   fancy_echo "Reading from $SECRETSFILE ..."
+   #chmod +x $SECRETSFILE
+   source "$SECRETSFILE"
+
+   echo -e "\n   git ls-files -v|grep '^h' ::" >>$THISSCRIPT.log
+   git update-index --skip-worktree $SECRETSFILE
+   echo "$(git ls-files -v|grep '^S')" >>$THISSCRIPT.log
+
+   echo -e "\n   $SECRETSFILE ::" >>$THISSCRIPT.log
+   echo "GIT_NAME=$GIT_NAME">>$THISSCRIPT.log
+   echo "GIT_ID=$GIT_ID" >>$THISSCRIPT.log
+   echo "GIT_EMAIL=$GIT_EMAIL" >>$THISSCRIPT.log
+   echo "GIT_USERNAME=$GIT_USERNAME" >>$THISSCRIPT.log
+   echo "GITS_PATH=$GITS_PATH" >>$THISSCRIPT.log
+   echo "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >>$THISSCRIPT.log
+   echo "GITHUB_REPO=$GITHUB_REPO" >>$THISSCRIPT.log
+   # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
+   echo "GIT_CLIENT=$GIT_CLIENT" >>$THISSCRIPT.log
+   echo "GIT_EDITOR=$GIT_EDITOR" >>$THISSCRIPT.log
+   echo "WORK_REPO=$WORK_REPO" >>$THISSCRIPT.log # i.e. git://example.com/some-big-repo.git"
+   echo "GIT_BROWSER=$GIT_BROWSER" >>$THISSCRIPT.log
+   echo "GIT_TOOLS=$GIT_TOOLS" >>$THISSCRIPT.log
+   echo "GIT_LANG=$GUI_LANG" >>$THISSCRIPT.log
+   echo "GUI_TEST=$GUI_TEST" >>$THISSCRIPT.log
+   echo "JAVA_TOOLS=$JAVA_TOOLS" >>$THISSCRIPT.log
+   echo "PYTHON_TOOLS=$PYTHON_TOOLS" >>$THISSCRIPT.log
+   echo "CLOUD=$CLOUD" >>$THISSCRIPT.log
+   echo "TRYOUT=$TRYOUT" >>$THISSCRIPT.log
+fi 
+
+
+
 ######### ~/.gitconfig initial settings:
 
 
@@ -549,7 +629,6 @@ fi
 
 
 ######### Git web browser setting:
-
 
 
 # Install browser using Homebrew to display GitHub to paste SSH key at the end.
@@ -707,24 +786,6 @@ echo "The last one installed is set as the Git client."
           # https://www.slant.co/topics/465/~best-git-clients-for-macos
 
 
-if ! command -v git >/dev/null; then
-    fancy_echo "Installing git using Homebrew ..."
-    brew install git
-else
-    if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-       git --version
-       fancy_echo "Git already installed: UPGRADE requested..."
-       # To avoid response "Error: git not installed" to brew upgrade git
-       brew uninstall git
-       # QUESTION: This removes .gitconfig file?
-       brew install git
-    else
-       fancy_echo "Git already installed:"
-    fi
-fi
-echo -e "\n$(git --version)"            >>$THISSCRIPT.log
-#git --version
-    # git version 2.14.3 (Apple Git-98)
 
 #[core]
 #  editor = vim
@@ -1408,16 +1469,26 @@ fi
    git config --global user.id       "$GIT_ID"
    git config --global user.username "$GIT_USERNAME"
 
+
+
+######### ~/.gitignore settings:
+
+
 #[core]
 #	# Use custom `.gitignore`
 #	excludesfile = ~/.gitignore
 #   hitespace = space-before-tab,indent-with-non-tab,trailing-space
 
-#fancy_echo "Configuring core git settings ..."
-   # Use custom `.gitignore`
-   git config --global core.excludesfile "~/.gitignore"
+GITIGNORE_PATH="$HOME/.gitignore_global"
+if [ ! -f $GITIGNORE_PATH ]; then 
+   fancy_echo "Copy to $GITIGNORE_PATH."
+   cp ".gitignore_global" $GITIGNORE_PATH
+
+   git config --global core.excludesfile "$GITIGNORE_PATH"
    # Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
    git config --global core.hitespace "space-before-tab,indent-with-non-tab,trailing-space"
+fi
+
 
 
 ######### Git coloring in .gitconfig:
@@ -1748,7 +1819,79 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       fi
    echo -e "\n$(jmeter --version)" >>$THISSCRIPT.log
    fi
-fi
+
+   if grep -q "export JMETER_HOME=" "$BASHFILE" ; then    
+      fancy_echo "JMETER_HOME alias already in $BASHFILE"
+   else
+      fancy_echo "Adding JMETER_HOME in $BASHFILE..."
+      echo "export JMETER_HOME='/usr/local/Cellar/jmeter/3.3'" >>"$BASHFILE"
+      source $BASHFILE
+   fi 
+
+   FILE="jmeter-plugins-manager-0.5.jar"  # TODO: Check if version has changed since Jan 4, 2018.
+   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-manager.jar"
+   if [ -f $FILE_PATH ]; then  # file exists within folder 
+      fancy_echo "$FILE already installed. Skipping install."
+      ls -al             $FILE_PATH
+   else
+      fancy_echo "Downloading $FILE to $FOLDER ..."
+      # From https://jmeter-plugins.org/wiki/StandardSet/
+      curl -O http://jmeter-plugins.org/downloads/file/$FILE  # 994 received. 
+      fancy_echo "Overwriting $FILE_PATH ..."
+      yes | cp -rf $FILE  $FILE_PATH 
+      ls -al             $FILE_PATH
+   fi
+
+   FILE="jmeter-plugins-extras-1.4.0.jar"  # TODO: Check if version has changed since Jan 4, 2018.
+   # From https://jmeter-plugins.org/downloads/old/
+   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-extras.jar"
+   if [ -f $FILE_PATH ]; then  # file exists within folder 
+      fancy_echo "$FILE already installed. Skipping install."
+      ls -al             $FILE_PATH
+   else
+      fancy_echo "Downloading $FILE_PATH ..."
+      # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-extras
+      curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-extras/1.4.0/jmeter-plugins-extras-1.4.0.jar
+      # 400K received. 
+      fancy_echo "Overwriting $FILE_PATH ..."
+      yes | cp -rf $FILE $FILE_PATH
+      ls -al             $FILE_PATH
+   fi
+
+   FILE="jmeter-plugins-standard-1.4.0.jar"  # TODO: Check if version has changed since Jan 4, 2018.
+      # From https://jmeter-plugins.org/downloads/old/
+      # From https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-1.4.0.zip
+   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-standard.jar"
+   if [ -f $FILE_PATH ]; then  # file exists within folder 
+      fancy_echo "$FILE already installed. Skipping install."
+      ls -al             $FILE_PATH
+   else
+      fancy_echo "Downloading $FILE_PATH ..."
+      # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-standard
+      curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-standard/1.4.0/jmeter-plugins-standard-1.4.0.jar
+      # 400K received. 
+      fancy_echo "Overwriting $FILE_PATH ..."
+      yes | cp -rf $FILE $FILE_PATH
+      ls -al             $FILE_PATH
+   fi
+
+   FILE="jmeter-plugins-extras-libs-1.4.0.jar"  # TODO: Check if version has changed since Jan 4, 2018.
+      # From https://jmeter-plugins.org/downloads/old/
+   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-extras-libs.jar"
+   if [ -f $FILE_PATH ]; then  # file exists within folder 
+      fancy_echo "$FILE already installed. Skipping install."
+      ls -al             $FILE_PATH
+   else
+      fancy_echo "Downloading $FILE_PATH ..."
+      # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-extras-libs
+      curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-extras-libs/1.4.0/jmeter-plugins-extras-libs-1.4.0.jar
+      # 400K received. 
+      fancy_echo "Overwriting $FILE_PATH ..."
+      yes | cp -rf $FILE $FILE_PATH
+      ls -al             $FILE_PATH
+   fi
+fi # JAVA_TOOLS" == *"jmeter
+
 
 if [[ "$JAVA_TOOLS" == *"jprofiler"* ]]; then
    if ! command -v jprofiler >/dev/null; then
@@ -2073,6 +2216,9 @@ if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
    # eval $(docker-machine env default)
    # docker-machine upgrade dev1
    # docker-machine rm dev2fi
+   # https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
+fi
+
 
 # See https://wilsonmar.github.io/gcp
 if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
@@ -2196,7 +2342,51 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
       # ... and many other lines.
 fi
 
-# TODO: OpenStack
+
+
+if [[ $CLOUD == *"openstack"* ]]; then  # contains openstack.
+   # See https://iujetstream.atlassian.net/wiki/spaces/JWT/pages/40796180/Installing+the+Openstack+clients+on+OS+X
+   PYTHON_INSTALL  # function defined at top of this file.
+   if ! command -v openstack >/dev/null; then  # not installed.
+      fancy_echo "Installing openstack using Homebrew ..."
+      brew install openstack
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "openstack already installed: UPGRADE requested..."
+         openstack --version | grep openstack
+            # openstack (2.0.18)
+            # ... and many other lines.
+         brew upgrade openstack
+      else
+         fancy_echo "openstack already installed."
+      fi
+   fi
+   echo -e "\n$(openstack --version | grep openstack)" >>$THISSCRIPT.log
+   # openstack --version | grep openstack
+      # openstack (2.0.30)
+      # ... and many other lines.
+
+   if [[ $TRYOUT == *"openstack"* ]]; then  # contains openstack.
+      OPENSTACK_PROJECT="openstack1"
+      # Start the VirtualEnvironment software:
+      virtualenv "$OPENSTACK_PROJECT"
+
+      # Activate the VirtualEnvironment for the project:
+      source "$OPENSTACK_PROJECT/bin/activate"
+
+      # Install OpenStack clients:
+      pip install python-keystoneclient python-novaclient python-heatclient python-swiftclient python-neutronclient python-cinderclient python-glanceclient python-openstackclient
+
+      # Set up your OpenStack credentials: See Setting up openrc.sh for details.
+      source .openrc
+
+      # Test a non-destructive Open Stack command:
+      openstack image list
+   fi
+fi
+
+
+
 # https://docs.openstack.org/mitaka/user-guide/common/cli_install_openstack_command_line_clients.html
 
 # TODO: IBM's Cloud CLI from brew? brew search did not find it.
@@ -2234,8 +2424,28 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
 fi
 
 
-# Docker:
-# https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
+######### Virtualenv for Python 2 and Python3:
+
+
+   # virtualenv supports both Python2 and Python3.
+   # virtualenv -p "$(command -v python)" python-tests/basic-python2
+      #New python executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python2.7
+      #Also creating executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python
+      # Installing setuptools, pip, wheel...
+   # virtualenv -p "$(command -v python3)" python-tests/basic-python3
+   # virtualenv -p "c:\Python34\python.exe foo
+   if [[ "$PYTHON_TOOLS" == *"virtualenv"* ]]; then
+      if ! command -v virtualenv >/dev/null; then  # /usr/bin/virtualenvdriver
+         fancy_echo "Installing PYTHON_TOOLS=\"virtualenv\" to manage multiple Python versions ..."
+         pip3 install virtualenv
+         pip3 install virtualenvwrapper
+         source /usr/local/bin/virtualenvwrapper.sh
+      else
+         fancy_echo "No upgrade on MacOS for PYTHON_TOOLS=\"virtualenv\"."
+      fi
+      #fancy_echo "Opening virtualenv ..."
+      #virtualenv
+   fi
 
 
 ######### SSH-KeyGen:

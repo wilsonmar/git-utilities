@@ -1,0 +1,19 @@
+2018-04-04 13:13:00,910 INFO o.a.j.u.JMeterUtils: Setting Locale to en_US
+2018-04-04 13:13:00,922 INFO o.a.j.JMeter: Loading user properties from: /usr/local/Cellar/jmeter/3.3/libexec/bin/user.properties
+2018-04-04 13:13:00,922 INFO o.a.j.JMeter: Loading system properties from: /usr/local/Cellar/jmeter/3.3/libexec/bin/system.properties
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: Copyright (c) 1998-2017 The Apache Software Foundation
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: Version 3.3 r1808647
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: java.version=1.8.0_162
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: java.vm.name=Java HotSpot(TM) 64-Bit Server VM
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: os.name=Mac OS X
+2018-04-04 13:13:00,928 INFO o.a.j.JMeter: os.arch=x86_64
+2018-04-04 13:13:00,929 INFO o.a.j.JMeter: os.version=10.13.3
+2018-04-04 13:13:00,929 INFO o.a.j.JMeter: file.encoding=utf-8
+2018-04-04 13:13:00,929 INFO o.a.j.JMeter: Max memory     =536870912
+2018-04-04 13:13:00,929 INFO o.a.j.JMeter: Available Processors =8
+2018-04-04 13:13:00,934 INFO o.a.j.JMeter: Default Locale=English (United States)
+2018-04-04 13:13:00,934 INFO o.a.j.JMeter: JMeter  Locale=English (United States)
+2018-04-04 13:13:00,934 INFO o.a.j.JMeter: JMeterHome=/usr/local/Cellar/jmeter/3.3/libexec
+2018-04-04 13:13:00,934 INFO o.a.j.JMeter: user.dir  =/Users/wilsonmar/gits/wilsonmar/git-utilities
+2018-04-04 13:13:00,934 INFO o.a.j.JMeter: PWD       =/Users/wilsonmar/gits/wilsonmar/git-utilities
+2018-04-04 13:13:00,938 INFO o.a.j.JMeter: IP: 10.0.0.5 Name: Wilsons-MacBook-Pro.local FullName: 10.0.0.5
