@@ -5,6 +5,8 @@
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
+alias c="clear"
+alias p="pwd"
 alias dir='ls -alr'
 alias ll='ls -FalhG'
 

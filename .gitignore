@@ -1,6 +1,7 @@
 # .gitignore file
 
-.secrets.sh
+*.log
+secrets.sh
 temp
 tempfile
 temp.sh
@@ -149,3 +150,4 @@ jspm_packages
 # Optional REPL history:
 .node_repl_history
 
+.gitsecret/keys/random_seed

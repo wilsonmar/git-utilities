@@ -1,9 +1,9 @@
 #!/bin/bash
-# Sample file .secrets.sh in https://github.com/wilsonmar/git-utilities
-# referenced by mac-git-install.sh also in https://github.com/wilsonmar/git-utilities
-# This file name .secrets.sh should be specified in .gitignore so 
+# Sample secrets.sh in https://github.com/wilsonmar/git-utilities
+# referenced by mac-git-install.sh in https://github.com/wilsonmar/git-utilities
+# This file name secrets.sh should be specified in .gitignore so 
 #    it doesn't upload to a public GitHub/BitBucket, etc.
-# Command source .secrets.sh pull these variables in:
+# Run command source secrets.sh pulls these variables in:
 # CAUTION: No spaces around = sign.
 GIT_NAME="Wilson Mar"
 GIT_ID="WilsonMar@gmail.com"
@@ -25,13 +25,13 @@ GIT_CLIENT="git"
 GIT_EDITOR="vim"
           # atom, code, eclipse, emacs, intellij, macvim, nano, pico, sts, sublime, textmate, textedit, vim
           # NOTE: pico, nano, and vim are built into MacOS, so no install.
-CLOUD="azure, terraform"
-     # none, aws, gcp, azure, cf, terraform, serverless
+CLOUD="vagrant"
+     # none, aws, gcp, azure, cf, terraform, serverless, docker, vagrant  NOT: openstack
 
 GIT_LANG="python"
         # python, java, node, go
-JAVA_TOOLS="none"
-        # gcviewer, jmeter, jprofiler
+JAVA_TOOLS="gcviewer, jmeter, jprofiler"
+          # gcviewer, jmeter, jprofiler
 GUI_TEST="selenium"
         # selenium, sikulix
         # Drivers for scripting language depend on what is defined in $GIT_LANG.

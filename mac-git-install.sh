@@ -2,11 +2,12 @@
 
 # mac-git-install.sh in https://github.com/wilsonmar/git-utilities
 # This establishes all the utilities related to use of Git,
-# customized based on specification in file .secrets.sh within the same repo.
+# customized based on specification in file secrets.sh within the same repo.
 # See https://github.com/wilsonmar/git-utilities/blob/master/README.md
 # Based on https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 # and https://git-scm.com/docs/git-config
 # and https://medium.com/my-name-is-midori/how-to-prepare-your-fresh-mac-for-software-development-b841c05db18
+# https://www.bonusbits.com/wiki/Reference:Mac_OS_DevOps_Workstation_Setup_Check_List
 
 # TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > 
 # Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
@@ -57,7 +58,7 @@ function PYTHON_INSTALL(){
       brew install python
       # Not brew install pyenv  # Python environment manager.
 
-      # brew cask install anaconda
+      # brew cask install --appdir="/Applications" anaconda
       # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
       # variable, eg (for bash shell):
       # export PATH=/usr/local/anaconda3/bin:"$PATH"
@@ -122,7 +123,7 @@ function PYTHON3_INSTALL(){
       fancy_echo "Installing Python3, a pre-requisite for awscli and azure ..."
       brew install python3
 
-      # brew cask install anaconda
+      # brew cask install --appdir="/Applications" anaconda
       # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
       # variable, eg (for bash shell):
       # export PATH=/usr/local/anaconda3/bin:"$PATH"
@@ -169,22 +170,16 @@ function JAVA_INSTALL(){
       fancy_echo "Installing Java, a pre-requisite for Selenium, JMeter, etc. ..."
       # Don't rely on Oracle to install Java properly on your Mac.
       brew tap caskroom/versions
-      brew cask install java8
+      brew cask install --appdir="/Applications" java8
    else
       # CAUTION: A specific version of JVM needs to be specified because code that use it need to be upgraded.
           fancy_echo "Java already installed"
    fi
 
-   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
-   if [ ! -z ${JAVA_HOME+x} ]; then 
-      echo "$JAVA_HOME=$JAVA_HOME"
-   else 
-      echo "JAVA_HOME being set ..." # per http://sourabhbajaj.com/mac-setup/Java/
-      echo "export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)" >>$BASHFILE
-      #echo "export JAVA_HOME=$(/usr/libexec/java_home -v 9)" >>$BASHFILE
-      source $BASHFILE
-   fi
-
+   TEMP=$(java -version | grep "java version") # | cut -d'=' -f 2 ) # | awk -F= '{ print $2 }'
+   JAVA_VERSION=${TEMP#*=};
+   echo "JAVA_VERSION=$JAVA_VERSION"
+   export JAVA_VERSION=$(java -version)
    echo -e "\n$(java -version)" >>$THISSCRIPT.log
       # java version "1.8.0_144"
       # Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
@@ -192,7 +187,18 @@ function JAVA_INSTALL(){
    echo -e "$($JAVA_HOME)" >>$THISSCRIPT.log
       # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home is a directory
 
-   export JAVA_VERSION=$(java -version)
+   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+   if [ ! -z ${JAVA_HOME+x} ]; then  # variable has NOT been defined already.
+      echo "$JAVA_HOME=$JAVA_HOME"
+   else 
+      echo "JAVA_HOME being set ..." # per http://sourabhbajaj.com/mac-setup/Java/
+      echo "export JAVA_HOME=$(/usr/libexec/java_home -v $JAVA_VERSION)" >>$BASHFILE
+      #echo "export JAVA_HOME=$(/usr/libexec/java_home -v 9)" >>$BASHFILE
+   fi
+   # /Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home
+   #   echo "export IDEA_JDK=$(/usr/libexec/java_home -v $JAVA_VERSION)" >>$BASHFILE
+   #   echo "export RUBYMINE_JDK=$(/usr/libexec/java_home -v $JAVA_VERSION)" >>$BASHFILE
+      source $BASHFILE
 
     # Associated: Maven (mvn) in /usr/local/opt/maven/bin/mvn
    if ! command -v mvn >/dev/null; then
@@ -238,10 +244,10 @@ function NODE_INSTALL(){
       else
          fancy_echo "nvm already installed."
       fi
-   fi
-   nvm --version
+      nvm --version
       #0.33.8
-
+   fi
+   
    if ! command -v node >/dev/null; then  # /usr/local/bin/node
       fancy_echo "Installing node using nvm"
       nvm install node  # use nvm to install the latest version of node.
@@ -374,11 +380,16 @@ FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6)
 # video: https://asciinema.org/a/41811?autoplay=1
 
 
-######### Read and use .secrets.sh file:
+######### Read and use secrets.sh file:
 
 
 # If the file still contains defaults, it should not be used:
-SECRETSFILE=".secrets.sh"
+SECRETSFILE="secrets.sh"
+if [ ! -f "$SECRETSFILE" ]; then #  NOT found:
+   fancy_echo "$SECRETSFILE not found. Aborting run ..."
+   exit
+fi
+
 if grep -q "wilsonmar@gmail.com" "$SECRETSFILE" ; then  # not customized:
    fancy_echo "Please edit file $SECRETSFILE with your own credentials. Aborting this run..."
    exit  # so script ends now
@@ -542,7 +553,7 @@ fi
 
 
 # Install browser using Homebrew to display GitHub to paste SSH key at the end.
-fancy_echo "GIT_BROWSER=$GIT_BROWSER in .secrets.sh ..."
+fancy_echo "GIT_BROWSER=$GIT_BROWSER in secrets.sh ..."
       echo "The last one installed is set as the Git browser."
 
 
@@ -688,7 +699,7 @@ brew install shellcheck
 ######### Git clients:
 
 
-fancy_echo "GIT_CLIENT=$GIT_CLIENT in .secrets.sh ..."
+fancy_echo "GIT_CLIENT=$GIT_CLIENT in secrets.sh ..."
 echo "The last one installed is set as the Git client."
 # See https://www.slant.co/topics/465/~best-git-clients-for-macos
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
@@ -1013,7 +1024,7 @@ fi
 ######### Text editors:
 
 
-# Specified in .secrets.sh
+# Specified in secrets.sh
           # nano, pico, vim, sublime, code, atom, macvim, textmate, emacs, intellij, sts, eclipse.
           # NOTE: nano and vim are built into MacOS, so no install.
 fancy_echo "GIT_EDITOR=$GIT_EDITOR..."
@@ -1702,7 +1713,9 @@ else
    fancy_echo "git-commit file found in .git/hooks. Skipping ..."
 fi
 
+
 ######### JAVA_TOOLS:
+
 
 if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
    if ! command -v gcviewer >/dev/null; then
@@ -1710,13 +1723,14 @@ if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
       brew install gcviewer
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         gcviewer --version
+         # gcviewer --version
          fancy_echo "JAVA_TOOLS=gcviewer already installed: UPGRADE requested..."
-         brew install gcviewer 
+         brew upgrade gcviewer 
+            # gcviewer 1.35 already installed
       else
          fancy_echo "gcviewer already installed:"
       fi
-      echo -e "\n$(gcviewer --version)" >>$THISSCRIPT.log
+      #echo -e "\n$(gcviewer --version)" >>$THISSCRIPT.log
    fi
 fi
 
@@ -1739,12 +1753,12 @@ fi
 if [[ "$JAVA_TOOLS" == *"jprofiler"* ]]; then
    if ! command -v jprofiler >/dev/null; then
       fancy_echo "Installing JAVA_TOOLS=jprofiler ..."
-      brew install jprofiler
+      brew cask install --appdir="/Applications" jprofiler
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          jprofiler --version
          fancy_echo "JAVA_TOOLS=jprofiler already installed: UPGRADE requested..."
-         brew install jprofiler 
+         brew cask install --appdir="/Applications" jprofiler 
       else
          fancy_echo "jprofiler already installed:"
       fi
@@ -1752,6 +1766,8 @@ if [[ "$JAVA_TOOLS" == *"jprofiler"* ]]; then
    echo -e "\n$(jprofiler --version)" >>$THISSCRIPT.log
 fi
 
+# https://www.bonusbits.com/wiki/HowTo:Setup_Charles_Proxy_on_Mac
+# brew install nmap
 
 ######### TODO: Code review:
 
@@ -1958,13 +1974,113 @@ fi
 # See https://cloud.google.com/sdk/docs/
 echo "CLOUD=$CLOUD"
 
+if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
+   if ! command -v vagrant >/dev/null; then
+      fancy_echo "Installing vagrant ..."
+      brew cask install --appdir="/Applications" vagrant
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "vagrant already installed: UPGRADE requested..."
+         vagrant --version
+            # Vagrant 2.0.0
+         brew cask upgrade vagrant
+      else
+         fancy_echo "vagrant already installed."
+      fi
+   fi
+   echo -e "\n$(vagrant --version)" >>$THISSCRIPT.log
+
+
+   if [ ! -d "/Applications/VirtualBox.app" ]; then 
+   #if ! command -v virtualbox >/dev/null; then  # /usr/local/bin/virtualbox
+      fancy_echo "Installing virtualbox ..."
+      brew cask install --appdir="/Applications" virtualbox
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "virtualbox already installed: UPGRADE requested..."
+         # virtualbox --version
+         brew cask upgrade virtualbox
+      else
+         fancy_echo "virtualbox already installed."
+      fi
+   fi
+   #echo -e "\n$(virtualbox --version)" >>$THISSCRIPT.log
+
+
+   if [ ! -d "/Applications/Vagrant Manager.app" ]; then 
+      fancy_echo "Installing vagrant-manager ..."
+      brew cask install --appdir="/Applications" vagrant-manager
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "vagrant-manager already installed: UPGRADE requested..."
+         brew cask upgrade vagrant-manager
+      else
+         fancy_echo "vagrant-manager already installed."
+      fi
+   fi
+   
+   # Create a test directory and cd into the test directory.
+   #vagrant init precise64  # http://files.vagrantup.com/precise64.box
+   #vagrant up
+   #vagrant ssh  # into machine
+   #vagrant suspend
+   #vagrant halt
+   #vagrant destroy 
+fi
+
+
+if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
+   # First remove boot2docker and Kitematic https://github.com/boot2docker/boot2docker/issues/437
+   if ! command -v docker >/dev/null; then  # /usr/local/bin/docker
+      fancy_echo "Installing docker ..."
+      brew install docker  docker-compose  docker-machine  xhyve  docker-machine-driver-xhyve
+      # This creates folder ~/.docker
+      # Docker images are stored in $HOME/Library/Containers/com.docker.docker
+      brew link --overwrite docker
+      # /usr/local/bin/docker -> /Applications/Docker.app/Contents/Resources/bin/docker
+      brew link --overwrite docker-machine
+      brew link --overwrite docker-compose
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "docker already installed: UPGRADE requested..."
+         docker version
+         brew upgrade docker-machine-driver-xhyve
+         brew upgrade xhyve
+         brew upgrade docker-compose  
+         brew upgrade docker-machine 
+         brew upgrade docker 
+      else
+         fancy_echo "docker already installed."
+      fi
+   fi
+   echo -e "\n$(docker --version)" >>$THISSCRIPT.log
+      # Docker version 18.03.0-ce, build 0520e24
+   echo -e "\n$(docker version)" >>$THISSCRIPT.log
+      # Client:
+       # Version:	18.03.0-ce
+       # API version:	1.37
+       # Go version:	go1.9.4
+       # Git commit:	0520e24
+       # Built:	Wed Mar 21 23:06:22 2018
+       # OS/Arch:	darwin/amd64
+       # Experimental:	false
+       # Orchestrator:	swarm
+
+   # docker-machine --help
+   # Create a machine:
+   # docker-machine create default --driver xhyve --xhyve-experimental-nfs-share
+   # docker-machine create -d virtualbox dev1
+   # eval $(docker-machine env default)
+   # docker-machine upgrade dev1
+   # docker-machine rm dev2fi
+
 # See https://wilsonmar.github.io/gcp
 if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
    if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
-      fancy_echo "Installing CLOUD=$CLOUD = brew cask install google-cloud-sdk ..."
+      fancy_echo "Installing CLOUD=$CLOUD = brew cask install --appdir="/Applications" google-cloud-sdk ..."
       PYTHON_INSTALL  # function defined at top of this file.
       brew tap caskroom/cask
-      brew cask install google-cloud-sdk  # to ./google-cloud-sdk
+      brew cask install --appdir="/Applications" google-cloud-sdk  # to ./google-cloud-sdk
       gcloud --version
          # Google Cloud SDK 194.0.0
          # bq 2.0.30
@@ -2080,6 +2196,8 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
       # ... and many other lines.
 fi
 
+# TODO: OpenStack
+# https://docs.openstack.org/mitaka/user-guide/common/cli_install_openstack_command_line_clients.html
 
 # TODO: IBM's Cloud CLI from brew? brew search did not find it.
 # is installed on MacOS by package IBM_Cloud_CLI_0.6.6.pkg from
@@ -2206,7 +2324,7 @@ fi
    fancy_echo "Now you copy contents of \"${FILEPATH}.pub\", "
    echo "and paste into GitHub, Settings, New SSH Key ..."
 #   open https://github.com/settings/keys
-   ## TODO: Add a token using GitHub API from credentials in .secrets.sh 
+   ## TODO: Add a token using GitHub API from credentials in secrets.sh 
 
    fancy_echo "Pop up from folder ~/.ssh ..."
    popd
