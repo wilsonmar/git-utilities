@@ -26,6 +26,8 @@ fancy_echo() {
   printf "\\n>>> $fmt\\n" "$@"
 }
 
+fancy_echo "here"
+
 # Add function to read in string and email, and return a KEY found for that email.
 # GPG_MAP_MAIL2KEY associates the key and email in an array
 function GPG_MAP_MAIL2KEY(){
@@ -2386,6 +2388,42 @@ if [[ $CLOUD == *"openstack"* ]]; then  # contains openstack.
 fi
 
 
+if [[ $CLOUD == *"minikube"* ]]; then 
+   # See https://kubernetes.io/docs/getting-started-guides/minikube/
+   PYTHON_INSTALL  # function defined at top of this file.
+   if ! command -v minikube >/dev/null; then  # not in /usr/local/bin/minikube
+      fancy_echo "Installing minikube using Homebrew ..."
+      brew cask install minikube
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "minikube already installed: UPGRADE requested..."
+         minikube version  # minikube version: v0.25.2 
+            # ... and many other lines.
+         brew cask upgrade minikube
+      else
+         fancy_echo "minikube already installed."
+      fi
+   fi
+   echo -e "\n$(minikube version)" >>$THISSCRIPT.log  # version: v0.25.2 
+
+   if [[ $TRYOUT == *"minikube"* ]]; then  # run minikube
+      # minikube start
+         # Starting local Kubernetes cluster...
+         # Running pre-create checks...
+         # Creating machine...
+         # Starting local Kubernetes cluster...
+
+      # kubectl run hello-minikube --image=k8s.gcr.io/echoserver:1.4 --port=8080
+         # deployment "hello-minikube" created
+      $ kubectl expose deployment hello-minikube --type=NodePort
+         # service "hello-minikube" exposed
+   fi
+else
+   if [[ $TRYOUT == *"minikube"* ]]; then
+      fancy_echo "ERROR: CLOUD != \"minikube\" but TRYOUT contains minikube."
+   fi
+fi
+
 
 # https://docs.openstack.org/mitaka/user-guide/common/cli_install_openstack_command_line_clients.html
 
@@ -2615,6 +2653,7 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
 
 
 ######### GitHub hub to manage GitHub functions:
+
 
 if [[ "$GIT_TOOLS" == *"hub"* ]]; then
    GO_INSTALL  # prerequiste
