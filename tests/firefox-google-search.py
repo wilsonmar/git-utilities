@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 # from http://www.techbeamers.com/selenium-webdriver-python-tutorial/
 
 from selenium import webdriver

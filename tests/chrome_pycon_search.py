@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # chrome_pycon_search.py
 # from http://selenium-python.readthedocs.io/getting-started.html#selenium-remote-webdriver
 from selenium import webdriver

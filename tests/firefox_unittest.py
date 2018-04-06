@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # python_firefox_unittest.py
 # from https://saucelabs.com/resources/articles/getting-started-with-webdriver-in-python-on-osx
 import unittest

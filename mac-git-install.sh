@@ -12,10 +12,16 @@
 # https://www.bonusbits.com/wiki/Reference:Mac_OS_DevOps_Workstation_Setup_Check_List
 
 # TOC: Functions (GPG_MAP_MAIL2KEY, Python, Python3, Java, Node, Go, Docker) > 
-# Secrets > OSX > XCode/Ruby > bash.profile > Brew > gitconfig > gitignore > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
+# Starting: Secrets > XCode > XCode/Ruby > bash.profile > Brew > gitconfig > gitignore > Git web browsers > p4merge > linters > Git clients > git users > git tig > BFG > gitattributes > Text Editors > git [core] > git coloring > rerere > prompts > bash command completion > git command completion > Git alias keys > Git repos > git flow > git hooks > Large File Storage > gcviewer, jmeter, jprofiler > code review > git signing > Cloud CLI/SDK > Selenium > SSH KeyGen > SSH Config > Paste SSH Keys in GitHub > GitHub Hub > dump contents > disk space > show log
 
-set -a
+# set -eou pipefail  # "strict mode"
+# set -u  # -uninitialised variable exits script.
+# set -e  # -exit the script if any statement returns a non-true return value.
+# set -a  # Mark variables which are modified or created for export. Each variable or function that is created or modified is given the export attribute and marked for export to the environment of subsequent commands. 
+# set -v  # -verbose Prints shell input lines as they are read.
+bar=${MY_RUNTYPE:-none} # :- sets undefine value. See http://redsymbol.net/articles/unofficial-bash-strict-mode/
 
+IFS=$'\n\t'  #  Internal Field Separator for word splitting is line or tab, not spaces.
 
 ######### Bash function definitions:
 
@@ -26,7 +32,6 @@ fancy_echo() {
   printf "\\n>>> $fmt\\n" "$@"
 }
 
-fancy_echo "here"
 
 # Add function to read in string and email, and return a KEY found for that email.
 # GPG_MAP_MAIL2KEY associates the key and email in an array
@@ -127,14 +132,18 @@ function PYTHON_INSTALL(){
          source "$BASHFILE"
          #echo "$PATH"
 
+      # TODO: Python add-ons
       #brew install freetype  # http://www.freetype.org to render fonts
+      #brew install openexr
+      #brew install freeimage
+      #brew install gmp
       #fancy_echo "Installing other popular Python helper modules ..."
       #pip install jupyter
       #pip install numpy
       #pip install scipy
       #pip install matplotlib
       #pip install ipython[all]	  
-
+  
    # There is also a Enthought Python Distribution -- www.enthought.com
 }
 
@@ -245,24 +254,6 @@ function JAVA_INSTALL(){
    #   echo "export RUBYMINE_JDK=$(/usr/libexec/java_home -v $JAVA_VERSION)" >>$BASHFILE
       source $BASHFILE
 
-    # Associated: Maven (mvn) in /usr/local/opt/maven/bin/mvn
-   if ! command -v mvn >/dev/null; then
-      fancy_echo "Installing Maven for Java ..."
-      brew install maven
-   fi
-   echo -e "$(mvn --version)" >>$THISSCRIPT.log
-
-   if ! command -v ant >/dev/null; then
-     fancy_echo "Installing ant utlity ..."
-     brew install ant
-     ant -v
-   else
-     fancy_echo "ant already installed. Skipping install."
-     ant -v
-   fi
-   # Ant can pick up the Test.jmx file, execute it, and generate an easily-readable HTML report.
-
-   # TODO: gradle
    # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
 }
 
@@ -287,7 +278,7 @@ function NODE_INSTALL(){
    if ! command -v nvm >/dev/null; then  # /usr/local/bin/node
       fancy_echo "Installing nvm (to manage node versions)"
       brew install nvm  # curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
-
+         # 0.33.8 
       # TODO: How to tell if nvm.sh has run?
       fancy_echo "Running /usr/local/opt/nvm/nvm.sh ..."
       source "/usr/local/opt/nvm/nvm.sh"  # nothing returned.
@@ -298,17 +289,14 @@ function NODE_INSTALL(){
       else
          fancy_echo "nvm already installed."
       fi
-      nvm --version
-      #0.33.8
    fi
+   nvm --version  #0.33.8
    
    if ! command -v node >/dev/null; then  # /usr/local/bin/node
       fancy_echo "Installing node using nvm"
       nvm install node  # use nvm to install the latest version of node.
          # v9.10.1...
-      nvm install --lts # lastest Long Term Support version
-         # v8.11.1...
-
+      nvm install --lts # lastest Long Term Support version  # v8.11.1...
       # nvm install 8.9.4  # install a specific version
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -318,62 +306,10 @@ function NODE_INSTALL(){
          fancy_echo "node already installed."
       fi
    fi
+   node --version
 
-   # TODO: nvm on
    # $NVM_HOME
-
-
-   #nvm use --delete-prefix v9.10.1  # to unset it.
-   #nvm use node
-      # nvm is not compatible with the npm config "prefix" option: currently set to "/usr/local/Cellar/nvm/0.33.8/versions/node/v9.10.1"
-   #node --version   # v9.10.1...
-   #npm --version    # 5.6.0
-
-   #nvm use --delete-prefix v8.11.1
-   #nvm use --lts
-      # Now using node v8.11.1 (npm v5.6.0)
-
-   #node --version   # v8.11.1
-   #npm --version    # 5.6.0
-
-   #nvm run 8.11.1 --version
-
-   # nvm which 8.9.4
-
    # $NODE_ENV 
-   
-   # npm (node package manager) installed with node.
-   # https://colorlib.com/wp/npm-packages-node-js/
-   #npm install -g mocha  # testing framework
-   #npm install -g chai   # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
-   # Alternative: karma, karma-cli
-   # browserify, bower, grunt, gulp/gulp-cli, webpack, 
-   # web: express, hapi, 
-   # front-end: angular, react, redux, Ember.js, Marionette.js
-   # Test React using Jest https://medium.com/@mathieux51/jest-selenium-webdriver-e25604969c6
-   # moment.js, graphicmagick, yeoman-generator
-   # cloud: aws-sdk 
-   # less, UglifyJS2, eslint, jslint, cfn-lint
-   # database: mongodb, redis 
-   # montebank security app
-   # nodemon, node-inspector
-
-   echo -e "\n  npm list -g --depth=0" >>$THISSCRIPT.log
-   echo -e "$(npm list -g --depth=0)" >>$THISSCRIPT.log
-      # v8.11.1
-      # v9.10.1
-      # node -> stable (-> v9.10.1) (default)
-      # stable -> 9.10 (-> v9.10.1) (default)
-      # iojs -> N/A (default)
-      # lts/* -> lts/carbon (-> v8.11.1)
-      # lts/argon -> v4.9.1 (-> N/A)
-      # lts/boron -> v6.14.1 (-> N/A)
-      # lts/carbon -> v8.11.1
-
-   # npm start
-
-   # mocha
-   # See https://github.com/creationix/howtonode.org by Tim Caswell
 }
 
 
@@ -391,8 +327,7 @@ function GO_INSTALL(){
          fancy_echo "go already installed."
       fi
    fi
-   go version
-      # go version go1.10.1 darwin/amd64
+   go version  # go version go1.10.1 darwin/amd64
 
       if grep -q "export GOPATH=" "$BASHFILE" ; then    
          fancy_echo "GOPATH already in $BASHFILE"
@@ -410,7 +345,9 @@ function GO_INSTALL(){
 
 
 TIME_START="$(date -u +%s)"
-fancy_echo "This is for MacOS only. Starting timer ..."
+FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+
+fancy_echo "Starting $0 on MacOS at ephoch $TIME_START ..."
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 
 THISSCRIPT="$0"   # "mac-git-install"
@@ -421,16 +358,8 @@ echo -e "$(sw_vers)"               >>$THISSCRIPT.log
 echo -e "\n   uname -a ::"         >>$THISSCRIPT.log
 echo -e "$(uname -a)"              >>$THISSCRIPT.log
 
-# The Available space from 2nd line, 6th item: 190920080
-   #Filesystem   1024-blocks      Used Available Capacity iused               ifree %iused  Mounted on
-   # /dev/disk1s1   488245284 294551984 190920080    61% 2470677 9223372036852305130    0%   /
-FREE_DISKBLOCKS_START=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
-echo -e "\n  FREE_DISKBLOCKS_START=$FREE_DISKBLOCKS_START" >>$THISSCRIPT.log
-
-
-
 # Read first parameter from command line supplied at runtime to invoke:
-MY_RUNTYPE=$1
+MY_RUNTYPE="$1"
 fancy_echo "MY_RUNTYPE=$MY_RUNTYPE"
 if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then # variable made lower case.
    echo "All packages here will be upgraded ..."
@@ -458,6 +387,24 @@ fi
 pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
    # Tools_Executables | grep version
    # version: 9.2.0.0.1.1510905681
+
+
+######### bash completion:
+
+echo -e "$(bash --version | grep 'bash')" >>$THISSCRIPT.log
+
+# BREW_VERSION="$(brew --version)"
+# TODO: Completion of bash commands on MacOS:
+# See https://kubernetes.io/docs/tasks/tools/install-kubectl/#on-macos-using-bash
+# Also see https://github.com/barryclark/bashstrap
+
+# TODO: Extract 4 from $BASH_VERSION
+      # GNU bash, version 4.4.19(1)-release (x86_64-apple-darwin17.3.0)
+
+## or, if running Bash 4.1+
+#brew install bash-completion@2
+## If running Bash 3.2 included with macOS
+#brew install bash-completion
 
 
 ######### bash.profile configuration:
@@ -589,16 +536,20 @@ GITHUB_REPO_URL="https://github.com/$GITHUB_ACCOUNT/$GITHUB_REPO.git"
 fancy_echo "GITHUB_REPO_URL=$GITHUB_REPO_URL"
 
 UTIL_REPO="git-utilities"
-if [ ! -d "$UTIL_REPO" ]; then #  directory NOT found:
-   fancy_echo "$(pwd)"
-   echo "Creating $UTIL_REPO repo under $(pwd)" >>$THISSCRIPT.log
+if [ -d "../$UTIL_REPO" ]; then #  already in
+   fancy_echo "Already in $UTIL_PROD"
+else
+   if [ ! -d "$UTIL_REPO" ]; then #  directory NOT found:
+      fancy_echo "$(pwd)"
+      echo "Creating $UTIL_REPO repo under $(pwd)" >>$THISSCRIPT.log
    
-   brew install wget  # rather than the curl utility that comes with MacOS:
-   # TODO: create folder then
-   #wget "https://github.com/wilsonmar/$REPO"
-   # or:
-   git clone https://github.com/wilsonmar/git-utilities.git --depth=1  # only master branche, no history
-   # see video: https://asciinema.org/a/41811?autoplay=1
+      brew install wget  # rather than the curl utility that comes with MacOS:
+      # TODO: create folder then
+      #wget "https://github.com/wilsonmar/$REPO"
+      # or:
+      git clone https://github.com/wilsonmar/git-utilities.git --depth=1  # only master branche, no history
+      # see video: https://asciinema.org/a/41811?autoplay=1
+   fi
 fi
 
 
@@ -793,7 +744,6 @@ else
 
    # See https://danlimerick.wordpress.com/2011/06/19/git-for-window-tip-use-p4merge-as-mergetool/
    # git difftool
-
 fi
 
 
@@ -806,7 +756,7 @@ fi
 # To ignore/override an error identified:
 # shellcheck disable=SC1091
 
-brew install shellcheck
+#brew install shellcheck
 
 # This enables Git hooks to run on pre-commit to check Bash scripts being committed.
 
@@ -820,8 +770,6 @@ echo "The last one installed is set as the Git client."
           # git, cola, github, gitkraken, smartgit, sourcetree, tower, magit, gitup. 
           # See https://git-scm.com/download/gui/linux
           # https://www.slant.co/topics/465/~best-git-clients-for-macos
-
-
 
 #[core]
 #  editor = vim
@@ -1001,7 +949,6 @@ if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
    fancy_echo "Starting GitUp in background ..."
    # gitup &
 fi
-
 
 
 ######### Git tig repo viewer:
@@ -1640,10 +1587,6 @@ fi
 # https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 # See http://maximomussini.com/posts/bash-git-prompt/
 
-# BTW, for completion of bash commands on MacOS:
-# brew install bash-completion
-# Also see https://github.com/barryclark/bashstrap
-
 if ! command -v brew >/dev/null; then
    fancy_echo "Installing bash-git-prompt using Homebrew ..."
    # From https://github.com/magicmonty/bash-git-prompt
@@ -1847,26 +1790,236 @@ else
 fi
 
 
+######### Node language:
+
+
+if [[ $GIT_LANG == *"node"* ]]; then
+     nvm --version
+   # Run with latest Long Term Stable version:
+      # nvm is not compatible with the npm config "prefix" option: currently set to "/usr/local/Cellar/nvm/0.33.8/versions/node/v9.10.1"
+   # a) Run with older Long Term Stable version:
+#      nvm run 8.11.1 --version
+      nvm use --lts  # (npm v5.6.0) 
+      RESPONSE=$(nvm use --delete-prefix v8.11.1)
+   # b) Run with current newest version:
+      #RESPONSE=$(nvm use --delete-prefix v9.10.1)
+
+      fancy_echo "RESPONSE=$RESPONSE"
+ #     node --version   # v8.11.1 or v9.10.1 
+      npm --version
+
+   # NOTE: NODE_TOOLS = npm (node package manager) installed within node.
+   # https://colorlib.com/wp/npm-packages-node-js/
+   # Task runners:
+   if [[ "${NODE_TOOLS,,}" == *"bower"* ]]; then
+      NPM_LIST=$(npm list -g bower | grep bower)
+      if ! grep -q "bowser" "$NPM_LIST" ; then
+         npm install -g bower  # like npm for GUI apps
+      fi
+   fi
+  
+   if [[ "${NODE_TOOLS,,}" == *"gulp-cli"* ]]; then
+      npm install -g gulp-cli
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"gulp"* ]]; then
+      npm install -g gulp
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"npm-check"* ]]; then
+      npm install -g npm-check
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"jscs"* ]]; then
+      npm install -g jscs
+   fi
+   # Linters: less, UglifyJS2, eslint, jslint, cfn-lint
+   if [[ "${NODE_TOOLS,,}" == *"less"* ]]; then
+      npm install -g less
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"jshint"* ]]; then
+      npm install -g jshint  # linter
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"eslint"* ]]; then
+      npm install -g eslint  # linter for ES6 javascript
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"webpack"* ]]; then
+      npm install -g webpack  # consolidate several javascript files into one file.
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"mocha"* ]]; then
+      npm install -g mocha # testing framework
+      exit # DEBUGGING
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"chai"* ]]; then
+      npm install -g chai # assertion library  "should", "expect", "assert" for BDD and TDD styles of programming 
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"browserify"* ]]; then
+      npm install -g browserify
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"tsc"* ]]; then
+      npm install -g tsc
+   fi
+   # web: express, hapi, 
+   if [[ "${NODE_TOOLS,,}" == *"express"* ]]; then
+      npm install -g express
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"hapi"* ]]; then
+      npm install -g hapi
+   fi
+   # front-end: angular, react, redux, Ember.js, Marionette.js
+   if [[ "${NODE_TOOLS,,}" == *"angular"* ]]; then
+      npm install -g angular
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"react"* ]]; then
+      npm install -g react  # Test using Jest https://medium.com/@mathieux51/jest-selenium-webdriver-e25604969c6
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"redux"* ]]; then
+      npm install -g redux
+   fi
+   
+   # moment.js, graphicmagick, yeoman-generator
+   if [[ "${NODE_TOOLS,,}" == *"graphicmagick"* ]]; then
+      npm install -g graphicmagick
+   fi
+
+   # cloud: aws-sdk
+   if [[ "${NODE_TOOLS,,}" == *"aws-sdk"* ]]; then
+      npm install -g aws-sdk
+   fi
+   # database: mongodb, redis 
+   if [[ "${NODE_TOOLS,,}" == *"mongodb"* ]]; then
+      npm install -g mongodb
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"redis"* ]]; then
+      npm install -g redis
+   fi
+   # montebank security app
+   # nodemon, node-inspector
+   # testing: enzyme, jest, 
+   if [[ "${NODE_TOOLS,,}" == *"mocha"* ]]; then
+      npm install -g mocha
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"karma"* ]]; then
+      npm install -g karma
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"karma-cli"* ]]; then
+      npm install -g karma-cli
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"jest"* ]]; then
+      npm install -g jest
+   fi
+   if [[ "${NODE_TOOLS,,}" == *"protractor"* ]]; then
+      npm install -g protractor  # https://github.com/mbcooper/ProtractorExample
+   fi
+
+   echo -e "\n  npm list -g --depth=0" >>$THISSCRIPT.log
+   echo -e "$(npm list -g --depth=0)" >>$THISSCRIPT.log
+      # v8.11.1
+      # v9.10.1
+      # node -> stable (-> v9.10.1) (default)
+      # stable -> 9.10 (-> v9.10.1) (default)
+      # iojs -> N/A (default)
+      # lts/* -> lts/carbon (-> v8.11.1)
+      # lts/argon -> v4.9.1 (-> N/A)
+      # lts/boron -> v6.14.1 (-> N/A)
+      # lts/carbon -> v8.11.1
+
+   # npm start
+   # See https://github.com/creationix/howtonode.org by Tim Caswell
+fi
 
 ######### JAVA_TOOLS:
 
 
-if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
-   if ! command -v gcviewer >/dev/null; then
-      fancy_echo "Installing JAVA_TOOLS=gcviewer ..."
-      brew install gcviewer
+if [[ "$JAVA_TOOLS" == *"maven"* ]]; then
+    # Associated: Maven (mvn) in /usr/local/opt/maven/bin/mvn
+   if ! command -v mvn >/dev/null; then
+      fancy_echo "Installing Maven for Java ..."
+      brew install maven
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         # gcviewer --version
-         fancy_echo "JAVA_TOOLS=gcviewer already installed: UPGRADE requested..."
-         brew upgrade gcviewer 
-            # gcviewer 1.35 already installed
+         # mvn --version
+         fancy_echo "JAVA_TOOLS maven dalready installed: UPGRADE requested..."
+         brew upgrade maven
       else
-         fancy_echo "gcviewer already installed:"
+         fancy_echo "JAVA_TOOLS maven already installed:"
       fi
-      #echo -e "\n$(gcviewer --version)" >>$THISSCRIPT.log
    fi
+   echo -e "$(mvn --version)" >>$THISSCRIPT.log  # Apache Maven 3.5.0 
 fi
+
+
+if [[ "$JAVA_TOOLS" == *"gradle"* ]]; then
+    # no xml angle brackets! Uses Groovy DSL
+    # See http://www.gradle.org/docs/1.6/userguide/userguide.html
+   if ! command -v gradle >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS gradle for Java ..."
+      brew install gradle
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         # gradle -v
+         fancy_echo "JAVA_TOOLS gradle already installed: UPGRADE requested..."
+         brew upgrade gradle
+      else
+         fancy_echo "JAVA_TOOLS gradle already installed:"
+      fi
+   fi
+   echo -e "$(gradle -v)" >>$THISSCRIPT.log  # Gradle 4.6 between lines
+   # http://www.gradle.org/docs/1.6/userguide/plugins.html
+   # http://www.gradle.org/docs/1.6/userguide/gradle_command_line.html
+   # gradle setupBuild  # reads build.gradle
+   # gradle tasks
+   # gradle test
+fi
+
+
+if [[ "$JAVA_TOOLS" == *"ant"* ]]; then
+    # 
+   if ! command -v ant >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS ant for Java ..."
+      brew install ant
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         # ant -v
+         fancy_echo "JAVA_TOOLS ant already installed: UPGRADE requested..."
+         brew upgrade ant
+      else
+         fancy_echo "JAVA_TOOLS ant already installed:"
+      fi
+   fi
+   # echo -e "$(ant -v)" >>$THISSCRIPT.log
+   # Ant can pick up the Test.jmx file, execute it, and generate an easily-readable HTML report.
+fi
+
+
+if [[ "$JAVA_TOOLS" == *"junit"* ]]; then
+   # junit5 reached 2nd GA February 18, 2018 https://junit.org/junit5/docs/current/user-guide/
+   # http://junit.org/junit4/
+   # https://github.com/junit-team/junit4/wiki/Download-and-Install
+   # https://www.tutorialspoint.com/junit/junit_environment_setup.htm
+   fancy_echo "There is no brew install junit because it is installed by adding it within Maven or Gradle." 
+   # TODO: Insert java-junit4-maven.xml as a dependency to maven pom.xml
+   # 
+fi
+
+
+if [[ "$JAVA_TOOLS" == *"mockito"* ]]; then
+   # See https://www.youtube.com/watch?v=GKUlQMrbtHE - May 28, 2016
+   # NOTE: mockito is installed by adding it within Maven or Gradle
+   # https://zeroturnaround.com/rebellabs/rebel-labs-report-go-away-bugs-keeping-your-code-safe-with-junit-testng-and-mockito/9/
+   fancy_echo "There is no brew install mockito because it is installed by adding it within Maven or Gradle."
+   # TODO: Insert file java-mockito-maven.xml as a dependency to maven pom.xml
+fi
+
+
+if [[ "$JAVA_TOOLS" == *"testng"* ]]; then
+   # See http://testng.org/doc/download.html
+   # Build from source git://github.com/cbeust/testng.git using ./build-with-gradle
+   fancy_echo "There is no brew install testng because it is installed by adding it within Maven or Gradle."
+   # TODO: Insert file java-testng-gradle as a dependency to gradle working within Eclipse plug-in
+   # TODO: Insert file java-testng-maven.xml as a dependency to maven pom.xml 
+   # See https://docs.mendix.com/howto/testing/create-automated-tests-with-testng
+fi
+
+# Also: https://github.com/google/guava  # Google Core Libraries for Java
+
 
 if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
    if ! command -v jmeter >/dev/null; then
@@ -1874,7 +2027,7 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       brew install jmeter
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         jmeter --version
+         jmeter -v | sed -n 5p | grep "\_\ "  # skip the ASCII art of APACHE.
          fancy_echo "JAVA_TOOLS=jmeter already installed: UPGRADE requested..."
          brew install jmeter 
       else
@@ -1891,6 +2044,8 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       source $BASHFILE
    fi 
 
+   # TODO: Paste the file to $JMETER_HOME/lib/ext = /usr/local/Cellar/jmeter/3.3/libexec
+
    FILE="jmeter-plugins-manager-0.5.jar"  # TODO: Check if version has changed since Jan 4, 2018.
    FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-manager.jar"
    if [ -f $FILE_PATH ]; then  # file exists within folder 
@@ -1899,25 +2054,9 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
    else
       fancy_echo "Downloading $FILE to $FOLDER ..."
       # From https://jmeter-plugins.org/wiki/StandardSet/
-      curl -O http://jmeter-plugins.org/downloads/file/$FILE  # 994 received. 
+      curl -O http://jmeter-plugins.org/downloads/file/$FILE 
       fancy_echo "Overwriting $FILE_PATH ..."
       yes | cp -rf $FILE  $FILE_PATH 
-      ls -al             $FILE_PATH
-   fi
-
-   FILE="jmeter-plugins-extras-1.4.0.jar"  # TODO: Check if version has changed since Jan 4, 2018.
-   # From https://jmeter-plugins.org/downloads/old/
-   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-extras.jar"
-   if [ -f $FILE_PATH ]; then  # file exists within folder 
-      fancy_echo "$FILE already installed. Skipping install."
-      ls -al             $FILE_PATH
-   else
-      fancy_echo "Downloading $FILE_PATH ..."
-      # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-extras
-      curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-extras/1.4.0/jmeter-plugins-extras-1.4.0.jar
-      # 400K received. 
-      fancy_echo "Overwriting $FILE_PATH ..."
-      yes | cp -rf $FILE $FILE_PATH
       ls -al             $FILE_PATH
    fi
 
@@ -1932,6 +2071,22 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       fancy_echo "Downloading $FILE_PATH ..."
       # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-standard
       curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-standard/1.4.0/jmeter-plugins-standard-1.4.0.jar
+      # 400K received. 
+      fancy_echo "Overwriting $FILE_PATH ..."
+      yes | cp -rf $FILE $FILE_PATH
+      ls -al             $FILE_PATH
+   fi
+
+   FILE="jmeter-plugins-extras-1.4.0.jar"  # TODO: Check if version has changed since Jan 4, 2018.
+   # From https://jmeter-plugins.org/downloads/old/
+   FILE_PATH="$JMETER_HOME/libexec/lib/ext/jmeter-plugins-extras.jar"
+   if [ -f $FILE_PATH ]; then  # file exists within folder 
+      fancy_echo "$FILE already installed. Skipping install."
+      ls -al             $FILE_PATH
+   else
+      fancy_echo "Downloading $FILE_PATH ..."
+      # See https://mvnrepository.com/artifact/kg.apc/jmeter-plugins-extras
+      curl -O http://central.maven.org/maven2/kg/apc/jmeter-plugins-extras/1.4.0/jmeter-plugins-extras-1.4.0.jar
       # 400K received. 
       fancy_echo "Overwriting $FILE_PATH ..."
       yes | cp -rf $FILE $FILE_PATH
@@ -1953,7 +2108,32 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       yes | cp -rf $FILE $FILE_PATH
       ls -al             $FILE_PATH
    fi
+
+   mv jmeter*.jar $JMETER_HOME/lib/ext
+
+   if [[ $TRYOUT == *"jmeter"* ]]; then
+      jmeter &  # GUI
+   fi
+
 fi # JAVA_TOOLS" == *"jmeter
+
+
+if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
+   if ! command -v gcviewer >/dev/null; then
+      fancy_echo "Installing JAVA_TOOLS=gcviewer ..."
+      brew install gcviewer
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         # gcviewer --version
+         fancy_echo "JAVA_TOOLS=gcviewer already installed: UPGRADE requested..."
+         brew upgrade gcviewer 
+            # gcviewer 1.35 already installed
+      else
+         fancy_echo "gcviewer already installed:"
+      fi
+      #echo -e "\n$(gcviewer --version)" >>$THISSCRIPT.log
+   fi
+fi
 
 
 if [[ "$JAVA_TOOLS" == *"jprofiler"* ]]; then
@@ -1976,14 +2156,19 @@ fi
 # brew install nmap
 
 
-######### TODO: Code review:
+######### Code review:
 
 
-# Prerequisite: Python
-# sudo easy_install pip
-# sudo pip install -U setuptools
-# sudo pip install git-review
-
+if [[ "$GIT_TOOLS" == *"git-review"* ]]; then
+   # Prerequisite: Python
+   if ! python -c "import git-review">/dev/null 2>&1 ; then   
+      echo "Installing git-review ..."; 
+      pip install git-review
+      # TODO: use git-review
+   else
+      echo "git-review installed already."; 
+   fi
+fi
 
 ######### Git Signing:
 
@@ -2224,14 +2409,12 @@ if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
    #vagrant halt
    #vagrant destroy 
 fi
-xxx
-
 
 
 # See https://wilsonmar.github.io/gcp
 if [[ $CLOUD == *"gcp"* ]]; then  # contains gcp.
    if [ ! -f "$(command -v gcloud) " ]; then  # /usr/local/bin/gcloud not installed
-      fancy_echo "Installing CLOUD=$CLOUD = brew cask install --appdir="/Applications" google-cloud-sdk ..."
+      fancy_echo "Installing CLOUD=$CLOUD = brew cask install --appdir=\"/Applications\" google-cloud-sdk ..."
       PYTHON_INSTALL  # function defined at top of this file.
       brew tap caskroom/cask
       brew cask install --appdir="/Applications" google-cloud-sdk  # to ./google-cloud-sdk
@@ -2275,19 +2458,16 @@ if [[ $CLOUD == *"aws"* ]]; then  # contains aws.
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "awscli already installed: UPGRADE requested..."
-         aws --version
-            # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+         aws --version  # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
          pip3 upgrade awscli --upgrade --user
       else
          fancy_echo "awscli already installed."
       fi
    fi
-   echo -e "\n$(aws --version)" >>$THISSCRIPT.log
-   # aws --version
-            # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+   echo -e "\n$(aws --version)" >>$THISSCRIPT.log  # aws-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
 
    # TODO: https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_aws
-   # https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_cfnl
+   # For aws-cli commands, see http://docs.aws.amazon.com/cli/latest/userguide/ 
 fi
 
 
@@ -2409,6 +2589,10 @@ if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
       # /usr/local/bin/docker -> /Applications/Docker.app/Contents/Resources/bin/docker
       brew link --overwrite docker-machine
       brew link --overwrite docker-compose
+
+      # docker-machine-driver-xhyve driver requires superuser privileges to access the hypervisor. To enable, execute:
+      sudo chown root:wheel /usr/local/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve
+      sudo chmod u+s /usr/local/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "docker already installed: UPGRADE requested..."
@@ -2437,6 +2621,8 @@ if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
 
    if [[ $TRYOUT == *"docker"* ]]; then  # run docker
       fancy_echo "TRYOUT run docker ..."
+      docker-machine create default
+
       # See https://github.com/bonusbits/devops_bash_config_examples/blob/master/shared/.bash_docker
       # https://www.upcloud.com/support/how-to-configure-docker-swarm/
       # docker-machine --help
@@ -2494,6 +2680,9 @@ if [[ $CLOUD == *"minikube"* ]]; then
 
    if [[ $TRYOUT == *"minikube"* ]]; then  # run minikube
       fancy_echo "TRYOUT run minikube ..."
+      kubectl cluster-info
+      #kubectl cluster-info dump  # for diagnostis
+
       # See https://kubernetes.io/docs/getting-started-guides/minikube/
       # minikube start
          # Starting local Kubernetes cluster...
@@ -2551,7 +2740,6 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
    if [[ $TRYOUT == *"cf"* ]]; then  # run minikube
       fancy_echo "TRYOUT run cf ..."
    fi
-   
 else
    if [[ $TRYOUT == *"cf"* ]]; then
       fancy_echo "ERROR: \"cf\" needs to be in CLOUD for TRYOUT."
@@ -2564,10 +2752,10 @@ fi
 
    # virtualenv supports both Python2 and Python3.
    # virtualenv -p "$(command -v python)" hooks/basic-python2
-      #New python executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python2.7
-      #Also creating executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/python-tests/basic-python2/bin/python
+      #New python executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/tests/basic-python2/bin/python2.7
+      #Also creating executable in /Users/wilsonmar/gits/wilsonmar/git-utilities/tests/basic-python2/bin/python
       # Installing setuptools, pip, wheel...
-   # virtualenv -p "$(command -v python3)" python-tests/basic-python3
+   # virtualenv -p "$(command -v python3)" tests/basic-python3
    # virtualenv -p "c:\Python34\python.exe foo
    if [[ "$PYTHON_TOOLS" == *"virtualenv"* ]]; then
       if ! command -v virtualenv >/dev/null; then  # /usr/bin/virtualenvdriver
@@ -2628,8 +2816,6 @@ fi
 echo -e "\n   $SSHCONFIG ::" >>$THISSCRIPT.log
 echo -e "$(cat $SSHCONFIG)" >>$THISSCRIPT.log
 
-
-
 # See https://www.saltycrane.com/blog/2008/11/creating-remote-server-nicknames-sshconfig/
 if grep -q "$FILEPATH" "$SSHCONFIG" ; then    
    fancy_echo "SSH \"$FILEPATH\" to \"$GITHUB_ACCOUNT\" already in $SSHCONFIG"
@@ -2666,7 +2852,9 @@ fi
 #   open https://github.com/settings/keys
    ## TODO: Add a token using GitHub API from credentials in secrets.sh 
 
-   fancy_echo "Pop up from folder ~/.ssh ..."
+   # see https://www.thegeekstuff.com/2008/11/3-steps-to-perform-ssh-login-without-password-using-ssh-keygen-ssh-copy-id/
+
+   fancy_echo "Pop up from folder $FILEPATH ..."
    popd
 
 
@@ -2675,8 +2863,8 @@ fi
 
 # To click and type on browser as if a human would do.
 # See http://seleniumhq.org/
-if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
-
+# Not necessarily: if [[ $GUI_TEST == *"selenium"* ]]; then  # contains .
+   # https://www.utest.com/articles/selenium-setup-on-a-mac-and-configuring-selenium-webdriver-on-mac-os
    # per ttps://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment
 
    # Download the latest webdrivers into folder /usr/bin: https://www.seleniumhq.org/about/platforms.jsp
@@ -2686,7 +2874,6 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
       # says it's unstable since Yosemite
    # Brave: https://github.com/brave/muon/blob/master/docs/tutorial/using-selenium-and-webdriver.md
       # Much more complicated!
-   # PhantomJs headless
 
    if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
       # Chrome:   https://sites.google.com/a/chromium.org/chromedriver/downloads
@@ -2700,16 +2887,23 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
       else
          fancy_echo "Deleting chromedriver.log from previous session ..."
          rm chromedriver.log
+      fi 
 
-         fancy_echo "Starting chromedriver in background ..."
-         chromedriver & # invoke:
+      if [[ $TRYOUT == *"chrome"* ]]; then
+         PS_OUTPUT=$(ps | grep chromedriver)
+         if grep -q "chromedriver" "$PS_OUTPUT" ; then    
+            fancy_echo "chromedriver already running."
+         else
+            fancy_echo "Starting chromedriver in background ..."
+            chromedriver & # invoke:
             # Starting ChromeDriver 2.36.540469 (1881fd7f8641508feb5166b7cae561d87723cfa8) on port 9515
             # Only local connections are allowed.
             # [1522424121.500][SEVERE]: bind() returned an error, errno=48: Address already in use (48)
-         ps | grep chromedriver
+            ps | grep chromedriver
             # 1522423621378   chromedriver   INFO  chromedriver 0.20.0
             # 1522423621446   chromedriver   INFO  Listening on 127.0.0.1:4444
-      fi 
+         fi
+      fi
    fi
 
 
@@ -2728,21 +2922,68 @@ if [[ $GUI_TEST == *"selenium"* ]]; then  # contains azure.
          source "$BASHFILE"
       fi 
 
-      PS_OUTPUT=$(ps | grep geckodriver)
-      if grep -q "geckodriver" "$PS_OUTFILE" ; then    
-         fancy_echo "geckodriver already running."
-      else
-         fancy_echo "Starting geckodriver in background ..."
-         geckodriver & # invoke:
+      if [[ $TRYOUT == *"chrome"* ]]; then
+         PS_OUTPUT=$(ps | grep geckodriver)
+         if grep -q "geckodriver" "$PS_OUTPUT" ; then    
+            fancy_echo "geckodriver already running."
+         else
+            fancy_echo "Starting geckodriver in background ..."
+            geckodriver & # invoke:
             # 1522423621378   geckodriver INFO  geckodriver 0.20.0
             # 1522423621446   geckodriver INFO  Listening on 127.0.0.1:4444
+         fi
          ps | grep geckodriver
       fi 
+   fi
+
+   if [[ $GIT_BROWSER == *"phantomjs"* ]]; then  # contains azure.
+      # NOTE: http://phantomjs.org/download.html is for direct download.
+      if ! command -v phantomjs >/dev/null; then  # not installed.
+         brew install phantomjs  # to /usr/local/bin/phantomjs  # for each MacOS release
+      else
+         if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+            # No need to invoke driver.
+            fancy_echo "phantomjs already installed: UPGRADE requested..."
+            phantomjs --version  # 2.1.1
+            brew upgrade phantomjs
+         else
+            fancy_echo "phantomjs already installed."
+         fi
+      fi
+      PHANTOM_VERSION=$(phantomjs --version)  # 2.1.1
+      fancy_echo "PHANTOM_VERSION=$PHANTOM_VERSION"
+      # NOTE: "export phantomjs= not nessary with brew install.
+
+      if [[ $TRYOUT == *"phantomjs"* ]]; then
+         phantomjs tests/phantomjs-smoke.js
+         # More code at http://phantomjs.org/quick-start.html
+      fi
    fi
 
    # TODO: install opencv for Selenium to recognize images
    # TODO: install tesseract for Selenium to recognize text within images
 
+# TODO: http://www.agiletrailblazers.com/blog/the-5-step-guide-for-selenium-cucumber-and-gherkin
+   # brew install ruby
+   # gem install bundler
+   # sudo gem install selenium-webdriver -v 3.2.1
+   # gem install cucumber  #  business language
+   # gem install rspec  # BDD mocking and performance assertions
+   # if [[ $TRYOUT == *"bdd"* ]]; then 
+   #   fancy_echo "TRYOUT run bdd ..."
+    #       ruby test.rb
+    # fi
+
+
+if [[ $GUI_TEST == *"protractor"* ]]; then  # contains .
+   # protractor for testing AngularJS versions greater than 1.0.6/1.1.4, 
+   # See http://www.protractortest.org/#/ and https://www.npmjs.com/package/protractor
+   NODE_INSTALL  # pre-requsite nodejs v6 and newer.
+
+   # TODO: Inside virtualenv ?
+   # npm install -g protractor
+   # protractor conf.js  # run test
+fi
 
 ######### GitHub hub to manage GitHub functions:
 
@@ -2788,23 +3029,20 @@ fi
          pip install webdriver
 
       if [[ $GIT_BROWSER == *"chrome"* ]]; then  # contains azure.
-         python python-tests/chrome_pycon_search.py chrome
-         # python python-tests/chrome-google-search-quit.py
+         python tests/chrome_pycon_search.py chrome
+         # python tests/chrome-google-search-quit.py
       fi
       if [[ $GIT_BROWSER == *"firefox"* ]]; then  # contains azure.
-         python python-tests/firefox_github_ssh_add.py
-         # python python-tests/firefox_unittest.py  # not working due to indents
-         # python python-tests/firefox-test-chromedriver.py
+         python tests/firefox_github_ssh_add.py
+         # python tests/firefox_unittest.py  # not working due to indents
+         # python tests/firefox-test-chromedriver.py
       fi
       if [[ $GIT_BROWSER == *"safari"* ]]; then  # contains azure.
-         fancy_echo "Need python python-tests/safari_github_ssh_add.py"
+         fancy_echo "Need python tests/safari_github_ssh_add.py"
       fi
 
       # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Python.gitattributes
    fi   
-
-   # phantomjs --wd  # headless webdriver
-fi # selenium
 
 # Now to add/commit - https://marklodato.github.io/visual-git-guide/index-en.html
 # TODO: Protractor for AngularJS
@@ -2813,23 +3051,45 @@ fi # selenium
 # TODO: Java Selenium script
 
 
+######### Sauce Labs with Node Selenium :
+
+
+# https://github.com/saucelabs-sample-test-frameworks/JS-Protractor-Selenium
+#   SAUCE_USERNAME=""
+#   SAUCE_ACCESS_KEY=""
+# ./node_modules/.bin/protractor conf.js
+
+
+######### Golum Python Framework for Selenium :
+
+
+if [[ $GUI_TEST == *"golum"* ]]; then  # contains golum.
+   PYTHON3_INSTALL  # pre-requisite
+   # https://golem-framework.readthedocs.io/en/latest/installation.html
+   # https://github.com/lucianopuccio/Golem.git 
+   pip install golem-framework  # installs Flask, itsdangerous, Werkzeug, MarkupSafe, 
+
+   # Sstart the Golem Web Module, run the following command:
+   golem gui
+
+   #The Web Module can be accessed at 
+   # open "http://localhost:5000/"
+
+   # By default, the following user is available: username: admin / password: admin
+   if [[ $TRYOUT == *"cleanup"* ]]; then
+      echo -e "\n   Removing all logs ::" >>$THISSCRIPT.log
+      echo -e "ls *.log" >>$THISSCRIPT.log
+      rm *.log
+   fi
+fi
+
+
 ######### Dump contents:
 
 
-#Listing of all brew cask installed (including dependencies automatically added):"
-echo -e "\n   brew info --all ::" >>$THISSCRIPT.log
-echo -e "$(brew info --all)" >>$THISSCRIPT.log
-#Listing of all brews installed (including dependencies automatically added):""
-# brew list
-echo -e "\n   ls ~/Library/Caches/Homebrew ::" >>$THISSCRIPT.log
-echo -e "$(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
-
-# List contents of ~/.gitconfig
-echo -e "\n   $GITCONFIG ::" >>$THISSCRIPT.log
-echo -e "$(cat $GITCONFIG)" >>$THISSCRIPT.log
-# List using git config --list:
-echo -e "\n   git config --list ::" >>$THISSCRIPT.log
-echo -e "$(git config --list)" >>$THISSCRIPT.log
+# List variables
+echo -e "\n   env varibles, alphabetically ::" >>$THISSCRIPT.log
+echo -e "$(export -p)" >>$THISSCRIPT.log
 
 # List ~/.bash_profile:
 echo -e "\n   $BASHFILE ::" >>$THISSCRIPT.log
@@ -2839,33 +3099,34 @@ echo -e "$(cat $BASHFILE)" >>$THISSCRIPT.log
 #########  brew cleanup
 
 
-#brew cleanup --force
-#rm -f -r /Library/Caches/Homebrew/*
+#Listing of all brew cask installed (including dependencies automatically added):"
+echo -e "\n   brew info --all ::" >>$THISSCRIPT.log
+echo -e "$(brew info --all)" >>$THISSCRIPT.log
+#Listing of all brews installed (including dependencies automatically added):""
 
+if [[ $TRYOUT == *"cleanup"* ]]; then
+   brew cleanup --force
+   echo -e "\n   ls ~/Library/Caches/Homebrew ::" >>$THISSCRIPT.log
+   echo -e "$(ls ~/Library/Caches/Homebrew)" >>$THISSCRIPT.log
+   rm -f -r /Library/Caches/Homebrew/*
+fi
 
-######### Disk space consumed:
+# List contents of ~/.gitconfig
+echo -e "\n   $GITCONFIG ::" >>$THISSCRIPT.log
+echo -e "$(cat $GITCONFIG)" >>$THISSCRIPT.log
 
+# List using git config --list:
+echo -e "\n   git config --list ::" >>$THISSCRIPT.log
+echo -e "$(git config --list)" >>$THISSCRIPT.log
 
-FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
-DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
-echo -e "\n   $DIFF MB of disk space consumed during this script run." >>$THISSCRIPT.log
-# 380691344 / 182G = 2091710.681318681318681 blocks per GB
-# 182*1024=186368 MB
-# 380691344 / 186368 G = 2042 blocks per MB
-
-exit
-TIME_END=$(date -u +%s);
-DIFF=$((TIME_END-TIME_START))
-MSG = "End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
-fancy_echo "$MSG"
-echo -e "\n$MSG" >>$THISSCRIPT.log
 
 
 ######### Open editor to show log:
 
 
-fancy_echo "Opening editor in background to display log ..."
-case "$GIT_EDITOR" in
+if [[ $TRYOUT == *"editor"* ]]; then
+   fancy_echo "Opening editor in background to display log ..."
+   case "$GIT_EDITOR" in
         atom)
             echo atom
             atom $THISSCRIPT.log &
@@ -2913,7 +3174,25 @@ case "$GIT_EDITOR" in
         *)
             echo "$GIT_EDITOR not recognized."
             exit 1
-esac
+   esac
+fi
 
+
+
+######### Disk space consumed:
+
+
+FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
+echo -e "\n   $DIFF MB of disk space consumed during this script run." >>$THISSCRIPT.log
+# 380691344 / 182G = 2091710.681318681318681 blocks per GB
+# 182*1024=186368 MB
+# 380691344 / 186368 G = 2042 blocks per MB
+
+TIME_END=$(date -u +%s);
+DIFF=$((TIME_END-TIME_START))
+MSG="End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
+fancy_echo "$MSG"
+echo -e "\n$MSG" >>$THISSCRIPT.log
 
 exit

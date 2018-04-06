@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # chrome-google-search-quit.py
 # from https://sites.google.com/a/chromium.org/chromedriver/getting-started
 import time
