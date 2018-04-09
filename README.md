@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Install all on a MacOS laptop"
+title: "Install, configure, and test all on a MacOS laptop"
 excerpt: "Everything you need to be a professional developer"
 tags: [API, devops, evaluation]
 Categories: Devops
@@ -15,13 +15,10 @@ comments: true
 
 This article explains the script that builds a Mac machine with "everything" needed by a professional developer.
 
-This is a "bootstrapping" script to enable you to more easily manage the complexity of competing stacks of components and their different versions. Java, Python, Node and their most popular add-ons are covered here.
+This is a <strong>"bootstrapping"</strong> script to enable you to more easily manage the complexity of competing stacks of components and their different versions. Java, Python, Node and their most popular add-ons are covered here.
 
-This bring DevSecOps <strong>"immutable architecture"</strong> to MacOS laptops. Immutable architecture is the practice of replacing the whole machine instance instead of upgrading or repairing faulty components.
-Target users of this script are those who configure new laptops for develpers joining the organization,
-so each developer doesn't waste days installing everything one at a time (and doing it differently than colleagues). 
-
-## TD;LR Customization
+<pre><strong>sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/mac-install-all.sh)"
+</strong></pre>
 
 Logic in the script goes beyond what Homebrew does, and <strong>configures</strong> the component just installed:
 
@@ -30,8 +27,15 @@ Logic in the script goes beyond what Homebrew does, and <strong>configures</stro
    * Add alias and paths in <strong>.bash_profile</strong> (if needed)
    * Perform configuration (such as adding a missing file needed for mariadb to start)
    * Edit configuration settings (such as changing default port within Nginx within config.conf file)
-   * Run a demo using the component to ensure that what has been installed actually works
    * Upgrade and uninstall if that is available
+   * Run a demo using the component to ensure that what has been installed actually works. 
+
+## TD;LR Customization
+
+This bring DevSecOps-style <strong>"immutable architecture"</strong> to MacOS laptops. Immutability means replacing the whole machine instance instead of upgrading or repairing faulty components.
+
+Target users of this script are those who configure new laptops for developers joining the organization,
+so each developer doesn't waste days installing everything one at a time (and doing it differently than colleagues). 
 
 To do the above manually for each component would needless hours, and be error-prone.
 
@@ -50,10 +54,7 @@ Technical techniques for the Bash shell scripting are described separtely at [Ba
 
 2. In the string for each category, add the keyword for each app you want to install.
    
-   There are several category variables.
-
-   NOTE: This script does NOT automatically uninstall modules.
-   It's just too dangerous.
+   There are several category variables: GIT_TOOLS, etc. 
 
 3. Remove comments in the section of the script which has a list of brew commands.
 
@@ -66,6 +67,16 @@ Technical techniques for the Bash shell scripting are described separtely at [Ba
    </string></pre>
 
    CAUTION: This often breaks things because some apps are not ready to use a newer dependency.
+
+   NOTE: This script does NOT automatically uninstall modules.
+   But if you're brave enough, invoke the script this way to remove components so you recover some disk space:
+
+   <pre><strong>
+   mac-install-all.sh uninstall
+   </string></pre>
+
+   This is not an option for components that add lines to ~/.bash_profile.
+   It's quite dangerous because the script cannot differentiate whether customizations occured to what it installed.
 
 ## Mac apps
 

@@ -780,17 +780,18 @@ else
    # DO NOT echo $GITHUB_PASSWORD. Do not cat $SECRETFILE because it contains secrets.
    echo "GIT_CLIENT=$GIT_CLIENT" >>$LOGFILE
    echo "GIT_EDITOR=$GIT_EDITOR" >>$LOGFILE
-   echo "WORK_REPO=$WORK_REPO" >>$LOGFILE # i.e. git://example.com/some-big-repo.git"
    echo "GIT_BROWSER=$GIT_BROWSER" >>$LOGFILE
    echo "GIT_TOOLS=$GIT_TOOLS" >>$LOGFILE
+   echo "WEB_TOOLS=$WEB_TOOLS" >>$LOGFILE
+   echo "NGINX_PORT=$NGINX_PORT" >>$LOGFILE  # from default 8080
+   echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
+
    echo "GIT_LANG=$GUI_LANG" >>$LOGFILE
    echo "TEST_TOOLS=$TEST_TOOLS" >>$LOGFILE
    echo "JAVA_TOOLS=$JAVA_TOOLS" >>$LOGFILE
    echo "PYTHON_TOOLS=$PYTHON_TOOLS" >>$LOGFILE
    echo "CLOUD=$CLOUD" >>$LOGFILE
    echo "TRYOUT=$TRYOUT" >>$LOGFILE
-   NGINX_PORT="8087"   # from default 8080
-   TOMCAT_PORT="8089"  # from default 8080
 fi 
 
 
