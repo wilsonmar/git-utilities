@@ -1,3 +1,5 @@
+      brew info atom >>$LOGFILE
+      brew list atom >>$LOGFILE
 #!/usr/local/bin/bash
 
 # mac-install-all.sh in https://github.com/wilsonmar/DevSecOps
@@ -174,6 +176,8 @@ function PYTHON_INSTALL(){
       # No upgrade option.
       fancy_echo "Installing Python, a pre-requisite for git-cola & GCP ..."
       brew install python
+      brew info python >>$LOGFILE
+      brew list python >>$LOGFILE
       # Not brew install pyenv  # Python environment manager.
 
 	  #brew linkapps python
@@ -237,6 +241,8 @@ function PYTHON3_INSTALL(){
       # No upgrade option.
       fancy_echo "Installing Python3, a pre-requisite for awscli and azure ..."
       brew install python3
+      brew info python3 >>$LOGFILE
+      brew list python3 >>$LOGFILE
 
       # 
       # To use anaconda, add the /usr/local/anaconda3/bin directory to your PATH environment 
@@ -289,6 +295,38 @@ function PYTHON3_INSTALL(){
 
    fi
 
+}
+
+function GROOVY_INSTALL(){
+    # See http://groovy-lang.org/install.html
+   if ! command -v groovy >/dev/null; then  # /usr/local/bin/groovy
+      fancy_echo "Installing groovy ..."
+      brew install groovy
+      brew info groovy >>$LOGFILE
+      brew list groovy >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "groovy upgrading ..."
+         groovy --version  # upgrading from.
+         brew upgrade groovy
+      fi
+   fi
+   groovy --version  # Groovy Version: 2.4.14 JVM: 1.8.0_162 Vendor: Oracle Corporation OS: Mac OS X
+
+      if grep -q "export GROOVY_HOME=" "$BASHFILE" ; then    
+         fancy_echo "export GROOVY_HOME already in $BASHFILE" >>$LOGFILE
+      else
+         fancy_echo "Adding export GROOVY_HOME in $BASHFILE..."
+         echo "export GROOVY_HOME=/usr/local/opt/groovy/libexec" >>"$BASHFILE"
+         source "$BASHFILE"
+      fi
+   
+   if [[ $TRYOUT == *"groovy"* ]]; then
+      fancy_echo "TRYOUT = groovy = run a Groovy script :"
+      groovy tests/groovy_smoketest
+   fi
+
+   # https://stackoverflow.com/questions/41110256/how-do-i-tell-intellij-about-groovy-installed-with-brew-on-osx
 }
 
 function JAVA_INSTALL(){
@@ -353,6 +391,8 @@ function NODE_INSTALL(){
    if ! command -v nvm >/dev/null; then  # /usr/local/bin/node
       fancy_echo "Installing nvm (to manage node versions)"
       brew install nvm  # curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+      brew info nvm >>$LOGFILE
+      brew list nvm >>$LOGFILE
          # 0.33.8 
       # TODO: How to tell if nvm.sh has run?
       fancy_echo "Running /usr/local/opt/nvm/nvm.sh ..."
@@ -388,6 +428,8 @@ function GO_INSTALL(){
    if ! command -v go >/dev/null; then  # /usr/local/bin/go
       fancy_echo "Installing go ..."
       brew install go
+      brew info go >>$LOGFILE
+      brew list go >>$LOGFILE
    else
       # specific to each MacOS version
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -408,6 +450,7 @@ function GO_INSTALL(){
    # export GOROOT=$HOME/go
    # export PATH=$PATH:$GOROOT/bin
 }
+
 
 
 ######### OSX configuration:
@@ -447,6 +490,8 @@ echo -e "$(bash --version | grep 'bash')" >>$LOGFILE
 #brew install bash-completion@2
 ## If running Bash 3.2 included with macOS
 #brew install bash-completion
+#      brew info atom >>$LOGFILE
+ #     brew list atom >>$LOGFILE
 
 
 ######### bash.profile configuration:
@@ -551,6 +596,8 @@ if [[ "$MAC_TOOLS" == *"mas"* ]]; then
    if ! command -v mas >/dev/null; then  # /usr/local/bin/mas
       fancy_echo "Installing MAC_TOOLS mas ..."
       brew install mas
+      brew info mas >>$LOGFILE
+      brew list mas >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "Upgrading MAC_TOOLS mas ..."
@@ -644,6 +691,8 @@ if [[ "$MAC_TOOLS" == *"mariadb"* ]]; then
    if [ ! -d "/Applications/mariadb.app" ]; then 
       fancy_echo "Installing MAC_TOOLS mariadb - password needed ..."
       brew install mariadb
+      brew info mariadb >>$LOGFILE
+      brew list mariadb >>$LOGFILE
       # There is also mariadb@10.0, mariadb@10.1, mariadb-connector-odbc 
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -706,6 +755,8 @@ fi
 if ! command -v git >/dev/null; then
     fancy_echo "Installing git using Homebrew ..."
     brew install git
+      brew info git >>$LOGFILE
+      brew list git >>$LOGFILE
 else
     if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
        fancy_echo "Git upgrading ..." >>$LOGFILE
@@ -900,6 +951,8 @@ fi
 # Other alternatives listed at https://git-scm.com/docs/git-web--browse.html
 
    # brew install links
+   # brew info git-links >>$LOGFILE
+   # brew list git-links >>$LOGFILE
 
    #git config --global web.browser cygstart
    #git config --global browser.cygstart.cmd cygstart
@@ -946,6 +999,8 @@ fi
 # shellcheck disable=SC1091
 
 #brew install shellcheck
+#      brew info atom >>$LOGFILE
+#      brew list atom >>$LOGFILE
 
 # This enables Git hooks to run on pre-commit to check Bash scripts being committed.
 
@@ -979,6 +1034,8 @@ if [[ "$GIT_CLIENT" == *"cola"* ]]; then
       PYTHON_INSTALL  # function defined at top of this file.
       fancy_echo "Installing GIT_CLIENT=\"cola\" using Homebrew ..."
       brew install git-cola
+      brew info git-cola >>$LOGFILE
+      brew list git-cola >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "Upgrading GIT_CLIENT=\"cola\" using Homebrew ..."
@@ -1123,6 +1180,8 @@ if [[ "$GIT_CLIENT" == *"magit"* ]]; then
         fancy_echo "Installing GIT_CLIENT=\"magit\" using Homebrew ..."
          brew tap dunn/emacs
          brew install magit
+      brew info magit >>$LOGFILE
+      brew list magit >>$LOGFILE
     else
         if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
            fancy_echo "Upgrading GIT_CLIENT=\"magit\" using Homebrew ..."
@@ -1170,6 +1229,8 @@ if [[ "$GIT_TOOLS" == *"tig"* ]]; then
    if ! command -v tig >/dev/null; then  # in /usr/local/bin/tig
       fancy_echo "Installing tig for formatting git logs ..."
       brew install tig
+      brew info tig >>$LOGFILE
+      brew list tig >>$LOGFILE
       # See https://jonas.github.io/tig/
       # A sample of the default configuration has been installed to:
       #   /usr/local/opt/tig/share/tig/examples/tigrc
@@ -1222,6 +1283,8 @@ if [[ "$GIT_TOOLS" == *"lfs"* ]]; then
    if ! command -v git-lfs >/dev/null; then  # in /usr/local/bin/git-lfs
       fancy_echo "Installing git-lfs for managing large files in git ..."
       brew install git-lfs
+      brew info git-lfs >>$LOGFILE
+      brew list git-lfs >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "git-lfs upgrading ..."
@@ -1357,6 +1420,8 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
     if ! command -v code >/dev/null; then
         fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
         brew install visual-studio-code
+      brew info visual-studio-code >>$LOGFILE
+      brew list visual-studio-code >>$LOGFILE
     else
        if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           fancy_echo "VS Code upgrading ..."
@@ -1389,6 +1454,8 @@ if [[ "$GIT_EDITOR" == *"atom"* ]]; then
    if ! command -v atom >/dev/null; then
       fancy_echo "Installing GIT_EDITOR=\"atom\" text editor using Homebrew ..."
       brew cask install --appdir="/Applications" atom
+      brew info atom >>$LOGFILE
+      brew list atom >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
           fancy_echo "GIT_EDITOR=\"atom\" upgrading ..."
@@ -1729,6 +1796,8 @@ if [[ "$GIT_TOOLS" == *"diff-so-fancy"* ]]; then
    if ! command -v diff-so-fancy >/dev/null; then
       fancy_echo "Installing GIT_TOOLS=\"diff-so-fancy\" using Homebrew ..."
       brew install diff-so-fancy
+      brew info diff-so-fancy >>$LOGFILE
+      brew list diff-so-fancy >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "GIT_EDITOR=\"diff-so-fancy\" upgrading ..."
@@ -1795,6 +1864,8 @@ if ! command -v brew >/dev/null; then
    fancy_echo "Installing bash-git-prompt using Homebrew ..."
    # From https://github.com/magicmonty/bash-git-prompt
    brew install bash-git-prompt
+      brew info bash-git-prompt >>$LOGFILE
+      brew list bash-git-prompt >>$LOGFILE
 
    if grep -q "gitprompt.sh" "$BASHFILE" ; then    
       fancy_echo "gitprompt.sh already in $BASHFILE"
@@ -1935,6 +2006,8 @@ if [[ "$GIT_TOOLS" == *"git-flow"* ]]; then
    if ! command -v git-flow >/dev/null; then
       fancy_echo "Installing git-flow ..."
       brew install git-flow
+      brew info git-flow >>$LOGFILE
+      brew list git-flow >>$LOGFILE
    else
       fancy_echo "git-flow already installed." >>$LOGFILE
    fi
@@ -2129,6 +2202,7 @@ if [[ "$NODE_TOOLS" == *"others"* ]]; then
 #   npm install -g superstatic
 #   npm install -g tsd
 #   npm install -g typescript
+#   npm install -g jira-client  # https://www.npmjs.com/package/jira-client
 fi
 
    echo -e "\n  npm list -g --depth=1 --long" >>$LOGFILE
@@ -2149,6 +2223,8 @@ fi
 fi
 
 
+
+
 ######### JAVA_TOOLS:
 
 
@@ -2157,6 +2233,8 @@ if [[ "$JAVA_TOOLS" == *"maven"* ]]; then
    if ! command -v mvn >/dev/null; then
       fancy_echo "Installing Maven for Java ..."
       brew install maven
+      brew info maven >>$LOGFILE
+      brew list maven >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "JAVA_TOOLS maven dupgrading ..."
@@ -2174,6 +2252,8 @@ if [[ "$JAVA_TOOLS" == *"gradle"* ]]; then
    if ! command -v gradle >/dev/null; then
       fancy_echo "Installing JAVA_TOOLS gradle for Java ..."
       brew install gradle
+      brew info gradle >>$LOGFILE
+      brew list gradle >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          # gradle -v
@@ -2195,6 +2275,8 @@ if [[ "$JAVA_TOOLS" == *"ant"* ]]; then
    if ! command -v ant >/dev/null; then
       fancy_echo "Installing JAVA_TOOLS ant for Java ..."
       brew install ant
+      brew info ant >>$LOGFILE
+      brew list ant >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "JAVA_TOOLS ant upgrading ..."
@@ -2223,6 +2305,7 @@ if [[ "$JAVA_TOOLS" == *"junit4"* ]]; then
    # TODO: Insert java-junit4-maven.xml as a dependency to maven pom.xml
    # 
 fi
+
 
 if [[ "$JAVA_TOOLS" == *"junit5"* ]]; then
    # junit5 reached 2nd GA February 18, 2018 https://junit.org/junit5/docs/current/user-guide/
@@ -2269,6 +2352,8 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       fancy_echo "Installing latest version of JAVA_TOOLS=jmeter ..."
       # from https://jmeter.apache.org/download_jmeter.cgi
       brew install jmeter
+      brew info jmeter >>$LOGFILE
+      brew list jmeter >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "JAVA_TOOLS=jmeter upgrading ..."
@@ -2390,6 +2475,8 @@ if [[ "$JAVA_TOOLS" == *"gcviewer"* ]]; then
    if ! command -v gcviewer >/dev/null; then
       fancy_echo "Installing JAVA_TOOLS=gcviewer ..."
       brew install gcviewer
+      brew info gcviewer >>$LOGFILE
+      brew list gcviewer >>$LOGFILE
       # creates gcviewer.properties in $HOME folder.
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -2483,9 +2570,11 @@ if [[ "$GIT_TOOLS" == *"signing"* ]]; then
 
    # NOTE: gpg is the command even though the package is gpg2:
    if ! command -v gpg >/dev/null; then
+      # See https://www.gnupg.org/faq/whats-new-in-2.1.html
       fancy_echo "Installing GPG2 for commit signing..."
       brew install gpg2
-      # See https://www.gnupg.org/faq/whats-new-in-2.1.html
+      brew info gpg2 >>$LOGFILE
+      brew list gpg2 >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "GPG2 upgrading ..."
@@ -2727,9 +2816,11 @@ fi
 
 if [[ "$GIT_TOOLS" == *"secret"* ]]; then
    if ! command -v git-secret >/dev/null; then
+      # See https://github.com/sobolevn/git-secret
       fancy_echo "Installing git-secret for managing secrets in a Git repo ..."
       brew install git-secret
-      # See https://github.com/sobolevn/git-secret
+      brew info git-secret >>$LOGFILE
+      brew list git-secret >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "git-secret upgrading ..."
@@ -2851,20 +2942,19 @@ fi
 
 if [[ $CLOUD == *"terraform"* ]]; then  # contains aws.
    if ! command -v terraform >/dev/null; then
+      # see https://www.terraform.io/
       fancy_echo "Installing terraform ..."
       brew install terraform 
-      # see https://www.terraform.io/
+      brew info terraform >>$LOGFILE
+      brew list terraform >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "terraform upgrading ..."
-         terraform --version
-            # terraform-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
+         terraform --version  # terraform-cli/1.11.160 Python/2.7.10 Darwin/17.4.0 botocore/1.7.18
          pip3 upgrade terraform 
       fi
    fi
    echo -e "\n$(terraform --version)" >>$LOGFILE
-   # terraform --version
-            # Terraform v0.11.5
 
       if grep -q "=\"terraform" "$BASHFILE" ; then    
          fancy_echo "Terraform already in $BASHFILE" >>$LOGFILE
@@ -2889,6 +2979,8 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    if ! command -v az >/dev/null; then  # not installed.
       fancy_echo "Installing azure using Homebrew ..."
       brew install azure-cli
+      brew info azure-cli >>$LOGFILE
+      brew list azure-cli >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "azure-cli upgrading ..."
@@ -2906,10 +2998,13 @@ fi
 
 
 if [[ $CLOUD == *"heroku"* ]]; then  # contains heroku.
+   # https://cli.heroku.com
    if ! command -v heroku >/dev/null; then  # not installed.
       # https://devcenter.heroku.com/articles/heroku-cli
       fancy_echo "Installing heroku using Homebrew ..."
       brew install heroku/brew/heroku
+      brew info heroku >>$LOGFILE
+      brew list heroku >>$LOGFILE
       # Cloning into '/usr/local/Homebrew/Library/Taps/heroku/homebrew-brew'...
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
@@ -2929,6 +3024,8 @@ if [[ $CLOUD == *"openstack"* ]]; then  # contains openstack.
    if ! command -v openstack >/dev/null; then  # not installed.
       fancy_echo "Installing openstack using Homebrew ..."
       brew install openstack
+      brew info atom >>$LOGFILE
+      brew list atom >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "openstack upgrading ..."
@@ -3038,6 +3135,8 @@ if [[ $CLOUD == *"minikube"* ]]; then
       fancy_echo "Installing kubectl using Homebrew ..."
       #  https://kubernetes.io/docs/tasks/tools/install-kubectl/
       brew install kubectl
+      brew info kubectl >>$LOGFILE
+      brew list kubectl >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "kubectl upgrading ..."
@@ -3104,6 +3203,8 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
       fancy_echo "Installing cf (Cloud Foundry CLI) ..."
       brew install cloudfoundry/tap/cf-cli
       # see https://github.com/cloudfoundry/cli
+      brew info cf-cli >>$LOGFILE
+      brew list cf-cli >>$LOGFILE
 
       # To uninstall on Mac OS, delete the binary /usr/local/bin/cf, and the directory /usr/local/share/doc/cf-cli.
    else
@@ -3259,6 +3360,8 @@ fi
       # Chrome:   https://sites.google.com/a/chromium.org/chromedriver/downloads
       if ! command -v chromedriver >/dev/null; then  # not installed.
          brew install chromedriver  # to /usr/local/bin/chromedriver
+      brew info chromedriver >>$LOGFILE
+      brew list chromedriver >>$LOGFILE
       fi
 
       PS_OUTPUT=$(ps -ef | grep chromedriver)
@@ -3291,6 +3394,8 @@ fi
       # Firefox:  https://github.com/mozilla/geckodriver/releases
       if ! command -v geckodriver >/dev/null; then  # not installed.
          brew install geckodriver  # to /usr/local/bin/geckodriver
+      brew info geckodriver >>$LOGFILE
+      brew list geckodriver >>$LOGFILE
       fi
 
       if grep -q "/usr/local/bin/chromedriver" "$BASHFILE" ; then    
@@ -3320,6 +3425,8 @@ fi
       # NOTE: http://phantomjs.org/download.html is for direct download.
       if ! command -v phantomjs >/dev/null; then  # not installed.
          brew install phantomjs  # to /usr/local/bin/phantomjs  # for each MacOS release
+      brew info phantomjs >>$LOGFILE
+      brew list phantomjs >>$LOGFILE
       else
          if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
             # No need to invoke driver.
@@ -3353,6 +3460,9 @@ fi
 
 # TODO: http://www.agiletrailblazers.com/blog/the-5-step-guide-for-selenium-cucumber-and-gherkin
    # brew install ruby
+#         brew info ruby >>$LOGFILE
+ #     brew list ruby >>$LOGFILE
+
    # gem install bundler
    # sudo gem install selenium-webdriver -v 3.2.1
    # gem install cucumber  #  business language
@@ -3381,9 +3491,11 @@ fi
 if [[ "$GIT_TOOLS" == *"hub"* ]]; then
    GO_INSTALL  # prerequiste
    if ! command -v hub >/dev/null; then  # in /usr/local/bin/hub
+      # See https://hub.github.com/
       fancy_echo "Installing hub for managing GitHub from a Git client ..."
       brew install hub
-      # See https://hub.github.com/
+      brew info hub >>$LOGFILE
+      brew list hub >>$LOGFILE
 
       # fancy_echo "Adding git hub in $BASHFILE..."
       # echo "alias git=hub" >>"$BASHFILE"
@@ -3534,8 +3646,7 @@ if [[ "$MEDIA_TOOLS" == *"others"* ]]; then
 # brew cask install screenflow
 # brew cask install vlc
 # brew cask install sketchup
-#   brew cask install snagit
-
+# brew cask install snagit
 fi
 
 

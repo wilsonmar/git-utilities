@@ -37,7 +37,7 @@ This bring DevSecOps-style <strong>"immutable architecture"</strong> to MacOS la
 Target users of this script are those who configure new laptops for developers joining the organization,
 so each developer doesn't waste days installing everything one at a time (and doing it differently than colleagues). 
 
-To do the above manually for each component would needless hours, and be error-prone.
+To do the above manually for each component would involve hours needlessly, and be error-prone.
 
 Technical techniques for the Bash shell scripting are described separtely at [Bash scripting page in this website](/bash-coding/).
 
@@ -56,11 +56,14 @@ Technical techniques for the Bash shell scripting are described separtely at [Ba
    
    There are several category variables: GIT_TOOLS, etc. 
 
-3. Remove comments in the section of the script which has a list of brew commands.
+3. Edit the script and search for components in "other" for each category.
+4. In the list of brew, pip, or npm commands, if you see a component you want to install,
+   remove the "#" character which treats the line as a comment.
+5. In the secrets.sh, add "other" for the category (MAC_TOOLS, PYTHON_TOOLS, NODE_TOOLS, etc.) so the script will invoke the other list.
 
    ## Update All Arguement 
 
-4. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
+6. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
 
    <pre><strong>chmod +x mac-install-all.sh
    mac-install-all.sh update
@@ -86,6 +89,8 @@ Apps on Apple's App Store for Mac need to be installed manually. Popular apps in
    * BitDefender for OSX
    * CrashPlan (for backups)
    * Amazon Music
+   * RDP from Microsoft
+   * etc.
 
 The brew "mas" manages Apple Store apps, but it only manages apps that have already been paid for. But mas does not install apps new to your Apple Store account.
 
@@ -108,15 +113,13 @@ Popular in the Maven Repository are:
    Insert file java-mockito-maven.xml as a dependency to maven pom.xml
    See https://www.youtube.com/watch?v=GKUlQMrbtHE - May 28, 2016
    and https://zeroturnaround.com/rebellabs/rebel-labs-report-go-away-bugs-keeping-your-code-safe-with-junit-testng-and-mockito/9/
+
    * <strong>TestNG</strong> 
    See http://testng.org/doc/download.html
    and https://docs.mendix.com/howto/testing/create-automated-tests-with-testng
-   # Build from source git://github.com/cbeust/testng.git using ./build-with-gradle
-   # TODO: Insert file java-testng-gradle as a dependency to gradle working within Eclipse plug-in
-   # TODO: Insert file java-testng-maven.xml as a dependency to maven pom.xml 
-fi
-
-
+   
+   When using Gradle, insert file java-testng-gradle as a dependency to gradle working within Eclipse plug-in
+   Build from source git://github.com/cbeust/testng.git using ./build-with-gradle
    
 TODO: The Python edition of this will insert specs such as this in pom.xml files.   
 
@@ -132,6 +135,8 @@ At the end of the script, the log is shown in an editor to <strong>enable search
 ## 
 
 Other similar scripts (listed in "References" below) run
+
+http://groovy-lang.org/install.html
 
 ## Cloud Sync
 
