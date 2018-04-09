@@ -951,8 +951,8 @@ fi
 # Other alternatives listed at https://git-scm.com/docs/git-web--browse.html
 
    # brew install links
-   # brew info git-links >>$LOGFILE
-   # brew list git-links >>$LOGFILE
+   # brew info links >>$LOGFILE
+   # brew list links >>$LOGFILE
 
    #git config --global web.browser cygstart
    #git config --global browser.cygstart.cmd cygstart
@@ -999,8 +999,8 @@ fi
 # shellcheck disable=SC1091
 
 #brew install shellcheck
-#      brew info atom >>$LOGFILE
-#      brew list atom >>$LOGFILE
+#      brew info shellcheck >>$LOGFILE
+#      brew list shellcheck >>$LOGFILE
 
 # This enables Git hooks to run on pre-commit to check Bash scripts being committed.
 
@@ -2509,6 +2509,8 @@ fi
 
 # https://www.bonusbits.com/wiki/HowTo:Setup_Charles_Proxy_on_Mac
 # brew install nmap
+#      brew info nmap >>$LOGFILE
+#      brew list nmap >>$LOGFILE
 
 
 ######### Python modules:
