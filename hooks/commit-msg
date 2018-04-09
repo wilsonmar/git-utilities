@@ -4,7 +4,7 @@ import argparse
 def parse_args():
   pass
 def main(args=None):
-  print "Hello from commit-msg."
+  print("Hello from commit-msg.")
   pass
 if __name__ == "__main__":
   args = parse_args()

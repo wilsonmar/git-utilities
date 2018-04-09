@@ -6,7 +6,8 @@ from selenium.webdriver.common.keys import Keys
 
 driver = webdriver.Chrome()
 
-driver.get("http://www.python.org")
+#driver.get("http://www.python.org")
+driver.get("https://github.com")
 assert "Python" in driver.title
 elem = driver.find_element_by_name("q")
 elem.clear()

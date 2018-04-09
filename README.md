@@ -1,65 +1,176 @@
-This GitHub repository contains files used by and explained in Wilson Mar's
-Git and GitHub course.
+---
+layout: post
+title: "Install all on a MacOS laptop"
+excerpt: "Everything you need to be a professional developer"
+tags: [API, devops, evaluation]
+Categories: Devops
+filename: README.md
+image:
+  feature: https://cloud.githubusercontent.com/assets/300046/14612210/373cb4e2-0553-11e6-8a1a-4b5e1dabe181.jpg
+  credit: And Beyond
+  creditlink: http://www.andbeyond.com/chile/places-to-go/easter-island.htm
+comments: true
+---
+<i>{{ page.excerpt }}</i>
 
-There are two editions of scripts in this repo:
+This article explains the script that builds a Mac machine with "everything" needed by a professional developer.
 
-* File names ending in <strong>.sh</strong> are <strong>Bash shell scripts</strong> 
-that normally run on Mac,
-and now also on Windows machines installed with <a target="_blank" href="https://wilsonmar.github.io/bash-windows/">Microsoft's WSL (Windows Subystem for Linux)</a>.
+This is a "bootstrapping" script to enable you to more easily manage the complexity of competing stacks of components and their different versions. Java, Python, Node and their most popular add-ons are covered here.
 
-* File names ending in <strong>.ps1</strong> are <strong>PowerShell scripts</strong> 
-that run on Windows,
-but now also Mac and Linux machines after installing <a target="_blank" href="https://wilsonmar.github.io/powershell-on-mac/">Microsoft's PowerShell on OSX</a>.
+This bring DevSecOps <strong>"immutable architecture"</strong> to MacOS laptops. Immutable architecture is the practice of replacing the whole machine instance instead of upgrading or repairing faulty components.
+Target users of this script are those who configure new laptops for develpers joining the organization,
+so each developer doesn't waste days installing everything one at a time (and doing it differently than colleagues). 
 
-* File names ending in <strong>.py</strong> are <strong>Python</strong> scripts that normally run on Mac,
-and now also on Windows machines installed with <a target="_blank" href="https://wilsonmar.github.io/bash-windows/">Microsoft's WSL (Windows Subystem for Linux)</a>.
+## TD;LR Customization
 
-Such scripts are being phased out in favor of cross-platform Python script for use on all platforms. However, Python first needs to be installed.
+Logic in the script goes beyond what Homebrew does, and <strong>configures</strong> the component just installed:
 
-<hr />
+   * Install dependent components where necessary
+   * Display the version number installed (to a log)
+   * Add alias and paths in <strong>.bash_profile</strong> (if needed)
+   * Perform configuration (such as adding a missing file needed for mariadb to start)
+   * Edit configuration settings (such as changing default port within Nginx within config.conf file)
+   * Run a demo using the component to ensure that what has been installed actually works
+   * Upgrade and uninstall if that is available
 
-<a name="mac-git-install.sh">
-<strong>mac-git-install.sh</strong> automatically installs and configures all you need to work with git and GitHub professionally. It downloads and installs Apple's Xcode, Homebrew, Bash code completion, GPG to enable code signing. Text editors Sublime Text, MacVim, and Microsoft's Code are installed. Git clients GitHub Desktop, GitKraken, or SmartGit are installed. These are installed based a setting in file <a target="_blank" href="https://github.com/wilsonmar/git-utilities/blob/master/secrets.sh">secrets.sh</a>.
+To do the above manually for each component would needless hours, and be error-prone.
 
-You begin by changing that file with your own information. That data is used to create SSH keys and config files. The script stops if the secrets file still contain default account info. The <secret>.gitignore</secret> file keeps local customizations (password) from being uploaded to GitHub. The script installs GPG utilities and uses them to encrypt the secrets.sh file before pushing it to GitHub. This happens automatically by a Git local hook. Your secrets.sh file would be stored in GitHub in encrypted form. On git pull the file is unencrypted.
+Technical techniques for the Bash shell scripting are described separtely at [Bash scripting page in this website](/bash-coding/).
 
-If a component has already been installed, the "UPGRADE" parameter added when executing the script results in an upgrade to the latest version of each component.
+<hr />   
 
-The script also configures the <strong>.bash_profile</strong> file run whenever a Terminal session. The script adds lines such as PATHs and keyboard aliases. It configures your .gitconfig with color.ui and code signing after it generates GPG and SSH keys for pasting into GitHub or other repositories. Version numbers are output for each utility installed.
-If something is already installed, that is skipped. So this script can be run again.
+1. Edit file <strong>secrets.sh</strong> in the repo to customize what you install. 
+
+   PROTIP: The default specification in the file is for a bare bones minimal components.
+   Edit the file to add more tools to install.
+
+   On a 4mbs network the run takes less than 5 minutes for a minimal install.
+
+   PROTIP: A faster network or a proxy nexus server providing installers within the firewall would speed things up a lot and ensure that vetted installers are used.
+
+2. In the string for each category, add the keyword for each app you want to install.
+   
+   There are several category variables.
+
+   NOTE: This script does NOT automatically uninstall modules.
+   It's just too dangerous.
+
+3. Remove comments in the section of the script which has a list of brew commands.
+
+   ## Update All Arguement 
+
+4. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
+
+   <pre><strong>chmod +x mac-install-all.sh
+   mac-install-all.sh update
+   </string></pre>
+
+   CAUTION: This often breaks things because some apps are not ready to use a newer dependency.
+
+## Mac apps
+
+Apps on Apple's App Store for Mac need to be installed manually. Popular apps include:
+
+   * Office for Mac 2016
+   * BitDefender for OSX
+   * CrashPlan (for backups)
+   * Amazon Music
+
+The brew "mas" manages Apple Store apps, but it only manages apps that have already been paid for. But mas does not install apps new to your Apple Store account.
+
+## Java tools via Maven, Ant
+
+Apps added by specifying in JAVA_TOOLS are GUI apps.
+
+Most other Java dependencies are specified by manually added in each custom app's <strong>pom.xml</strong> file
+to specify what Maven downloads from the Maven Central online repository of installers at
+
+   <a target="_blank" href="
+   http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dbunit%22">
+   http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dbunit%22</a>
+
+Popular in the Maven Repository are:
+
+   * <strong>yarn</strong> for code generation. JHipster uses it as an integrated tool in Java Spring development.
+   * <strong>DbUnit</strong> extends the JUnit TestCase class to put databases into a known state between test runs. Written by Manuel Laflamme, DbUnit is added in the Maven pom.xml (or Ant) for download from Maven Central. See http://dbunit.wikidot.com/
+   * <strong>mockito</strong> enables calls to be mocked as if they have been creted.
+   Insert file java-mockito-maven.xml as a dependency to maven pom.xml
+   See https://www.youtube.com/watch?v=GKUlQMrbtHE - May 28, 2016
+   and https://zeroturnaround.com/rebellabs/rebel-labs-report-go-away-bugs-keeping-your-code-safe-with-junit-testng-and-mockito/9/
+   * <strong>TestNG</strong> 
+   See http://testng.org/doc/download.html
+   and https://docs.mendix.com/howto/testing/create-automated-tests-with-testng
+   # Build from source git://github.com/cbeust/testng.git using ./build-with-gradle
+   # TODO: Insert file java-testng-gradle as a dependency to gradle working within Eclipse plug-in
+   # TODO: Insert file java-testng-maven.xml as a dependency to maven pom.xml 
+fi
 
 
-<hr />
-
-<a name="git-hooks-install.ps1">
-<strong>git-hooks-install.ps1</strong> should be run after cloning locally
-to install scripts that Git invokes automatically based on events.
-A git clone is necessary to re-build the database.
+   
+TODO: The Python edition of this will insert specs such as this in pom.xml files.   
 
 
-<a name="git-sisters-update.ps1">
-<strong>git-sisters-update.ps1</strong> is a PowerShell script that
-clones a sample sample repository you forked on GitHub.
-It calls a script that sets git configurations for a project (or globally)<br />
-<strong>git_client-config.ps1</strong>.
+## Logging
+
+The script outputs logs to a file.
+
+This is so that during runs, what appears on the command console are only what is relevant to debugging the current issue.
+
+At the end of the script, the log is shown in an editor to <strong>enable search</strong> through the whole log.
+
+## 
+
+Other similar scripts (listed in "References" below) run
+
+## Cloud Sync
+
+Dropbox, OneDrive, Google Drive, Amazon Drive
 
 
-<a name="git-sample-repo-create.ps1">
-<strong>git-sample-repo-create.ps1</strong> is a PowerShell script that
-creates a repository on your local clones your fork of a sample sample repository.
+<a name="EclipsePlugins"></a>
 
-TODO: A script that provides a summary report of where there are un-pushed files lingering among a set of  repo folders locally (folders with a .git folder).
+## Eclips IDE plug-ins
 
-<hr />
+http://download.eclipse.org/releases/juno
 
-All these scripts create a folder, but that folder is deleted at the beginning of each run
-to make them "idempotent" in that each run of the script ends up in the same condition,
-whether run the first time or subsequent times.
+Within Eclipse IDE, get a list of plugins at Help -> Install New Software -> Select a repo -> select a plugin -> go to More -> General Information -> Identifier
 
-The scripts contain an <strong>exit</strong> after each set of steps
-so you can examine the impact of the whole sequence of commands.
+   <pre>eclipse -application org.eclipse.equinox.p2.director \
+-destination d:/eclipse/ \
+-profile SDKProfile  \
+-clean -purgeHistory  \
+-noSplash \
+-repository http://download.eclipse.org/releases/juno/ \
+-installIU org.eclipse.cdt.feature.group, \
+   org.eclipse.egit.feature.group
+   </pre>
 
-Additionally, diagrams (animated step-by-step in PowerPoint) have been prepared to illustrate the flow and sequence of commands.
+   "Equinox" is the runtime environment of Eclipse, which is the <a target="_blank" href="http://www.vogella.de/articles/OSGi/article.html">reference implementation of OSGI</a>.
+   Thus, Eclipse plugins are architectually the same as bundles in OSGI.
 
-Enjoy!
+   Notice that there are different versions of Eclipse repositories, such as "juno".
 
+   PROTIP: Although one can install several at once, do it one at a time to see if you can actually use each one.
+   Some of them:
+
+   <pre>
+   org.eclipse.cdt.feature.group, \
+   org.eclipse.egit.feature.group, \
+   org.eclipse.cdt.sdk.feature.group, \
+   org.eclipse.linuxtools.cdt.libhover.feature.group, \
+   org.eclipse.wst.xml_ui.feature.feature.group, \
+   org.eclipse.wst.web_ui.feature.feature.group, \
+   org.eclipse.wst.jsdt.feature.feature.group, \
+   org.eclipse.php.sdk.feature.group, \
+   org.eclipse.rap.tooling.feature.group, \
+   org.eclipse.linuxtools.cdt.libhover.devhelp.feature.feature.group, \
+   org.eclipse.linuxtools.valgrind.feature.group, \
+   </pre>
+
+   <a target="_blank" href="https://stackoverflow.com/questions/2692048/what-are-the-differences-between-plug-ins-features-and-products-in-eclipse-rcp">NOTE</a>:
+   A feature group is a list of plugins and other features which can be understood as a logical separate project unit
+   for the updates manager and for the build process.
+
+   ## Others like this
+
+   * https://github.com/andrewconnell/osx-install described at http://www.andrewconnell.com/blog/rapid-complete-install-reinstall-os-x-like-a-champ-in-three-ish-hours separates coreinstall.sh from myinstall.sh for personal preferences.
