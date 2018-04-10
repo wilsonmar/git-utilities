@@ -715,18 +715,21 @@ fi
 
 if [[ "$MAC_TOOLS" == *"others"* ]]; then
       echo "Installing MAC_TOOLS=others ..."; 
-#      brew cask install vmware-fusion  # run Windows
-#      brew install google-drive
-#      brew install dropbox
-#      brew install box
-#      brew install amazon
-#      brew cask install charles  # proxy
+#   brew cask install monolingual # remove unneeded osx lang files https://ingmarstein.github.io/Monolingual/
+#   brew cask install vmware-fusion  # run Windows
+
+#   brew install google-drive
+#   brew install dropbox
+#   brew install box
+#   brew install amazon
+
+#   brew cask install charles  # proxy
 #   brew cask install xtrafinder
 #   brew cask install sizeup
 #   brew cask install bartender   # manage icons at top launch bar
 #   brew cask install duet
 #   brew cask install logitech-harmony
-#   brew cask install cheatsheet
+#   brew cask install cheatsheet  # hold ⌘ gives you all the shortcuts you can use with the active app.
 #   brew cask install steam
 #   brew cask install fritzing   
 #   brew cask install nosleep
@@ -2736,10 +2739,6 @@ if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
          fancy_echo "Upgrading WEB_TOOLS=nginx ..."
          nginx -v  # nginx version: nginx/1.13.11
          brew upgrade nginx
-      elif [[ "${MY_RUNTYPE,,}" == *"uninstall"* ]]; then
-         fancy_echo "Uninstalling WEB_TOOLS=nginx ..."
-         nginx -v  # nginx version: nginx/1.13.11
-         brew uninstall nginx
       fi
    fi
    fancy_echo -e "WEB_TOOLS=nginx :: $(nginx -v)" >>$LOGFILE
@@ -2764,6 +2763,10 @@ if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
          open "http://localhost:$NGINX_PORT"  # to show default Welcome to Nginx
       fi 
    fi
+elif [[ "${MY_RUNTYPE,,}" == *"uninstall"* ]]; then
+         fancy_echo "Uninstalling WEB_TOOLS=nginx ..."
+         nginx -v  # nginx version: nginx/1.13.11
+         brew uninstall nginx
 fi
 
 if [[ "$WEB_TOOLS" == *"tomcat"* ]]; then
@@ -3263,6 +3266,7 @@ fi
 ######### SSH-KeyGen:
 
 
+# PROTIP: Consider brew install shuttle for ssh management
 #FILE="$USER@$(uname -n)-$RANDOM"  # computer node name.
 FILE="$USER@$(uname -n)"  # computer node name.
 fancy_echo "Diving into folder ~/.ssh ..."

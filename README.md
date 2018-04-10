@@ -67,7 +67,7 @@ Technical techniques for the Bash shell scripting are described separtely at [Ba
 
    <pre><strong>chmod +x mac-install-all.sh
    mac-install-all.sh update
-   </string></pre>
+   </strong></pre>
 
    CAUTION: This often breaks things because some apps are not ready to use a newer dependency.
 
@@ -83,13 +83,15 @@ Technical techniques for the Bash shell scripting are described separtely at [Ba
 
 ## Mac apps
 
-Apps on Apple's App Store for Mac need to be installed manually. Popular apps include:
+Apps on Apple's App Store for Mac need to be installed manually. <a target="_blank" href="https://www.reddit.com/r/osx/comments/4hmgeh/list_of_os_x_tools_everyone_needs_to_know_about/">
+Popular apps</a> include:
 
    * Office for Mac 2016
    * BitDefender for OSX
    * CrashPlan (for backups)
    * Amazon Music
-   * RDP from Microsoft
+   * <a target="_blank" href="https://wilsonmar.github.io/rdp/#microsoft-hockeyapp-remote-desktop-for-mac">HockeyApp RDP</a> (Remote Desktop Protocol client for controlling Microsoft Windows servers)
+   * Colloquy IRC client (at https://github.com/colloquy/colloquy)
    * etc.
 
 The brew "mas" manages Apple Store apps, but it only manages apps that have already been paid for. But mas does not install apps new to your Apple Store account.
