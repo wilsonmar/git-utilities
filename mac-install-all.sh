@@ -441,8 +441,8 @@ function SCALA_INSTALL(){
      # Getting org.scala-sbt sbt 1.1.4  (this may take some time)...
 
    if [[ $TRYOUT == *"scala"* ]]; then
-      fancy_echo "TRYOUT = scala = run a scala script :"
-      scala tests/scala_smoketest
+      fancy_echo "TRYOUT = run program HelloWorld.scala :"
+      scala tests/HelloWorld.scala
    fi
 
    # https://stackoverflow.com/questions/41110256/how-do-i-tell-intellij-about-scala-installed-with-brew-on-osx
@@ -3928,7 +3928,6 @@ if [[ $TRYOUT == *"editor"* ]]; then
             exit 1
    esac
 fi
-
 
 
 ######### Disk space consumed:
