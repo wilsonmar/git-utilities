@@ -393,7 +393,61 @@ function JAVA_INSTALL(){
    # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
 }
 
-# TODO: Scala and Gatling
+
+function SCALA_INSTALL(){
+   # See http://scala-lang.org/install.html and http://sourabhbajaj.com/mac-setup/Scala/README.html
+   # There's also brew scala@2.10      scala@2.11  
+   if ! command -v scala >/dev/null; then  # /usr/local/bin/scala
+      fancy_echo "Installing scala ..."
+      brew install scala  # --with-docs
+      brew info scala >>$LOGFILE
+      brew list scala >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "scala upgrading ..."
+         scala -version  # upgrading from.
+         brew upgrade scala
+      fi
+   fi
+   fancy_echo -e "scala : $(scala -version)" >>$LOGFILE
+       # 2.12.5
+
+      if grep -q "export scala_HOME=" "$BASHFILE" ; then    
+         fancy_echo "export scala_HOME already in $BASHFILE" >>$LOGFILE
+      else
+         fancy_echo "Adding export scala_HOME in $BASHFILE..."
+         echo "export scala_HOME=/usr/local/opt/scala/libexec" >>"$BASHFILE"
+         source "$BASHFILE"
+      fi
+
+   # echo '-J-XX:+CMSClassUnloadingEnabled' >> /usr/local/etc/sbtopts
+   # echo '-J-Xmx2G' >> /usr/local/etc/sbtopts
+   # within Eclipse > Help → Install New Software..., add the Add... button in the dialog.
+   # To use with IntelliJ, set the Scala home to: /usr/local/opt/scala/idea
+
+   if ! command -v sbt >/dev/null; then  # /usr/local/bin/sbt
+      fancy_echo "Installing sbt ..."
+      brew install sbt  # --with-docs
+      brew info sbt >>$LOGFILE
+      brew list sbt >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "sbt upgrading ..."
+         # sbt -version  # upgrading from. Too verbose
+         brew upgrade sbt
+      fi
+   fi
+   #echo -e "sbt : $(sbt -version)" >>$LOGFILE
+     # Getting org.scala-sbt sbt 1.1.4  (this may take some time)...
+
+   if [[ $TRYOUT == *"scala"* ]]; then
+      fancy_echo "TRYOUT = scala = run a scala script :"
+      scala tests/scala_smoketest
+   fi
+
+   # https://stackoverflow.com/questions/41110256/how-do-i-tell-intellij-about-scala-installed-with-brew-on-osx
+}
+
 
 function NODE_INSTALL(){
    fancy_echo "In function NODE_INSTALL ..."
