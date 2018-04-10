@@ -1,5 +1,3 @@
-      brew info atom >>$LOGFILE
-      brew list atom >>$LOGFILE
 #!/usr/local/bin/bash
 
 # mac-install-all.sh in https://github.com/wilsonmar/DevSecOps
@@ -591,6 +589,44 @@ brew analytics off  # see https://github.com/Homebrew/brew/blob/master/docs/Anal
 ######### Mac tools:
 
 
+if [[ "$MAC_TOOLS" == *"iterm"* ]]; then
+   # https://www.iterm2.com/documentation.html
+   if [ ! -d "/Applications/iTerm.app" ]; then 
+      fancy_echo "Installing MAC_TOOLS iterm2 iTerm.app ..."
+      brew cask install iterm2
+      brew info iterm2 >>$LOGFILE
+      brew list iterm2 >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading MAC_TOOLS iterm2 ..."
+         #iterm2 version  # before upgrade
+         brew cask upgrade iterm2
+      fi
+   fi
+   echo -e "$(iterm2 no version)" >>$LOGFILE  
+   
+      if grep -q "alias iterm=" "$BASHFILE" ; then
+         fancy_echo "PATH to iTerm.app already in $BASHFILE" >>$LOGFILE
+      else
+         fancy_echo "Adding PATH to iTterm.app in $BASHFILE..." >>$LOGFILE
+         echo "alias iterm2='open -a \"/Applications/iTerm.app\"'" >>"$BASHFILE"
+      fi
+
+      if grep -q "export CLICOLOR=" "$BASHFILE" ; then
+         fancy_echo "export CLICOLOR=1 already in $BASHFILE" >>$LOGFILE
+      else
+         fancy_echo "Adding export CLICOLOR= to $BASHFILE..." >>$LOGFILE
+         echo "alias export CLICOLOR=1" >>"$BASHFILE"
+      fi
+
+   if [[ $TRYOUT == *"iterm"* ]]; then
+      fancy_echo "Starting iTerm ..." >>$LOGFILE
+      open -a "/Applications/iTerm.app"
+   fi
+   # http://sourabhbajaj.com/mac-setup/iTerm/README.html
+fi
+
+
 if [[ "$MAC_TOOLS" == *"mas"* ]]; then
    # To manage apps purchased & installed using App Store on MacOS:
    if ! command -v mas >/dev/null; then  # /usr/local/bin/mas
@@ -725,7 +761,7 @@ if [[ "$MAC_TOOLS" == *"others"* ]]; then
 
 #   brew cask install charles  # proxy
 #   brew cask install xtrafinder
-#   brew cask install sizeup
+#   brew cask install sizeup  # $12.99 resize windows http://www.irradiatedsoftware.com/sizeup/
 #   brew cask install bartender   # manage icons at top launch bar
 #   brew cask install duet
 #   brew cask install logitech-harmony
@@ -733,8 +769,8 @@ if [[ "$MAC_TOOLS" == *"others"* ]]; then
 #   brew cask install steam
 #   brew cask install fritzing   
 #   brew cask install nosleep
-#   brew cask install balsamiq-mockups
-#   brew cask install brackets
+#   brew cask install balsamiq-mockups  # for designing website forms
+#   brew cask install brackets # Cross-platform code editor for the web, written in JavaScript, HTML and CSS 
 #   brew cask install smartsynchronize
 #   brew cask install toggldesktop
 #   brew cask install xmind
@@ -749,6 +785,7 @@ if [[ "$MAC_TOOLS" == *"others"* ]]; then
 #   brew cask install betterzipql
 #   brew cask install asepsis
 #   brew cask install cheatsheet
+# http://almworks.com/jiraclient/download.html
 fi
 
 
@@ -778,7 +815,7 @@ echo -e "\n$(git --version)"            >>$LOGFILE
 
 
 # When running from sh -c "$(curl -fsSL 
-UTIL_REPO="DevSecOps"
+UTIL_REPO="git-utilities"
 if [ ! -d "$HOME/$UTIL_REPO" ]; then
    GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO.git"
    fancy_echo "Cloning in $GITHUB_REPO_URL ..."
@@ -793,12 +830,11 @@ fi
 if [ ! -d "$HOME/$UTIL_REPO" ]; then
    fancy_echo "Directory $HOME/$UTIL_REPO missing despite cloning ..."
 else
+   fancy_echo "cd into $HOME/$UTIL_REPO ..."
    cd $HOME/$UTIL_REPO
 fi
       # see video: https://asciinema.org/a/41811?autoplay=1
 pwd  >>$LOGFILE
-
-exit # DEBUGGING
 
 
 ######### Read and use secrets.sh file:

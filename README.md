@@ -189,6 +189,25 @@ Within Eclipse IDE, get a list of plugins at Help -> Install New Software -> Sel
    A feature group is a list of plugins and other features which can be understood as a logical separate project unit
    for the updates manager and for the build process.
 
-   ## Others like this
+## Scape for Fonts in GitHub
+ 
+Some developers have not put their stuff from GitHub into Homebrew. So we need to read (scrape) the website and see what is listed, then grab the text and URL to download.
+
+Such is the situation with font files at 
+https://github.com/adobe-fonts/source-code-pro/releases/tag/variable-fonts
+The two files desired downloaded using the curl command are:
+
+* https://github.com/adobe-fonts/source-code-pro/releases/download/variable-fonts/SourceCodeVariable-Italic.ttf
+* https://github.com/adobe-fonts/source-code-pro/releases/download/variable-fonts/SourceCodeVariable-Roman.ttf
+
+The files are downloaded into <a target="_blank" href="https://support.apple.com/en-us/HT201722">where MacOS holds fonts available to all users</a>: <tt>/Library/Fonts/</tt>
+
+<a target="_blank" href="http://sourabhbajaj.com/mac-setup/iTerm/README.html">ITerm2 can make use of these font files</a>.
+
+## Other lists of Mac programs 
 
    * https://github.com/andrewconnell/osx-install described at http://www.andrewconnell.com/blog/rapid-complete-install-reinstall-os-x-like-a-champ-in-three-ish-hours separates coreinstall.sh from myinstall.sh for personal preferences.
+
+   * https://github.com/siyelo/laptop
+   * https://github.com/evanchiu/dotfiles
+   * https://github.com/jeffreyjackson/mac-apps
