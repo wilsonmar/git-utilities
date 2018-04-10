@@ -3742,14 +3742,14 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "Upgrading VIZ_TOOLS=grafana ..."
          # grafana -v  # first line.
-         brew upgrade grafana
+         brew reinstall grafana
       fi
    fi
-   # echo -e "$(grafana )" >>$LOGFILE  # 
 
    if [[ $TRYOUT == *"grafana"* ]]; then
 
       GRAFANA_PORT="3000"  # per outputs.
+      # http_port=1234
 
       fancy_echo "Starting VIZ_TOOLS=grafana session in background ..." >>$LOGFILE
       grafana-server --config=/usr/local/etc/grafana/grafana.ini \
@@ -3760,8 +3760,11 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
 
       fancy_echo "Opening localhost:$GRAFANA_PORT for WEB_TOOLS=nginx ..."
       open "http://localhost:$GRAFANA_PORT"
+      # Capture version: Grafana v5.0.4 (commit: unknown-dev)
    fi
-   # See https://wiki.grafana.org/Tools
+   # brew tap homebrew/services
+   # brew services start grafana
+   # default sqlite database is located at /usr/local/var/lib/grafana
 fi
 
 
