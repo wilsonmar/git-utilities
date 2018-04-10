@@ -110,7 +110,35 @@ function git_parse_hash() {
 }
 
 
-######### Bash function definitions:
+######### OSX configuration:
+
+
+fancy_echo "Configure OSX Finder to show hidden files too:" >>$LOGFILE
+defaults write com.apple.finder AppleShowAllFiles YES
+# NOTE: Additional config dotfiles for Mac?
+# NOTE: See osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
+#       installs other programs on Macs for developers.
+
+
+fancy_echo "ulimit -a:" >>$LOGFILE
+ulimit -a  >>$LOGFILE
+launchctl limit >>$LOGFILE
+# sysctl -a | grep files >>$LOGFILE
+# TODO: https://gist.github.com/tylergets/90f7e61314821864951e58d57dfc9acd
+
+
+# Ensure Apple's command line tools (such as cc) are installed by node:
+if ! command -v cc >/dev/null; then
+   fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
+   xcode-select --install 
+   # Xcode installs its git to /usr/bin/git; recent versions of OS X (Yosemite and later) ship with stubs in /usr/bin, which take precedence over this git. 
+fi
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
+   # Tools_Executables | grep version
+   # version: 9.2.0.0.1.1510905681
+
+
+######### Language function definitions:
 
 
 # Add function to read in string and email, and return a KEY found for that email.
@@ -449,28 +477,6 @@ function GO_INSTALL(){
    # export GOROOT=$HOME/go
    # export PATH=$PATH:$GOROOT/bin
 }
-
-
-
-######### OSX configuration:
-
-
-fancy_echo "Configure OSX Finder to show hidden files too:" >>$LOGFILE
-defaults write com.apple.finder AppleShowAllFiles YES
-# NOTE: Additional config dotfiles for Mac?
-# NOTE: See osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
-#       installs other programs on Macs for developers.
-
-
-# Ensure Apple's command line tools (such as cc) are installed by node:
-if ! command -v cc >/dev/null; then
-   fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
-   xcode-select --install 
-   # Xcode installs its git to /usr/bin/git; recent versions of OS X (Yosemite and later) ship with stubs in /usr/bin, which take precedence over this git. 
-fi
-pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
-   # Tools_Executables | grep version
-   # version: 9.2.0.0.1.1510905681
 
 
 ######### bash completion:
@@ -2171,7 +2177,7 @@ if [[ $GIT_LANG == *"node"* ]]; then
       npm install -g protractor
    fi
    # testing: enzyme, jest, 
-   # nodemon, node-inspector
+   # nodemon, # https://codeburst.io/dont-use-nodemon-there-are-better-ways-fc016b50b45e
    if [[ "${NODE_TOOLS,,}" == *"node-inspector"* ]]; then
       npm install -g node-inspector
    fi
@@ -3028,16 +3034,14 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "azure-cli upgrading ..."
-         az --version | grep azure-cli
-            # azure-cli (2.0.18)
-            # ... and many other lines.
+         az --version | grep azure-cli  # azure-cli (2.0.18)
          brew upgrade azure-cli
       fi
    fi
    echo -e "\n$(az --version | grep azure-cli)" >>$LOGFILE
-   # az --version | grep azure-cli
-      # azure-cli (2.0.30)
-      # ... and many other lines.
+       # azure-cli (2.0.30)
+
+   # https://www.robinosborne.co.uk/2014/11/18/scripting-a-statsd-mongodb-elasticsearch-metrics-server-on-azure-with-powershell/
 fi
 
 
@@ -3659,11 +3663,15 @@ if [[ "$MON_TOOLS" == *"wireshark"* ]]; then
 fi
 
 if [[ "$MON_TOOLS" == *"others"* ]]; then
-# brew cask install istat-menus
-# StatsD
+# Comparison: https://blog.takipi.com/statsd-vs-collectd-vs-fluentd-and-other-daemons-you-should-know/
+# brew cask install istat-menus  # macos stats on Launch bar
+# fluentd has no brew only dmg for clouds https://docs.fluentd.org/v0.12/articles/install-by-dmg
+# Elastic Stack Logstash
+# StatsD # Node-based. from 2016
+# collectd  # portable C. needs plugins
+# Open Tracing
 # Dynatrace
 # AppD
-# Elastic Stack 
 # Grafana
 # Datadog
 fi

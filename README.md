@@ -124,7 +124,7 @@ It contains a configuration file named <strong>secrets.sh</strong> which you edi
 
     There are several variations possible:
 
-    ### Update All Arguement 
+    ### Update All Calling Arguement 
 
 11. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
 
@@ -298,3 +298,5 @@ The files are downloaded into <a target="_blank" href="https://support.apple.com
    * https://github.com/evanchiu/dotfiles
    * https://github.com/jeffreyjackson/mac-apps
    * https://github.com/jaywcjlove/awesome-mac/blob/master/README.md
+   * https://medium.com/@ankushagarwal/maximize-developer-productivity-on-a-mac-a9ae6fbaedab
+   * https://dotfiles.github.io/
