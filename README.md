@@ -17,8 +17,7 @@ This article explains the script that builds a Mac machine with "everything" nee
 
 This is a <strong>"bootstrapping"</strong> script to enable you to more easily manage the complexity of competing stacks of components and their different versions. Java, Python, Node and their most popular add-ons are covered here.
 
-<pre><strong>sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/mac-install-all.sh)"
-</strong></pre>
+<a name="Extras"></a>
 
 Logic in the script goes beyond what Homebrew does, and <strong>configures</strong> the component just installed:
 
@@ -41,45 +40,107 @@ To do the above manually for each component would involve hours needlessly, and 
 
 Technical techniques for the Bash shell scripting are described separtely at [Bash scripting page in this website](/bash-coding/).
 
-<hr />   
+## How this works
 
-1. Edit file <strong>secrets.sh</strong> in the repo to customize what you install. 
+This script references a folder in your Home folder named <strong>git-utilities</strong>, 
+It contains a configuration file named <strong>secrets.sh</strong> which you edit to specify what you want installed and run. The file's name is suffixed with ".sh" because it is run to establish variables for the script to reference. You don't run the file yourself. It is run by script <strong>mac-install-all.sh</strong> which you initiate within a Terminal command line.
 
-   PROTIP: The default specification in the file is for a bare bones minimal components.
-   Edit the file to add more tools to install.
+1. The starting point (generic version) of these files are in a public GitHub repository:
+
+   <a target="_blank" href="
+   https://github.com/wilsonmar/git-utilities">
+   https://github.com/wilsonmar/git-utilities</a>
+
+   If you know what I'm talking about and have a GitHub accoun, you may Fork the repo under your own account and, while in a Teminal window at your Home folder, git clone it locally under your Home folder.
+   This approach would enable you to save your changes back up to GitHub under your own account.
+
+   Alternately, follow these steps to create an initial installation of what many developers use
+   (but you won't be able to upload changes back to GitHub):
+
+2. Triple-click this command and press command+C to copy to your invisible Clipboard:
+
+   <pre><strong>sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/mac-install-all.sh)"
+   </strong></pre>
+
+2. Open a Terminal and press keys command+V to paste it from Clipboard.
+3. Press Enter to run it.
+
+   If your home folder does not contain a folder named "git-utilities",
+   the script will create one by Git cloning, using a Git client it first installs if there isn't one already.
+
+4. Wait for the script to finish.
 
    On a 4mbs network the run takes less than 5 minutes for a minimal install.
 
    PROTIP: A faster network or a proxy nexus server providing installers within the firewall would speed things up a lot and ensure that vetted installers are used.
 
-2. In the string for each category, add the keyword for each app you want to install.
-   
-   There are several category variables: GIT_TOOLS, etc. 
+   When the script ends it pops up a log file in the TextEdit program that comes with MacOS.
 
-3. Edit the script and search for components in "other" for each category.
-4. In the list of brew, pip, or npm commands, if you see a component you want to install,
-   remove the "#" character which treats the line as a comment.
-5. In the secrets.sh, add "other" for the category (MAC_TOOLS, PYTHON_TOOLS, NODE_TOOLS, etc.) so the script will invoke the other list.
+5. Within TextEdit, review the log file.
+6. Close the log file.
+7. click File and navigate to your Home folder then within <tt>git-utilities</tt> to 
+   open file <strong>secrets.sh</strong> in the repo so you can customize what you want installed. 
 
-   ## Update All Arguement 
-
-6. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
-
-   <pre><strong>chmod +x mac-install-all.sh
-   mac-install-all.sh update
+   <pre><strong>textedit secrets.sh
    </strong></pre>
 
-   CAUTION: This often breaks things because some apps are not ready to use a newer dependency.
+   PROTIP: The default specification in the file is for a "bare bones" minimal set of components.
+   If you run it again, it will not install it again.
 
-   NOTE: This script does NOT automatically uninstall modules.
-   But if you're brave enough, invoke the script this way to remove components so you recover some disk space:
+   There is a key (variable name) for each category (MAC_TOOLS, etc.).
 
-   <pre><strong>
-   mac-install-all.sh uninstall
-   </string></pre>
+8. Among the comments (which begin with a pound sige) look for keywords for programs you want.
+   
+   Keywords shown are for the most popular programs. The mac-install-all.sh script contains logic go
+   get it setup fully <a href="#Extras">(as summarized above)</a>.
 
-   This is not an option for components that add lines to ~/.bash_profile.
-   It's quite dangerous because the script cannot differentiate whether customizations occured to what it installed.
+9. Save the file. You need not exit the text editor completely.
+10. Run the script to carry out your changes:
+
+    <pre><strong>chmod +x mac-install-all.sh
+    mac-install-all.sh 
+    </strong></pre>
+
+    There are several variations possible:
+
+    ### Update All Arguement 
+
+11. Upgrade to the latest versions of ALL components when "update" is added to the calling script:
+
+    <pre><strong>chmod +x mac-install-all.sh
+    mac-install-all.sh update
+    </strong></pre>
+
+    CAUTION: This often breaks things because some apps are not ready to use a newer dependency.
+
+    NOTE: This script does NOT automatically uninstall modules.
+    But if you're brave enough, invoke the script this way to remove components so you recover some disk space:
+
+    <pre><strong>
+    mac-install-all.sh uninstall
+    </string></pre>
+
+    This is not an option for components that add lines to ~/.bash_profile.
+    It's quite dangerous because the script cannot differentiate whether customizations occured to what it installed.
+
+    ### Edit mac-install.sh for others
+
+    There are lists of additional programs (components) you may elect to install.
+
+12. At the Terminal, use TextEdit or a other text editor to view the script file:
+
+    <pre><strong>textedit mac-install.sh
+    </strong></pre>
+
+13. Press command+F to search for "others" (including the double-quotes).
+ 
+    PROTIP: Several categories have a list of brew commands to install additional components.
+    (MAC_TOOLS, PYTHON_TOOLS, NODE_TOOLS, etc.) 
+
+14. For each additional component you want, delete the # to un-comment it.
+
+    Remember that each component installed takes more disk space.
+
 
 ## Mac apps
 

@@ -366,6 +366,8 @@ function JAVA_INSTALL(){
    # TODO: https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
 }
 
+# TODO: Scala and Gatling
+
 function NODE_INSTALL(){
    fancy_echo "In function NODE_INSTALL ..."
    # See https://wilsonmar.github.io/node-starter/
@@ -817,25 +819,25 @@ echo -e "\n$(git --version)"            >>$LOGFILE
 # When running from sh -c "$(curl -fsSL 
 UTIL_PARENT="$HOME"
 UTIL_REPO="git-utilities"
-GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO.git"
+GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO"
 if [ ! -d "$UTIL_PARENT" ]; then
    fancy_echo "Directory $UTIL_PARENT missing, making ..."
    mkdir $UTIL_PARENT
 fi
-   fancy_echo "cd into $PWD ..." >>$LOGFILE
    cd $UTIL_PARENT
 
 if [ ! -d "$UTIL_PARENT/$UTIL_REPO" ]; then
    fancy_echo "Directory $UTIL_PARENT/$UTIL_REPO not created yet ..." >>$LOGFILE
    fancy_echo "Cloning in $GITHUB_REPO_URL ..."
-   git clone "$GITHUB_REPO_URL" --depth=1  # only master branche, no history
-   cd $UTIL_REPO
-   # List branch and latest commit SHA:
-   GIT_BRANCH="branch $(git_parse_branch) commit $(git_parse_hash)" 
-   fancy_echo "$GIT_BRANCH" >>$LOGFILE
-else
-   fancy_echo "Directory $UTIL_PARENT/$UTIL_REPO exists already ..." >>$LOGFILE
-   # Do not rm -rf $UTIL_REPO
+   git clone $GITHUB_REPO_URL
+fi
+if [ ! -d "$UTIL_PARENT/$UTIL_REPO" ]; then
+   exit
+if
+
+if [ ! -d "secrets.sh" ]; then
+   fancy_echo "Downloading secrets.sh ..." >>$LOGFILE
+   curl -O https://raw.githubusercontent.com/wilsonmar/git-utilities/master/secrets.sh
    # git pull
    fancy_echo "Using existing repo rather than downloading again ..." >>$LOGFILE
    # exit 
