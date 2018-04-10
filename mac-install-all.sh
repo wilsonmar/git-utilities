@@ -931,6 +931,7 @@ else
    echo "CLOUD=$CLOUD" >>$LOGFILE
 
    echo "MON_TOOLS=$MON_TOOLS" >>$LOGFILE
+   echo "VIZ_TOOLS=$VIZ_TOOLS" >>$LOGFILE
    echo "COLAB_TOOLS=$COLAB_TOOLS" >>$LOGFILE
 # TODO: Artifactory, Jira, 
 
@@ -2862,10 +2863,6 @@ if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
          open "http://localhost:$NGINX_PORT"  # to show default Welcome to Nginx
       fi 
    fi
-elif [[ "${MY_RUNTYPE,,}" == *"uninstall"* ]]; then
-         fancy_echo "Uninstalling WEB_TOOLS=nginx ..."
-         nginx -v  # nginx version: nginx/1.13.11
-         brew uninstall nginx
 fi
 
 if [[ "$WEB_TOOLS" == *"tomcat"* ]]; then
@@ -3728,6 +3725,50 @@ if [[ "$MON_TOOLS" == *"others"* ]]; then
 # AppD
 # Grafana
 # Datadog
+fi
+
+
+######### VIZ_TOOLS ::
+
+
+if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
+   if [ ! -d "/Applications/grafana.app" ]; then 
+      # http://docs.grafana.org/installation/mac/
+      fancy_echo "Installing VIZ_TOOLS=grafana ..."
+      brew install grafana
+      brew info grafana >>$LOGFILE
+      brew list grafana >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading VIZ_TOOLS=grafana ..."
+         # grafana -v  # first line.
+         brew upgrade grafana
+      fi
+   fi
+   # echo -e "$(grafana )" >>$LOGFILE  # 
+
+   if [[ $TRYOUT == *"grafana"* ]]; then
+
+      GRAFANA_PORT="3000"  # per outputs.
+
+      fancy_echo "Starting VIZ_TOOLS=grafana session in background ..." >>$LOGFILE
+      grafana-server --config=/usr/local/etc/grafana/grafana.ini \
+                     --homepath /usr/local/share/grafana \
+                     cfg:default.paths.logs=/usr/local/var/log/grafana \
+                     cfg:default.paths.data=/usr/local/var/lib/grafana \
+                     cfg:default.paths.plugins=/usr/local/var/lib/grafana/plugins &
+
+      fancy_echo "Opening localhost:$GRAFANA_PORT for WEB_TOOLS=nginx ..."
+      open "http://localhost:$GRAFANA_PORT"
+   fi
+   # See https://wiki.grafana.org/Tools
+fi
+
+
+if [[ "$VIZ_TOOLS" == *"others"* ]]; then
+   fancy_echo "VIZ_TOOLS=$VIZ_TOOLS" >>$LOGFILE
+   # kibana
+   # gafana
 fi
 
 ######### COLAB_TOOLS
