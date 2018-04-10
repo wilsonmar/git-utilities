@@ -3765,6 +3765,7 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
    # brew tap homebrew/services
    # brew services start grafana
    # default sqlite database is located at /usr/local/var/lib/grafana
+   # see http://docs.grafana.org/administration/cli/
 fi
 
 
