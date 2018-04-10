@@ -292,7 +292,6 @@ function PYTHON3_INSTALL(){
    # ftype Python.File=C:\path\to\Anaconda\python.exe "%1" %*
 
    fi
-
 }
 
 function GROOVY_INSTALL(){
@@ -646,6 +645,7 @@ if [[ "$MAC_TOOLS" == *"mas"* ]]; then
    echo -e "$(mas version)" >>$LOGFILE  # mas 1.4.1
 fi
 
+
 if [[ "$MAC_TOOLS" == *"ansible"* ]]; then
    # To install programs. See http://wilsonmar.github.io/ansible/
    if ! command -v ansible >/dev/null; then  # /usr/local/bin/ansible
@@ -699,26 +699,33 @@ if [[ "$MAC_TOOLS" == *"PowerShell"* ]]; then
    #echo -e "$(PowerShell -v)" >>$LOGFILE  # powershell v6.0.0-beta.7
 fi
 
-if [[ "$MAC_TOOLS" == *"kindle"* ]]; then
-   # 
-   if [ ! -d "/Applications/Kindle.app" ]; then 
-      fancy_echo "Installing MAC_TOOLS Kindle - password needed ..."
-      brew cask install --appdir="/Applications" kindle
+
+if [[ "$MAC_TOOLS" == *"alfred"* ]]; then
+   # https://www.alfredapp.com/ multi-function utility
+   if [ ! -d "/Applications/Alfred 3.app" ]; then 
+      fancy_echo "Installing MAC_TOOLS alfred ..."
+      brew cask install --appdir="/Applications" alfred
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading MAC_TOOLS Kindle ..."
-         # kindle -v
-         brew cask upgrade kindle
+         fancy_echo "Upgrading MAC_TOOLS alfred ..."
+         # alfred -v
+         brew cask upgrade alfred
       fi
    fi
+   #echo -e "$(alfred -v)" >>$LOGFILE  # alfred v6.0.0-beta.7
 
-      if grep -q "alias kindle=" "$BASHFILE" ; then    
-         fancy_echo "PATH to Kindle.app already in $BASHFILE" >>$LOGFILE
+      if grep -q "alias alfred=" "$BASHFILE" ; then    
+         fancy_echo "PATH to alfred 3.app already in $BASHFILE" >>$LOGFILE
       else
-         fancy_echo "Adding PATH to Kindle.app in $BASHFILE..."
-         echo "alias kindle='open -a \"/Applications/Kindle.app\"'" >>"$BASHFILE"
+         fancy_echo "Adding alias alfred to alfred 3.app in $BASHFILE..."
+         echo "alias alfred='open -a \"/Applications/alfred 3.app\"'" >>"$BASHFILE"
       fi
-   #echo -e "$(Kindle -v)" >>$LOGFILE  # Kindle v6.0.0-beta.7
+
+   if [[ $TRYOUT == *"alfred"* ]]; then
+      fancy_echo "Starting alfred ..." >>$LOGFILE
+      open -a "/Applications/alfred 3.app"
+   fi
+   # Buy the $19 https://www.alfredapp.com/powerpack/
 fi
 
 
@@ -813,37 +820,9 @@ echo -e "\n$(git --version)"            >>$LOGFILE
     # git version 2.14.3 (Apple Git-98)
 
 
-######### Download/clone GITHUB_REPO_URL repo:
+######### TODO: Download/clone GITHUB_REPO_URL repo:
 
 
-# When running from sh -c "$(curl -fsSL 
-UTIL_PARENT="$HOME"
-UTIL_REPO="git-utilities"
-GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO"
-if [ ! -d "$UTIL_PARENT" ]; then
-   fancy_echo "Directory $UTIL_PARENT missing, making ..."
-   mkdir $UTIL_PARENT
-fi
-   cd $UTIL_PARENT
-
-if [ ! -d "$UTIL_PARENT/$UTIL_REPO" ]; then
-   fancy_echo "Directory $UTIL_PARENT/$UTIL_REPO not created yet ..." >>$LOGFILE
-   fancy_echo "Cloning in $GITHUB_REPO_URL ..."
-   git clone $GITHUB_REPO_URL
-fi
-if [ ! -d "$UTIL_PARENT/$UTIL_REPO" ]; then
-   exit
-if
-
-if [ ! -d "secrets.sh" ]; then
-   fancy_echo "Downloading secrets.sh ..." >>$LOGFILE
-   curl -O https://raw.githubusercontent.com/wilsonmar/git-utilities/master/secrets.sh
-   # git pull
-   fancy_echo "Using existing repo rather than downloading again ..." >>$LOGFILE
-   # exit 
-fi
-      # see video: https://asciinema.org/a/41811?autoplay=1
-exit # DEBUGGING
 
 ######### Read and use secrets.sh file:
 
@@ -880,18 +859,25 @@ else
    echo "GIT_EDITOR=$GIT_EDITOR" >>$LOGFILE
    echo "GIT_BROWSER=$GIT_BROWSER" >>$LOGFILE
    echo "GIT_TOOLS=$GIT_TOOLS" >>$LOGFILE
+
    echo "WEB_TOOLS=$WEB_TOOLS" >>$LOGFILE
    echo "NGINX_PORT=$NGINX_PORT" >>$LOGFILE  # from default 8080
    echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
 
    echo "GIT_LANG=$GUI_LANG" >>$LOGFILE
-   echo "TEST_TOOLS=$TEST_TOOLS" >>$LOGFILE
    echo "JAVA_TOOLS=$JAVA_TOOLS" >>$LOGFILE
    echo "PYTHON_TOOLS=$PYTHON_TOOLS" >>$LOGFILE
+   echo "TEST_TOOLS=$TEST_TOOLS" >>$LOGFILE
    echo "CLOUD=$CLOUD" >>$LOGFILE
+
+   echo "MON_TOOLS=$MON_TOOLS" >>$LOGFILE
+   echo "COLAB_TOOLS=$COLAB_TOOLS" >>$LOGFILE
+# TODO: Artifactory, Jira, 
+
+   echo "MEDIA_TOOLS=$MEDIA_TOOLS" >>$LOGFILE
+
    echo "TRYOUT=$TRYOUT" >>$LOGFILE
 fi 
-
 
 
 ######### ~/.gitconfig initial settings:
@@ -2767,6 +2753,15 @@ fi
 # https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/
 
 
+######### TODO: FONTS="opensans, sourcecode" (for editors and web tools)
+
+# For text editors: sourcecode
+# SourceCodeVariable-Roman.ttf
+# SourceCodeVariable-Italic.ttf
+
+# For web pages: opensans
+
+
 ######### WEB_TOOLS ::
 
 
@@ -3635,7 +3630,45 @@ if [[ $TEST_TOOLS == *"golum"* ]]; then  # contains golum.
 fi
 
 
-######### COMM_TOOLS
+######### MON_TOOLS ::
+
+
+if [[ "$MON_TOOLS" == *"wireshark"* ]]; then
+   if [ ! -d "/Applications/Wireshark.app" ]; then 
+      # https://www.wireshark.org/download.html
+      fancy_echo "Installing MON_TOOLS=wireshark ..."
+      brew cask install --appdir="/Applications" wireshark
+      brew info wireshark >>$LOGFILE
+      brew list wireshark >>$LOGFILE
+      # brew cask install wireshark-chmodbpf
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading MON_TOOLS=wireshark ..."
+         wireshark -v  # first line.
+         brew cask upgrade wireshark
+      fi
+   fi
+   echo -e "$(tshark -v | grep TShark)" >>$LOGFILE  # wireshark v6.0.0-beta.7
+
+   if [[ $TRYOUT == *"wireshark"* ]]; then
+      fancy_echo "Starting TShark to Wireshark.app ..." >>$LOGFILE
+      #open -a "/Applications/Wireshark.app"
+      tshark -O TCP -c 2  # caputure x TCP packets then stop.
+   fi
+   # See https://wiki.wireshark.org/Tools
+fi
+
+if [[ "$MON_TOOLS" == *"others"* ]]; then
+# brew cask install istat-menus
+# StatsD
+# Dynatrace
+# AppD
+# Elastic Stack 
+# Grafana
+# Datadog
+fi
+
+######### COLAB_TOOLS
 
 
 #fancy_echo "At installing Collaboration / screen sharing:" >>$LOGFILE
@@ -3645,37 +3678,37 @@ fi
    # GONE? brew cask install --appdir="/Applications" Colloquy. ## IRC http://colloquy.info/downloads.html
    # GONE: brew cask install --appdir="/Applications" gotomeeting   # 32-bit
 
-if [[ $COMM_TOOLS == *"hangouts"* ]]; then
+if [[ $COLAB_TOOLS == *"hangouts"* ]]; then
    brew cask install --appdir="/Applications" google-hangouts
 fi
-if [[ $COMM_TOOLS == *"hipchat"* ]]; then 
+if [[ $COLAB_TOOLS == *"hipchat"* ]]; then 
    brew cask install --appdir="/Applications" hipchat
 fi
-if [[ $COMM_TOOLS == *"joinme"* ]]; then 
+if [[ $COLAB_TOOLS == *"joinme"* ]]; then 
    brew cask install --appdir="/Applications" joinme
 fi
-if [[ $COMM_TOOLS == *"keybase"* ]]; then 
+if [[ $COLAB_TOOLS == *"keybase"* ]]; then 
    brew cask install --appdir="/Applications" keybase  # encrypted https://keybase.io/
 fi
-if [[ $COMM_TOOLS == *"skype"* ]]; then 
+if [[ $COLAB_TOOLS == *"skype"* ]]; then 
    brew cask install --appdir="/Applications" skype  # unselect show birthdays
 fi
    # obsolete: brew cask install --appdir="/Applications" microsoft-lync
    #brew cask install --appdir="/Applications" skype-for-business  # unselect show birthdays
 
-if [[ $COMM_TOOLS == *"slack"* ]]; then
+if [[ $COLAB_TOOLS == *"slack"* ]]; then
    brew cask install --appdir="/Applications" slack  # installed to "~/Applications" by default.
 fi
-if [[ $COMM_TOOLS == *"sococo"* ]]; then 
+if [[ $COLAB_TOOLS == *"sococo"* ]]; then 
    brew cask install --appdir="/Applications" sococo
 fi
-if [[ $COMM_TOOLS == *"teamviewer"* ]]; then 
+if [[ $COLAB_TOOLS == *"teamviewer"* ]]; then 
    brew cask install --appdir="/Applications" teamviewer
 fi
-if [[ $COMM_TOOLS == *"whatsapp"* ]]; then 
+if [[ $COLAB_TOOLS == *"whatsapp"* ]]; then 
    brew cask install --appdir="/Applications" whatsapp
 fi
-if [[ $COMM_TOOLS == *"zoom"* ]]; then 
+if [[ $COLAB_TOOLS == *"zoom"* ]]; then 
    brew cask install --appdir="/Applications" zoom   # 32-bit
 fi
     #https://zapier.com/blog/disable-mic-webcam-notifications/
@@ -3684,19 +3717,60 @@ fi
 ######### MEDIA TOOLS:
 
 
+if [[ "$MEDIA_TOOLS" == *"kindle"* ]]; then
+   # https://www.amazon.com/kindle-dbs/fd/kcp
+   if [ ! -d "/Applications/Kindle.app" ]; then 
+      fancy_echo "Installing MEDIA_TOOLS Kindle ..."
+      brew cask install --appdir="/Applications" kindle
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading MEDIA_TOOLS Kindle ..."
+         # kindle -v
+         brew cask upgrade kindle
+      fi
+   fi
+
+      if grep -q "alias kindle=" "$BASHFILE" ; then    
+         fancy_echo "PATH to Kindle.app already in $BASHFILE" >>$LOGFILE
+      else
+         fancy_echo "Adding PATH to Kindle.app in $BASHFILE..."
+         echo "alias kindle='open -a \"/Applications/Kindle.app\"'" >>"$BASHFILE"
+      fi
+   #echo -e "$(Kindle -v)" >>$LOGFILE  # Kindle v6.0.0-beta.7
+
+   if [[ $TRYOUT == *"kindle"* ]]; then
+      fancy_echo "Starting Kindle ..." >>$LOGFILE
+      open -a "/Applications/Kindle.app"
+   fi
+fi
+
+
 if [[ "$MEDIA_TOOLS" == *"others"* ]]; then
-    echo "Installing MEDIA_TOOLS=others ..."; 
-# brew cask install adobe-creative-cloud
-# brew cask install camtasia   # screen recording and video editing
-# brew cask install handbrake  # rip DVD
+   fancy_echo "Installing MEDIA_TOOLS=others ..."  >>$LOGFILE
+# brew cask install spotify    # listen to music (monthly fees)
+# brew cask install vlc        # Video LAN Client to view mp4 video files
+
+# brew cask install snagit     # capture screen images
+# licecap # capture gif image of screen https://www.cockos.com/licecap/
+# brew cask install cloud      # capture screen to cloud storage http://www.getcloudapp.com/
+
+# brew cask install handbrake  # rip DVDs to (massive) mp4 files
+# brew install youtube-dl      # youtube video download
+
+# brew cask install adobe-creative-cloud  #
+# brew install ffmpeg  # manipulate images from command line
+   # See https://www.macupdate.com/app/mac/35968/remux for a GUI
+# brew cask install gimp       # image file editing
+# brew cask install sketchup   # image file editing
+
 # brew cask install audacity   # audio recording and editing
-# brew install ffmpeg
-# brew install youtube-dl
+# https://www.reaper.fm/
+
+# brew cask install camtasia   # screen recording and video editing
+# brew cask install screenflow # screencast recording
+
 # brew cask install qlimageize
-# brew cask install screenflow
-# brew cask install vlc
-# brew cask install sketchup
-# brew cask install snagit
+
 fi
 
 

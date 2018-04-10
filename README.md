@@ -33,6 +33,13 @@ Logic in the script goes beyond what Homebrew does, and <strong>configures</stro
 
 This bring DevSecOps-style <strong>"immutable architecture"</strong> to MacOS laptops. Immutability means replacing the whole machine instance instead of upgrading or repairing faulty components.
 
+Like many, you may have an AirPort Time Capsule to back up everything using the MacOS Time Machine app.
+However, as <a target="_blank" href="https://gist.github.com/zenorocha/7159780">this person discovered</a>, 
+
+> "I don't want all the crap I had in the old one."
+
+This script helps you manage what you have installed so you can, but don't have to start from scratch.
+
 Target users of this script are those who configure new laptops for developers joining the organization,
 so each developer doesn't waste days installing everything one at a time (and doing it differently than colleagues). 
 
@@ -51,7 +58,7 @@ It contains a configuration file named <strong>secrets.sh</strong> which you edi
    https://github.com/wilsonmar/git-utilities">
    https://github.com/wilsonmar/git-utilities</a>
 
-   If you know what I'm talking about and have a GitHub accoun, you may Fork the repo under your own account and, while in a Teminal window at your Home folder, git clone it locally under your Home folder.
+   If you know what I'm talking about and have a GitHub account, you may Fork the repo under your own account and, while in a Teminal window at your Home folder, git clone it locally under your Home folder.
    This approach would enable you to save your changes back up to GitHub under your own account.
 
    Alternately, follow these steps to create an initial installation of what many developers use
@@ -67,6 +74,10 @@ It contains a configuration file named <strong>secrets.sh</strong> which you edi
 
    If your home folder does not contain a folder named "git-utilities",
    the script will create one by Git cloning, using a Git client it first installs if there isn't one already.
+
+   A folder is necessary to hold additional folders such as "hooks" used by Git (if marked for install.)
+   File "mac-bash-profile.txt" contains starter entries to insert in ~/.bash_profile that is executed before MacOS opens a Terminal session. 
+   Ignore the other files.
 
 4. Wait for the script to finish.
 
@@ -94,7 +105,17 @@ It contains a configuration file named <strong>secrets.sh</strong> which you edi
    Keywords shown are for the most popular programs. The mac-install-all.sh script contains logic go
    get it setup fully <a href="#Extras">(as summarized above)</a>.
 
-9. Save the file. You need not exit the text editor completely.
+   ### TRYOUT one at a time
+
+8. Scroll to the bottom of the secrets.sh file and click between the double-quotes of <tt><strong>TRYOUT=""</strong></tt>.
+
+   Paste or type the keyword of the components you want opened (invoked) by the script.
+
+   We don't want to automatically open every component installed because that would be overwhelming.
+
+   This way you have a choice.
+
+9. Save the file. You need not exit the text editor completely if you want to re-run.
 10. Run the script to carry out your changes:
 
     <pre><strong>chmod +x mac-install-all.sh
@@ -267,8 +288,13 @@ The files are downloaded into <a target="_blank" href="https://support.apple.com
 
 ## Other lists of Mac programs 
 
+   * https://github.com/paulirish/dotfiles/blob/master/brew-cask.sh
+   (one of the earliest ones by a legend at Google)
+
    * https://github.com/andrewconnell/osx-install described at http://www.andrewconnell.com/blog/rapid-complete-install-reinstall-os-x-like-a-champ-in-three-ish-hours separates coreinstall.sh from myinstall.sh for personal preferences.
 
+   * https://www.reddit.com/r/osx/comments/3u6mob/what_are_the_top_10_osx_applications_you_use/
    * https://github.com/siyelo/laptop
    * https://github.com/evanchiu/dotfiles
    * https://github.com/jeffreyjackson/mac-apps
+   * https://github.com/jaywcjlove/awesome-mac/blob/master/README.md
