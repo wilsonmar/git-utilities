@@ -815,27 +815,33 @@ echo -e "\n$(git --version)"            >>$LOGFILE
 
 
 # When running from sh -c "$(curl -fsSL 
+UTIL_PARENT="$HOME"
 UTIL_REPO="git-utilities"
-if [ ! -d "$HOME/$UTIL_REPO" ]; then
-   GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO.git"
+GITHUB_REPO_URL="https://github.com/wilsonmar/$UTIL_REPO.git"
+if [ ! -d "$UTIL_PARENT" ]; then
+   fancy_echo "Directory $UTIL_PARENT missing, making ..."
+   mkdir $UTIL_PARENT
+fi
+   fancy_echo "cd into $PWD ..." >>$LOGFILE
+   cd $UTIL_PARENT
+
+if [ ! -d "$UTIL_PARENT/$UTIL_REPO" ]; then
+   fancy_echo "Directory $UTIL_PARENT/$UTIL_REPO not created yet ..." >>$LOGFILE
    fancy_echo "Cloning in $GITHUB_REPO_URL ..."
    git clone "$GITHUB_REPO_URL" --depth=1  # only master branche, no history
+   cd $UTIL_REPO
    # List branch and latest commit SHA:
    GIT_BRANCH="branch $(git_parse_branch) commit $(git_parse_hash)" 
-   fancy_echo "$GIT_BRANCH"
+   fancy_echo "$GIT_BRANCH" >>$LOGFILE
 else
-   fancy_echo "$UTIL_REPO found ..."
-fi
-
-if [ ! -d "$HOME/$UTIL_REPO" ]; then
-   fancy_echo "Directory $HOME/$UTIL_REPO missing despite cloning ..."
-else
-   fancy_echo "cd into $HOME/$UTIL_REPO ..."
-   cd $HOME/$UTIL_REPO
+   fancy_echo "Directory $UTIL_PARENT/$UTIL_REPO exists already ..." >>$LOGFILE
+   # Do not rm -rf $UTIL_REPO
+   # git pull
+   fancy_echo "Using existing repo rather than downloading again ..." >>$LOGFILE
+   # exit 
 fi
       # see video: https://asciinema.org/a/41811?autoplay=1
-pwd  >>$LOGFILE
-
+exit # DEBUGGING
 
 ######### Read and use secrets.sh file:
 
