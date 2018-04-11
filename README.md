@@ -217,13 +217,13 @@ This is so that during runs, what appears on the command console are only what i
 At the end of the script, the log is shown in an editor to <strong>enable search</strong> through the whole log.
 
 
-<a name"JenkinsStart"></a>
+<a name="JenkinsStart"></a>
 
 ## Jenkins server
 
 To start the Jenkins server to a specified port:
 
-    <pre>jenkins --httpPort=$JENKINS_PORT &</pre>
+    <pre>jenkins --httpPort=$JENKINS_PORT  &</pre>
 
    The "&" puts the process in the background so that the script can continue running.
 
@@ -236,6 +236,7 @@ Several other methods (which don't work now) are presented on the internet:
 
    * <a target="_blank" href="https://three1415.wordpress.com/2014/12/29/changing-jenkins-port-on-mac-os-x/">
    This blog, on Dec 29, 2014</a> recommends
+
    <pre>sudo defaults write /Library/Preferences/org.jenkins-ci httpPort "$JENKINS_PORT"
    sudo launchctl unload /Library/LaunchDaemons/org.jenkins-ci.plist
    sudo launchctl load /Library/LaunchDaemons/org.jenkins-ci.plist
@@ -366,7 +367,7 @@ based on the id "security-token" defined in this HTML:
 
 The call is:
 
-   <pre>python tests/jenkins_secret_chrome.py  $JENKINS_PORT  $JENKINS_SECRET
+   <pre>python tests/jenkins_secret_chrome.py  chrome  $JENKINS_PORT  $JENKINS_SECRET
    </pre>
 
 We use Selenium Python because it reads and writes system environment variables.
