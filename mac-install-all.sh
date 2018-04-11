@@ -290,6 +290,11 @@ function PYTHON3_INSTALL(){
    # NOTE: To make "python" command reach Python3 instead of 2.7, per docs.python-guide.org/en/latest/starting/install3/osx/
    # Put in PATH Python 3.6 bits at /usr/local/bin/ before Python 2.7 bits at /usr/bin/
 
+      if ! python3 -c "import pytz">/dev/null 2>&1 ; then   
+         fancy_echo "Installing utility import pytz ..."
+         python3 -m pip install pytz  # in /usr/local/lib/python3.6/site-packages
+      fi
+
    if [[ "$PYTHON_TOOLS" == *"anaconda"* ]]; then
       if [ ! -d "/Applications/Google Chrome.app" ]; then 
       # if ! command -v anaconda >/dev/null; then  # /usr/bin/anacondadriver
@@ -938,7 +943,7 @@ else
 
    echo "MEDIA_TOOLS=$MEDIA_TOOLS" >>$LOGFILE
 
-   echo "WEB_TOOLS=$WEB_TOOLS" >>$LOGFILE
+   echo "LOCALHOSTS=$LOCALHOSTS" >>$LOGFILE
    echo "NGINX_PORT=$NGINX_PORT" >>$LOGFILE  # from default 8080
    echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
    echo "JENKINS_PORT=$JENKINS_PORT" >>$LOGFILE  # from default 8080
@@ -2830,25 +2835,25 @@ fi
 # For web pages: opensans
 
 
-######### WEB_TOOLS SERVERS ::
+######### LOCALHOSTS SERVERS ::
 
 
-if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
+if [[ "$LOCALHOSTS" == *"nginx"* ]]; then
    # See https://wilsonmar.github.io/nginx
    JAVA_INSTALL  # pre-requisite
    if ! command -v nginx >/dev/null; then  # in /usr/local/bin/nginx
-      fancy_echo "Installing WEB_TOOLS=nginx ..."
+      fancy_echo "Installing LOCALHOSTS=nginx ..."
       brew install nginx
       brew info nginx >>$LOGFILE
       brew list nginx >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading WEB_TOOLS=nginx ..."
+         fancy_echo "Upgrading LOCALHOSTS=nginx ..."
          nginx -v  # nginx version: nginx/1.13.11
          brew upgrade nginx
       fi
    fi
-   fancy_echo -e "WEB_TOOLS=nginx :: $(nginx -v)" >>$LOGFILE
+   fancy_echo -e "LOCALHOSTS=nginx :: $(nginx -v)" >>$LOGFILE
    echo -e "openssl :: $(openssl version)" >>$LOGFILE
 
    # Docroot is:    /usr/local/var/www
@@ -2857,59 +2862,59 @@ if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
    if [[ $TRYOUT == *"nginx"* ]]; then
       PS_OUTPUT=$(ps -ef | grep nginx)
       if grep -q "nginx: master process" "$PS_OUTFILE" ; then 
-         fancy_echo "WEB_TOOLS=nginx running on $PS_OUTPUT." >>$LOGFILE
+         fancy_echo "LOCALHOSTS=nginx running on $PS_OUTPUT." >>$LOGFILE
       else
          # NGINX_PORT="8087"  # from default 8080
-         fancy_echo "Configuring WEB_TOOLS /usr/local/etc/nginx/nginx.conf to port $NGINX_PORT ..."
+         fancy_echo "Configuring LOCALHOSTS /usr/local/etc/nginx/nginx.conf to port $NGINX_PORT ..."
          sed -i "s/8080/$NGINX_PORT/g" /usr/local/etc/nginx/nginx.conf
 
-         fancy_echo "Starting WEB_TOOLS=nginx in background ..."
+         fancy_echo "Starting LOCALHOSTS=nginx in background ..."
          nginx &
          
-         fancy_echo "Opening localhost:$NGINX_PORT for WEB_TOOLS=nginx ..."
+         fancy_echo "Opening localhost:$NGINX_PORT for LOCALHOSTS=nginx ..."
          open "http://localhost:$NGINX_PORT"  # to show default Welcome to Nginx
       fi 
    fi
 fi
 
-if [[ "$WEB_TOOLS" == *"tomcat"* ]]; then
+if [[ "$LOCALHOSTS" == *"tomcat"* ]]; then
    # See https://tomcat.apache.org/
    JAVA_INSTALL  # pre-requisite
    if ! command -v tomcat >/dev/null; then  # in /usr/local/bin/tomcat
-      fancy_echo "Installing WEB_TOOLS=tomcat ..."
+      fancy_echo "Installing LOCALHOSTS=tomcat ..."
       brew install tomcat
       brew info tomcat >>$LOGFILE
       brew list tomcat >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading WEB_TOOLS=tomcat ..."
+         fancy_echo "Upgrading LOCALHOSTS=tomcat ..."
          tomcat -v  # 9.0.5
          brew upgrade tomcat
       elif [[ "${MY_RUNTYPE,,}" == *"uninstall"* ]]; then
-         fancy_echo "Uninstalling WEB_TOOLS=tomcat ..."
+         fancy_echo "Uninstalling LOCALHOSTS=tomcat ..."
          tomcat -v 
          brew uninstall tomcat
       fi
    fi
-   fancy_echo -e "WEB_TOOLS=tomcat :: $(tomcat -v)" >>$LOGFILE
+   fancy_echo -e "LOCALHOSTS=tomcat :: $(tomcat -v)" >>$LOGFILE
    if [[ $TRYOUT == *"tomcat"* ]]; then
       PS_OUTPUT=$(ps -ef | grep tomcat)
       if grep -q "/Library/java" "$PS_OUTFILE" ; then 
-         fancy_echo "WEB_TOOLS=tomcat running on $PS_OUTPUT." >>$LOGFILE
+         fancy_echo "LOCALHOSTS=tomcat running on $PS_OUTPUT." >>$LOGFILE
       else
          # TOMCAT_PORT="8089"  # from default 8080
          # Using dynamic path /usr/local/opt/tomcat/
-         fancy_echo "Configuring WEB_TOOLS /usr/local/opt/tomcat/libexec/conf/server.xml to port $TOMCAT_PORT ..."
+         fancy_echo "Configuring LOCALHOSTS /usr/local/opt/tomcat/libexec/conf/server.xml to port $TOMCAT_PORT ..."
          sed -i "s/8080/$TOMCAT_PORT/g" /usr/local/opt/tomcat/libexec/conf/server.xml
             #     <Connector port="8080" protocol="HTTP/1.1"
             #     <Connector executor="tomcatThreadPool"
             #               port="8089" protocol="HTTP/1.1"
 
-         fancy_echo "Starting WEB_TOOLS=tomcat in background ..."
+         fancy_echo "Starting LOCALHOSTS=tomcat in background ..."
          catalina run &
          # brew services start tomcat  # To have launchd start tomcat now and restart at login
 
-         fancy_echo "Opening localhost:$TOMCAT_PORT for WEB_TOOLS=tomcat ..."
+         fancy_echo "Opening localhost:$TOMCAT_PORT for LOCALHOSTS=tomcat ..."
          open "http://localhost:$TOMCAT_PORT"
          # See https://www.mkyong.com/tomcat/how-to-change-tomcat-default-port/
 
@@ -3770,7 +3775,7 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
                      cfg:default.paths.data=/usr/local/var/lib/grafana \
                      cfg:default.paths.plugins=/usr/local/var/lib/grafana/plugins &
 
-      fancy_echo "Opening localhost:$GRAFANA_PORT for WEB_TOOLS=nginx ..."
+      fancy_echo "Opening localhost:$GRAFANA_PORT for LOCALHOSTS=nginx ..."
       open "http://localhost:$GRAFANA_PORT"
       # Capture version: Grafana v5.0.4 (commit: unknown-dev)
 
@@ -3894,40 +3899,40 @@ if [[ "$MEDIA_TOOLS" == *"others"* ]]; then
 fi
 
 
-######### WEB_TOOLS ::
+######### LOCALHOSTS ::
 
 
-if [[ "$WEB_TOOLS" == *"jenkins"* ]]; then
+if [[ "$LOCALHOSTS" == *"jenkins"* ]]; then
    # https://wilsonmar.github.io/jenkins-setup
    JAVA_INSTALL  # pre-requisite
    if ! command -v jenkins >/dev/null; then  # in /usr/local/bin/jenkins
-      fancy_echo "Installing WEB_TOOLS=jenkins ..."
+      fancy_echo "Installing LOCALHOSTS=jenkins ..."
       brew install jenkins
       brew info jenkins >>$LOGFILE
       brew list jenkins >>$LOGFILE
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading WEB_TOOLS=jenkins ..."
+         fancy_echo "Upgrading LOCALHOSTS=jenkins ..."
          jenkins --version  # 2.113
          brew upgrade jenkins
       fi
    fi
-   fancy_echo -e "WEB_TOOLS=jenkins :: $(jenkins --version)" >>$LOGFILE
+   fancy_echo -e "LOCALHOSTS=jenkins :: $(jenkins --version)" >>$LOGFILE
    
    if [[ $TRYOUT == *"jenkins"* ]]; then
       JENKINS_VERSION=$(jenkins --version)  # 2.113
       PS_OUTPUT=$(ps -ef | grep jenkins)
       if grep -q "jenkins: master process" "$PS_OUTFILE" ; then 
-         fancy_echo "WEB_TOOLS=jenkins running on $PS_OUTPUT." >>$LOGFILE
+         fancy_echo "LOCALHOSTS=jenkins running on $PS_OUTPUT." >>$LOGFILE
       else
          # Custom JENKINS_PORT="8086" defined in secrets.sh within this script
          #JENKINS_CONF="/usr/local/Cellar/Jenkins/$JENKINS_VERSION/homebrew.mxcl.jenkins.plist"
          JENKINS_CONF="/usr/local/opt/jenkins/homebrew.mxcl.jenkins.plist"
-         fancy_echo "Configuring WEB_TOOLS $JENKINS_CONF to port $JENKINS_PORT ..."
+         fancy_echo "Configuring LOCALHOSTS $JENKINS_CONF to port $JENKINS_PORT ..."
          sed -i "s/httpPort=8080/httpPort=$JENKINS_PORT/g" $JENKINS_CONF
                # --httpPort=8080 is default.
 
-         fancy_echo "Starting WEB_TOOLS=jenkins on port $JENKINS_PORT in background ..."
+         fancy_echo "Starting LOCALHOSTS=jenkins on port $JENKINS_PORT in background ..."
          jenkins --httpPort=$JENKINS_PORT &
             #java -jar jenkins.war "--httpPort=$JENKINS_PORT" &  /usr/local/Cellar/jenkins/2.113/bin/jenkins
             #JAVA_HOME="$(/usr/libexec/java_home --version 1.8)" \
@@ -3935,7 +3940,7 @@ if [[ "$WEB_TOOLS" == *"jenkins"* ]]; then
                # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home
          
          # Instead of:
-         #fancy_echo "Opening localhost:$JENKINS_PORT for WEB_TOOLS=jenkins ..."
+         #fancy_echo "Opening localhost:$JENKINS_PORT for LOCALHOSTS=jenkins ..."
          #open "http://localhost:$JENKINS_PORT"
 
          # pick up key such as 851ed535fd3249ab95a274d23242655c from:
