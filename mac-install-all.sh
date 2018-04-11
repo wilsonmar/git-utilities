@@ -820,40 +820,39 @@ fi
 
 if [[ "$MAC_TOOLS" == *"others"* ]]; then
       echo "Installing MAC_TOOLS=others ..."; 
-#   brew cask install monolingual # remove unneeded osx lang files https://ingmarstein.github.io/Monolingual/
-#   brew cask install vmware-fusion  # run Windows
+#   brew cask install --appdir="/Applications" monolingual # remove unneeded osx lang files https://ingmarstein.github.io/Monolingual/
+#   brew cask install --appdir="/Applications" vmware-fusion  # run Windows
 
 #   brew install google-drive
 #   brew install dropbox
 #   brew install box
 #   brew install amazon
 
-#   brew cask install charles  # proxy
-#   brew cask install xtrafinder
-#   brew cask install sizeup  # $12.99 resize windows http://www.irradiatedsoftware.com/sizeup/
-#   brew cask install bartender   # manage icons at top launch bar
-#   brew cask install duet
-#   brew cask install logitech-harmony
-#   brew cask install cheatsheet  # hold ⌘ gives you all the shortcuts you can use with the active app.
-#   brew cask install steam
-#   brew cask install fritzing   
-#   brew cask install nosleep
-#   brew cask install balsamiq-mockups  # for designing website forms
-#   brew cask install brackets # Cross-platform code editor for the web, written in JavaScript, HTML and CSS 
-#   brew cask install smartsynchronize
-#   brew cask install toggldesktop
-#   brew cask install xmind
-#   brew cask install webstorm
+#   brew cask install --appdir="/Applications" charles  # proxy
+#   brew cask install --appdir="/Applications" xtrafinder
+#   brew cask install --appdir="/Applications" sizeup  # $12.99 resize windows http://www.irradiatedsoftware.com/sizeup/
+#   brew cask install --appdir="/Applications" bartender   # manage icons at top launch bar
+#   brew cask install --appdir="/Applications" duet
+#   brew cask install --appdir="/Applications" logitech-harmony  # multi-controller of TVs etc
+#   brew cask install --appdir="/Applications" cheatsheet  # hold ⌘ gives you all the shortcuts you can use with the active app.
+#   brew cask install --appdir="/Applications" steam
+#   brew cask install --appdir="/Applications" fritzing
+#   brew cask install --appdir="/Applications" nosleep
+#   brew cask install --appdir="/Applications" balsamiq-mockups  # for designing website forms
+#   brew cask install --appdir="/Applications" smartsynchronize
+#   brew cask install --appdir="/Applications" toggldesktop
+#   brew cask install --appdir="/Applications" xmind
+#   brew cask install --appdir="/Applications" webstorm
 #   brew install jsdoc3
-#   brew cask install appcleaner
-#   brew cask install qlcolorcode
-#   brew cask install qlstephen
-#   brew cask install qlmarkdown
-#   brew cask install quicklook-json
-#   brew cask install quicklook-csv
-#   brew cask install betterzipql
-#   brew cask install asepsis
-#   brew cask install cheatsheet
+#   brew cask install --appdir="/Applications" appcleaner
+#   brew cask install --appdir="/Applications" qlcolorcode
+#   brew cask install --appdir="/Applications" qlstephen
+#   brew cask install --appdir="/Applications" qlmarkdown
+#   brew cask install --appdir="/Applications" quicklook-json
+#   brew cask install --appdir="/Applications" quicklook-csv
+#   brew cask install --appdir="/Applications" betterzipql
+#   brew cask install --appdir="/Applications" asepsis
+#   brew cask install --appdir="/Applications" cheatsheet
 # http://almworks.com/jiraclient/download.html
 fi
 
@@ -920,22 +919,30 @@ else
    echo "GIT_BROWSER=$GIT_BROWSER" >>$LOGFILE
    echo "GIT_TOOLS=$GIT_TOOLS" >>$LOGFILE
 
-   echo "WEB_TOOLS=$WEB_TOOLS" >>$LOGFILE
-   echo "NGINX_PORT=$NGINX_PORT" >>$LOGFILE  # from default 8080
-   echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
-
    echo "GIT_LANG=$GUI_LANG" >>$LOGFILE
    echo "JAVA_TOOLS=$JAVA_TOOLS" >>$LOGFILE
    echo "PYTHON_TOOLS=$PYTHON_TOOLS" >>$LOGFILE
    echo "TEST_TOOLS=$TEST_TOOLS" >>$LOGFILE
+
    echo "CLOUD=$CLOUD" >>$LOGFILE
+   # AWS_ACCESS_KEY_ID=""
+   # AWS_SECRET_ACCESS_KEY=""
+   # AWS_REGION="us-west-1"
+   # SAUCE_USERNAME=""
+   # SAUCE_ACCESS_KEY=""
 
    echo "MON_TOOLS=$MON_TOOLS" >>$LOGFILE
    echo "VIZ_TOOLS=$VIZ_TOOLS" >>$LOGFILE
    echo "COLAB_TOOLS=$COLAB_TOOLS" >>$LOGFILE
-# TODO: Artifactory, Jira, 
+        # TODO: Artifactory, Jira, 
 
    echo "MEDIA_TOOLS=$MEDIA_TOOLS" >>$LOGFILE
+
+   echo "WEB_TOOLS=$WEB_TOOLS" >>$LOGFILE
+   echo "NGINX_PORT=$NGINX_PORT" >>$LOGFILE  # from default 8080
+   echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
+   echo "JENKINS_PORT=$JENKINS_PORT" >>$LOGFILE  # from default 8080
+   echo "GRAFANA_PORT=$GRAFANA_PORT" >>$LOGFILE  # from default 8080
 
    echo "TRYOUT=$TRYOUT" >>$LOGFILE
 fi 
@@ -2823,7 +2830,7 @@ fi
 # For web pages: opensans
 
 
-######### WEB_TOOLS ::
+######### WEB_TOOLS SERVERS ::
 
 
 if [[ "$WEB_TOOLS" == *"nginx"* ]]; then
@@ -3248,7 +3255,7 @@ if [[ $CLOUD == *"minikube"* ]]; then
 
    if ! command -v minikube >/dev/null; then  # not in /usr/local/bin/minikube
       fancy_echo "Installing minikube using Homebrew ..."
-      brew cask install minikube
+      brew cask install --appdir="/Applications" minikube
    else
       if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
          fancy_echo "minikube upgrading ..."
@@ -3723,7 +3730,6 @@ if [[ "$MON_TOOLS" == *"others"* ]]; then
 # Open Tracing
 # Dynatrace
 # AppD
-# Grafana
 # Datadog
 fi
 
@@ -3748,8 +3754,14 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
 
    if [[ $TRYOUT == *"grafana"* ]]; then
 
-      GRAFANA_PORT="3000"  # per outputs.
+      #GRAFANA_PORT="3000"  # per outputs.
       # http_port=1234
+
+      PS_OUTPUT=$(ps -ef | grep grafana)
+      if grep -q "grafana-server" "$PS_OUTFILE" ; then 
+         fancy_echo "grafana already running." >>$LOGFILE
+         # grafana stop or kill it
+      fi 
 
       fancy_echo "Starting VIZ_TOOLS=grafana session in background ..." >>$LOGFILE
       grafana-server --config=/usr/local/etc/grafana/grafana.ini \
@@ -3761,6 +3773,7 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
       fancy_echo "Opening localhost:$GRAFANA_PORT for WEB_TOOLS=nginx ..."
       open "http://localhost:$GRAFANA_PORT"
       # Capture version: Grafana v5.0.4 (commit: unknown-dev)
+
    fi
    # brew tap homebrew/services
    # brew services start grafana
@@ -3854,30 +3867,87 @@ fi
 
 if [[ "$MEDIA_TOOLS" == *"others"* ]]; then
    fancy_echo "Installing MEDIA_TOOLS=others ..."  >>$LOGFILE
-# brew cask install spotify    # listen to music (monthly fees)
-# brew cask install vlc        # Video LAN Client to view mp4 video files
+# brew cask install --appdir="/Applications" spotify    # listen to music (monthly fees)
+# brew cask install --appdir="/Applications" vlc        # Video LAN Client to view mp4 video files
 
-# brew cask install snagit     # capture screen images
+# brew cask install --appdir="/Applications" snagit     # capture screen images
 # licecap # capture gif image of screen https://www.cockos.com/licecap/
-# brew cask install cloud      # capture screen to cloud storage http://www.getcloudapp.com/
+# brew cask install --appdir="/Applications" cloud      # capture screen to cloud storage http://www.getcloudapp.com/
 
-# brew cask install handbrake  # rip DVDs to (massive) mp4 files
+# brew cask install --appdir="/Applications" handbrake  # rip DVDs to (massive) mp4 files
 # brew install youtube-dl      # youtube video download
 
-# brew cask install adobe-creative-cloud  #
+# brew cask install --appdir="/Applications" adobe-creative-cloud  #
 # brew install ffmpeg  # manipulate images from command line
    # See https://www.macupdate.com/app/mac/35968/remux for a GUI
-# brew cask install gimp       # image file editing
-# brew cask install sketchup   # image file editing
+# brew cask install --appdir="/Applications" gimp       # image file editing
+# brew cask install --appdir="/Applications" sketchup   # image file editing
 
-# brew cask install audacity   # audio recording and editing
+# brew cask install --appdir="/Applications" audacity   # audio recording and editing
 # https://www.reaper.fm/
 
-# brew cask install camtasia   # screen recording and video editing
-# brew cask install screenflow # screencast recording
+# brew cask install --appdir="/Applications" camtasia   # screen recording and video editing
+# brew cask install --appdir="/Applications" screenflow # screencast recording
 
-# brew cask install qlimageize
+# brew cask install --appdir="/Applications" qlimageize
 
+fi
+
+
+######### WEB_TOOLS ::
+
+
+if [[ "$WEB_TOOLS" == *"jenkins"* ]]; then
+   # https://wilsonmar.github.io/jenkins-setup
+   JAVA_INSTALL  # pre-requisite
+   if ! command -v jenkins >/dev/null; then  # in /usr/local/bin/jenkins
+      fancy_echo "Installing WEB_TOOLS=jenkins ..."
+      brew install jenkins
+      brew info jenkins >>$LOGFILE
+      brew list jenkins >>$LOGFILE
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading WEB_TOOLS=jenkins ..."
+         jenkins --version  # 2.113
+         brew upgrade jenkins
+      fi
+   fi
+   fancy_echo -e "WEB_TOOLS=jenkins :: $(jenkins --version)" >>$LOGFILE
+   
+   if [[ $TRYOUT == *"jenkins"* ]]; then
+      JENKINS_VERSION=$(jenkins --version)  # 2.113
+      PS_OUTPUT=$(ps -ef | grep jenkins)
+      if grep -q "jenkins: master process" "$PS_OUTFILE" ; then 
+         fancy_echo "WEB_TOOLS=jenkins running on $PS_OUTPUT." >>$LOGFILE
+      else
+         # Custom JENKINS_PORT="8086" defined in secrets.sh within this script
+         #JENKINS_CONF="/usr/local/Cellar/Jenkins/$JENKINS_VERSION/homebrew.mxcl.jenkins.plist"
+         JENKINS_CONF="/usr/local/opt/jenkins/homebrew.mxcl.jenkins.plist"
+         fancy_echo "Configuring WEB_TOOLS $JENKINS_CONF to port $JENKINS_PORT ..."
+         sed -i "s/httpPort=8080/httpPort=$JENKINS_PORT/g" $JENKINS_CONF
+               # --httpPort=8080 is default.
+
+         fancy_echo "Starting WEB_TOOLS=jenkins on port $JENKINS_PORT in background ..."
+         jenkins --httpPort=$JENKINS_PORT &
+            #java -jar jenkins.war "--httpPort=$JENKINS_PORT" &  /usr/local/Cellar/jenkins/2.113/bin/jenkins
+            #JAVA_HOME="$(/usr/libexec/java_home --version 1.8)" \
+               # exec java  -jar /usr/local/Cellar/jenkins/2.113/libexec/jenkins.war "$@"
+               # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home
+         
+         fancy_echo "Opening localhost:$JENKINS_PORT for WEB_TOOLS=jenkins ..."
+         open "http://localhost:$JENKINS_PORT"
+
+         PID="ps -A | grep -m1 'jenkins' | awk '{print $1}'"
+         fancy_echo "Shutting downn jenkins $PID ..."
+         kill $PID
+
+         # TODO: Call Selenium script to pick up key such as 851ed535fd3249ab95a274d23242655c from:
+         # /Users/wilsonmar/.jenkins/secrets/initialAdminPassword
+         # Then paste the number on screen's Administrator Password field:
+         # <input id="security-token" class="form-control" type="password" name="j_password">
+         
+      fi 
+   fi
 fi
 
 
