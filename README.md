@@ -329,7 +329,7 @@ The path is defined in a variable so simplify the sed command to make the change
 
 ### Jenkins GUI in browser
 
-To view the server in the default internet browser (such as Safari, Chrome, etc.):
+The command to view the server in the default internet browser (such as Safari, Chrome, etc.) is:
 
    <pre>open "http://localhost:$JENKINS_PORT"</pre>
 
@@ -337,6 +337,8 @@ To view the server in the default internet browser (such as Safari, Chrome, etc.
 
 When executed the first time, Jenkins displays this screen:
 
+
+However, we don't want to open it from the command line script, but from a GUI automation script.
 
 <a name="JenkinsGUIAuto"></a>
 
@@ -348,17 +350,24 @@ The script invokes a GUI automation script that opens the file mentioned on the 
 
    "/Users/wilsonmar" is represented by the environment variable named $HOME or ~ symbol,
    which would be different for you, with your own MacOS account name.
+   Thus, the generic coding is:
 
-   The file contains a string in clear-text like "851ed535fd3249ab95a274d23242655c".
+   <pre>JENKINS_SECRET=$(<$HOME/.jenkins/secrets/initialAdminPassword)</pre>
 
-We then use a GUI automation script to get that string to paste it in the box labeled "Administrator Password"
+The file (and now $JENKINS_SECRET) contains a string in clear-text like "851ed535fd3249ab95a274d23242655c".
+
+We then call a GUI automation script to get that string to paste it in the box labeled "Administrator Password"
 based on the id "security-token" defined in this HTML:
 
    <pre>&LT;input id="security-token" class="form-control" type="password" name="j_password">
    </pre>
 
-   We prefer to use id rather than name fields because the HTML standard states that id's are 
-   supposed to be unique in each web page.
+   This was determined by obtaining the outer HTML from Chrome Developer Tools.
+
+The call is:
+
+   <pre>python tests/jenkins_secret_chrome.py  $JENKINS_PORT  $JENKINS_SECRET
+   </pre>
 
 We use Selenium Python because it reads and writes system environment variables.
 
@@ -375,15 +384,20 @@ To shut down Jenkins,
 
 The above is the automated approach to the manual on recommended by many blogs on the internet:
 
+   Some say in Finder look for Applications -> Utilities -> Activity Monitor
+   
+   Others say use command:
+
    <pre>ps -el | grep jenkins</pre>
 
    Two lines would appear. One is the bash command to do the ps command. 
+   
    The PID desired is the one that lists the path used to invoke Jenkins, 
    <a href="#JenkinsJava">described above</a>:
 
-   /usr/bin/java -jar /usr/local/Cellar/jenkins/2.113/libexec/jenkins.war
+   <pre>/usr/bin/java -jar /usr/local/Cellar/jenkins/2.113/libexec/jenkins.war</pre>
 
-   <pre>kill <em>PID</em></pre>
+   <pre>kill <em>2134</em></pre>
 
    That is the equivalent of Windows command "taskkill /F /PID XXXX"
 
@@ -394,6 +408,57 @@ The above is the automated approach to the manual on recommended by many blogs o
 Either way, the response expected is:
 
    <pre>INFO: JVM is terminating. Shutting down Winstone</pre>
+
+
+## Python GUI Automation
+
+
+If the title is not found:
+
+   <pre>
+  File "tests/jenkins_secret_chrome.py", line 30, in <module>
+    assert "Jenkins [Jenkins]" in driver.title  # bail out if not found.
+AssertionError
+   </pre>
+
+   We prefer to use id rather than name fields because the HTML standard states that id's are 
+   supposed to be unique in each web page.
+
+
+### Delay to view
+
+Some put in a 5 second delay:
+
+   <pre>time.sleep(5)</pre>
+
+Use of this feature requires a library to be specified at the top of the file:
+
+   <pre>import sys</pre>
+
+### Screen shot picture
+
+Some also take a photo to "prove" that the result was achieved:
+
+   <pre>driver.save_screenshot('jenkins_secret_chrome.py' +utc_offset_sec+ '.png')</pre>
+
+We put the name of the script file in the picture name to trace back to its origin.
+We put a time stamp in ISO 8601 format so that several png files sort by date.
+
+utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
+datetime.datetime.now().replace(tzinfo=datetime.timezone(offset=utc_offset_sec)).isoformat()
+
+The long explanation is https://docs.python.org/2/library/datetime.html
+
+### End of script
+
+<a target="_blank" href="https://stackoverflow.com/questions/15067107/difference-between-webdriver-dispose-close-and-quit">
+NOTE</a>:
+
+   * webDriver.Close() - Close the browser window that currently has focus
+   * webDriver.Quit() - Calls Dispose()
+   * webDriver.Dispose() Closes all browser windows and safely ends the session
+
+driver.quit() means that someone watching the script execute would only see the web app's screen for a split second. 
 
 
 <a name="Groovy"></a>

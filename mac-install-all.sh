@@ -3934,18 +3934,23 @@ if [[ "$WEB_TOOLS" == *"jenkins"* ]]; then
                # exec java  -jar /usr/local/Cellar/jenkins/2.113/libexec/jenkins.war "$@"
                # /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home
          
-         fancy_echo "Opening localhost:$JENKINS_PORT for WEB_TOOLS=jenkins ..."
-         open "http://localhost:$JENKINS_PORT"
+         # Instead of:
+         #fancy_echo "Opening localhost:$JENKINS_PORT for WEB_TOOLS=jenkins ..."
+         #open "http://localhost:$JENKINS_PORT"
+
+         # pick up key such as 851ed535fd3249ab95a274d23242655c from:
+         # /Users/wilsonmar/.jenkins/secrets/initialAdminPassword
+         JENKINS_SECRET=$(<$HOME/.jenkins/secrets/initialAdminPassword)
+         echo "$JENKINS_SECRET"
+
+         # TODO: Call Selenium script to paste the number on screen's Administrator Password field:
+         # <input id="security-token" class="form-control" type="password" name="j_password">
+         python tests/jenkins_secret_chrome.py   $JENKINS_PORT  $JENKINS_SECRET
 
          PID="ps -A | grep -m1 'jenkins' | awk '{print $1}'"
          fancy_echo "Shutting downn jenkins $PID ..."
          kill $PID
 
-         # TODO: Call Selenium script to pick up key such as 851ed535fd3249ab95a274d23242655c from:
-         # /Users/wilsonmar/.jenkins/secrets/initialAdminPassword
-         # Then paste the number on screen's Administrator Password field:
-         # <input id="security-token" class="form-control" type="password" name="j_password">
-         
       fi 
    fi
 fi
