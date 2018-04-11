@@ -139,7 +139,7 @@ It contains a configuration file named <strong>secrets.sh</strong> which you edi
 
     <pre><strong>
     mac-install-all.sh uninstall
-    </string></pre>
+    </strong></pre>
 
     This is not an option for components that add lines to ~/.bash_profile.
     It's quite dangerous because the script cannot differentiate whether customizations occured to what it installed.
@@ -412,17 +412,13 @@ Either way, the response expected is:
 
 ## Python GUI Automation
 
-
-If the title is not found:
+If the title is not found an error message like this appears on the console:
 
    <pre>
   File "tests/jenkins_secret_chrome.py", line 30, in <module>
     assert "Jenkins [Jenkins]" in driver.title  # bail out if not found.
 AssertionError
    </pre>
-
-   We prefer to use id rather than name fields because the HTML standard states that id's are 
-   supposed to be unique in each web page.
 
 
 ### Delay to view
@@ -449,6 +445,7 @@ datetime.datetime.now().replace(tzinfo=datetime.timezone(offset=utc_offset_sec))
 
 The long explanation is https://docs.python.org/2/library/datetime.html
 
+
 ### End of script
 
 <a target="_blank" href="https://stackoverflow.com/questions/15067107/difference-between-webdriver-dispose-close-and-quit">
@@ -460,6 +457,10 @@ NOTE</a>:
 
 driver.quit() means that someone watching the script execute would only see the web app's screen for a split second. 
 
+   We prefer to use id rather than name fields because the HTML standard states that id's are 
+   supposed to be unique in each web page.
+
+<hr />
 
 <a name="Groovy"></a>
 
