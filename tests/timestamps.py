@@ -25,23 +25,3 @@ def iso8601_local():
 
 print(iso8601_utc()+"   = ISO8601 time at +00:00 UTC (Zulu time), with microseconds")
 print(iso8601_local()+" = ISO8601 time at local time zone offset, with random microseconds")
-
-
-
-#tz = pytz.timezone('America/Los_Angeles')
-#print(datetime.fromtimestamp(1463288494, tz).isoformat())
-
-#2016-05-14T22:01:34-07:00
-
-#import sys
-#import argparse  # https://docs.python.org/2/howto/argparse.html
-#import time  # tzinfo,  timedelta
-
-#utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
-#datetime.datetime.now().replace(tzinfo=datetime.timezone(offset=utc_offset_sec)).isoformat()
-
-#class TZ(tzinfo):
-#   def utcoffset(self, dt): return timedelta(minutes=-399)
-#datetime(2002, 12, 25, tzinfo=TZ()).isoformat(' ')
-
-#print('jenkins_secret_chrome.py' +utc_offset_sec+ '.png')

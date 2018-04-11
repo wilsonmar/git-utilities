@@ -3,12 +3,32 @@
 # Call pattern:
 #    python tests/jenkins_secret_chrome.py   $JENKINS_PORT  $JENKINS_SECRET  jenkins.png
 
-import sys
 #import argparse  # https://docs.python.org/2/howto/argparse.html
-import time, datetime
+import sys
+import pytz, time
+from datetime import datetime, tzinfo, timedelta
+from random import randint
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+
+def iso8601_utc():
+    class simple_utc(tzinfo):
+        def tzname(self,**kwargs):
+            return "UTC"
+        def utcoffset(self, dt):
+            return timedelta(0)
+    return datetime.utcnow().replace(tzinfo=simple_utc()).isoformat()
+    #print(iso8601_utc()+"   = ISO8601 time at +00:00 UTC (Zulu time), with microseconds")
+
+def iso8601_local():
+    class local_tz(tzinfo):
+        def utcoffset(self, dt):
+            ts = time.time()
+            offset_in_seconds = (datetime.fromtimestamp(ts) - datetime.utcfromtimestamp(ts)).total_seconds()
+            return timedelta(seconds=offset_in_seconds)
+    return datetime.now().replace(microsecond=randint(0, 999999)).replace(tzinfo=local_tz()).isoformat()
+    # print(iso8601_local()+" = ISO8601 time at local time zone offset, with random microseconds")
 
 jenkins_port=sys.argv[1]
 jenkins_secret=sys.argv[2]
@@ -33,9 +53,7 @@ secret.submit()
 time.sleep(10) # to give it time to work.
 
 # Take a picture (screen shot) of "Getting Started, Customize Jenkins"
-utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
-datetime.datetime.now().replace(tzinfo=datetime.timezone(offset=utc_offset_sec)).isoformat()
-driver.save_screenshot('jenkins_secret_chrome.py' +utc_offset_sec+ '.png')
+driver.save_screenshot('jenkins_secret_chrome.py' +iso8601_local()+ '.png')
 assert "SetupWizard [Jenkins]" in driver.title 
 #time.sleep(5) # to see it
 
