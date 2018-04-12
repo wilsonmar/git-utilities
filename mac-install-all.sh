@@ -65,7 +65,6 @@ function cleanup() {
     err=$?
     echo "At cleanup() LOGFILE=$LOGFILE"
     open -a "TextEdit" $LOGFILE
-    #nano $LOGFILE
     trap '' EXIT INT TERM
     exit $err 
 }
@@ -84,11 +83,166 @@ sig_cleanup() {
 }
 
 
+# TODO: Accept custom secrets.sh file name/location.
 # Read first parameter from command line supplied at runtime to invoke:
 MY_RUNTYPE="$1"
 if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then # variable made lower case.
    echo "MY_RUNTYPE=\"$MY_RUNTYPE\" means all packages here will be upgraded ..." >>$LOGFILE
 fi
+# TODO: Add tryout for all.
+
+
+######### MacOS maxfiles config:
+
+
+FILE="/Library/LaunchDaemons/limit.maxfiles.plist"
+if [ ! -f "$FILE" ]; then #  NOT found, so add it
+   fancy_echo "Copying configs/ to $FILE ..."
+   sudo cp configs/limit.maxfiles.plist $FILE
+   #see http://bencane.com/2013/09/16/understanding-a-little-more-about-etcprofile-and-etcbashrc/
+   sudo chmod 644 $FILE
+fi
+
+FILE="/Library/LaunchDaemons/limit.maxproc.plist"
+if [ ! -f "$FILE" ]; then #  NOT found, so add it
+   fancy_echo "Copying configs/ to $FILE ..."
+   sudo cp configs/limit.maxproc.plist $FILE
+   sudo chmod 644 $FILE
+   # https://apple.stackexchange.com/questions/168495/why-wont-kern-maxfiles-setting-in-etc-sysctl-conf-stick
+fi
+
+if grep -q "ulimit -n " "/etc/profile" ; then    
+   fancy_echo "ulimit -n already in /etc/profile" >>$LOGFILE
+else
+   fancy_echo "Concatenating ulimit 2048 to /etc/profile ..."
+   echo 'ulimit -n 2048' | sudo tee -a /etc/profile
+   fancy_echo "Now please reboot so the settings take. Exiting ..."
+   exit
+   #see http://bencane.com/2013/09/16/understanding-a-little-more-about-etcprofile-and-etcbashrc/
+fi 
+
+# Based on https://docs.microsoft.com/en-us/dotnet/core/macos-prerequisites?tabs=netcore2x
+fancy_echo "launchctl limit ::" >>$LOGFILE
+launchctl limit >>$LOGFILE
+
+OPEN_FILES=$(ulimit -n)  # 256 default
+fancy_echo "ulimit -a = $OPEN_FILES" >>$LOGFILE
+
+# https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html
+/usr/sbin/sysctl -a | grep files >>$LOGFILE
+   #kern.maxfiles: 49152
+   #kern.maxfilesperproc: 24576
+   #kern.num_files: 4692s
+
+
+FILE="/etc/sysctl.conf"
+if [ ! -f "$FILE" ]; then #  NOT found, so add it
+   fancy_echo "Copying kern to $FILE ..."
+   echo "kern.maxfiles=49152" | sudo tee -a $FILE
+   echo "kern.maxfilesperproc=24576" | sudo tee -a $FILE
+fi
+
+
+######### MacOS hidden files configuration:
+
+
+fancy_echo "Configure OSX Finder to show hidden files too:" >>$LOGFILE
+defaults write com.apple.finder AppleShowAllFiles YES
+# NOTE: Additional config dotfiles for Mac?
+# NOTE: See osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
+#       installs other programs on Macs for developers.
+
+
+# Ensure Apple's command line tools (such as cc) are installed by node:
+if ! command -v cc >/dev/null; then
+   fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
+   xcode-select --install 
+   # Xcode installs its git to /usr/bin/git; recent versions of OS X (Yosemite and later) ship with stubs in /usr/bin, which take precedence over this git. 
+fi
+# https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/pkgutil.1.html
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
+   # Tools_Executables | grep version
+   # version: 9.2.0.0.1.1510905681
+
+# TODO: https://gist.github.com/tylergets/90f7e61314821864951e58d57dfc9acd
+
+
+######### bash completion:
+
+
+echo -e "$(bash --version | grep 'bash')" >>$LOGFILE
+
+# BREW_VERSION="$(brew --version)"
+# TODO: Completion of bash commands on MacOS:
+# See https://kubernetes.io/docs/tasks/tools/install-kubectl/#on-macos-using-bash
+# Also see https://github.com/barryclark/bashstrap
+
+# TODO: Extract 4 from $BASH_VERSION
+      # GNU bash, version 4.4.19(1)-release (x86_64-apple-darwin17.3.0)
+
+## or, if running Bash 4.1+
+#brew install bash-completion@2
+## If running Bash 3.2 included with macOS
+#brew install bash-completion
+#      brew info atom >>$LOGFILE
+ #     brew list atom >>$LOGFILE
+
+
+######### bash.profile configuration:
+
+
+BASHFILE=$HOME/.bash_profile  # on Macs
+
+# if ~/.bash_profile has not been defined, create it:
+if [ ! -f "$BASHFILE" ]; then #  NOT found:
+   fancy_echo "Creating blank \"${BASHFILE}\" ..." >>$LOGFILE
+   touch "$BASHFILE"
+   echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>"$BASHFILE"
+   # El Capitan no longer allows modifications to /usr/bin, and /usr/local/bin is preferred over /usr/bin, by default.
+else
+   LINES=$(wc -l < "${BASHFILE}")
+   fancy_echo "\"${BASHFILE}\" already created with $LINES lines." >>$LOGFILE
+   fancy_echo "Backing up file $BASHFILE to $BASHFILE-$LOG_PREFIX.bak ..."  >>$LOGFILE
+   cp "$BASHFILE" "$BASHFILE-$LOG_PREFIX.bak"
+fi
+
+
+###### bash.profile locale settings missing in OS X Lion+:
+
+
+# See https://stackoverflow.com/questions/7165108/in-os-x-lion-lang-is-not-set-to-utf-8-how-to-fix-it
+# https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do
+# LC_ALL forces applications to use the default language for output, and forces sorting to be bytewise.
+if grep -q "LC_ALL" "$BASHFILE" ; then    
+   fancy_echo "LC_ALL Locale setting already in $BASHFILE" >>$LOGFILE
+else
+   fancy_echo "Adding LC_ALL Locale in $BASHFILE..." >>$LOGFILE
+   echo "# Added by $0 ::" >>"$BASHFILE"
+   echo "export LC_ALL=en_US.utf-8" >>"$BASHFILE"
+      #export LANG="en_US.UTF-8"
+      #export LC_CTYPE="en_US.UTF-8"
+   
+   # Run .bash_profile to have changes take, run $FILEPATH:
+   source "$BASHFILE"
+fi 
+#locale
+   # LANG="en_US.UTF-8"
+   # LC_COLLATE="en_US.UTF-8"
+   # LC_CTYPE="en_US.utf-8"
+   # LC_MESSAGES="en_US.UTF-8"
+   # LC_MONETARY="en_US.UTF-8"
+   # LC_NUMERIC="en_US.UTF-8"
+   # LC_TIME="en_US.UTF-8"
+   # LC_ALL=
+
+
+if grep -q "export ARCHFLAGS=" "$BASHFILE" ; then    
+   fancy_echo "ARCHFLAGS setting already in $BASHFILE" >>$LOGFILE
+else
+   fancy_echo "Adding ARCHFLAGS in $BASHFILE..." >>$LOGFILE
+   echo "export ARCHFLAGS=\"-arch x86_64\"" >>"$BASHFILE"
+   source "$BASHFILE"
+fi 
 
 
 ######### Git functions:
@@ -108,34 +262,6 @@ function git_parse_branch() {
 function git_parse_hash() {
    git rev-parse --short HEAD 2> /dev/null | sed "s/\(.*\)/@\1/"
 }
-
-
-######### OSX configuration:
-
-
-fancy_echo "Configure OSX Finder to show hidden files too:" >>$LOGFILE
-defaults write com.apple.finder AppleShowAllFiles YES
-# NOTE: Additional config dotfiles for Mac?
-# NOTE: See osx-init.sh in https://github.com/wilsonmar/DevSecOps/osx-init
-#       installs other programs on Macs for developers.
-
-
-fancy_echo "ulimit -a:" >>$LOGFILE
-ulimit -a  >>$LOGFILE
-launchctl limit >>$LOGFILE
-# sysctl -a | grep files >>$LOGFILE
-# TODO: https://gist.github.com/tylergets/90f7e61314821864951e58d57dfc9acd
-
-
-# Ensure Apple's command line tools (such as cc) are installed by node:
-if ! command -v cc >/dev/null; then
-   fancy_echo "Installing Apple's xcode command line tools (this takes a while) ..."
-   xcode-select --install 
-   # Xcode installs its git to /usr/bin/git; recent versions of OS X (Yosemite and later) ship with stubs in /usr/bin, which take precedence over this git. 
-fi
-pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep version
-   # Tools_Executables | grep version
-   # version: 9.2.0.0.1.1510905681
 
 
 ######### Language function definitions:
@@ -538,83 +664,6 @@ function GO_INSTALL(){
 }
 
 
-######### bash completion:
-
-echo -e "$(bash --version | grep 'bash')" >>$LOGFILE
-
-# BREW_VERSION="$(brew --version)"
-# TODO: Completion of bash commands on MacOS:
-# See https://kubernetes.io/docs/tasks/tools/install-kubectl/#on-macos-using-bash
-# Also see https://github.com/barryclark/bashstrap
-
-# TODO: Extract 4 from $BASH_VERSION
-      # GNU bash, version 4.4.19(1)-release (x86_64-apple-darwin17.3.0)
-
-## or, if running Bash 4.1+
-#brew install bash-completion@2
-## If running Bash 3.2 included with macOS
-#brew install bash-completion
-#      brew info atom >>$LOGFILE
- #     brew list atom >>$LOGFILE
-
-
-######### bash.profile configuration:
-
-
-BASHFILE=$HOME/.bash_profile  # on Macs
-
-# if ~/.bash_profile has not been defined, create it:
-if [ ! -f "$BASHFILE" ]; then #  NOT found:
-   fancy_echo "Creating blank \"${BASHFILE}\" ..." >>$LOGFILE
-   touch "$BASHFILE"
-   echo "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" >>"$BASHFILE"
-   # El Capitan no longer allows modifications to /usr/bin, and /usr/local/bin is preferred over /usr/bin, by default.
-else
-   LINES=$(wc -l < "${BASHFILE}")
-   fancy_echo "\"${BASHFILE}\" already created with $LINES lines." >>$LOGFILE
-   fancy_echo "Backing up file $BASHFILE to $BASHFILE-$LOG_PREFIX.bak ..."  >>$LOGFILE
-   cp "$BASHFILE" "$BASHFILE-$LOG_PREFIX.bak"
-fi
-
-
-###### bash.profile locale settings missing in OS X Lion+:
-
-
-# See https://stackoverflow.com/questions/7165108/in-os-x-lion-lang-is-not-set-to-utf-8-how-to-fix-it
-# https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do
-# LC_ALL forces applications to use the default language for output, and forces sorting to be bytewise.
-if grep -q "LC_ALL" "$BASHFILE" ; then    
-   fancy_echo "LC_ALL Locale setting already in $BASHFILE" >>$LOGFILE
-else
-   fancy_echo "Adding LC_ALL Locale in $BASHFILE..." >>$LOGFILE
-   echo "# Added by $0 ::" >>"$BASHFILE"
-   echo "export LC_ALL=en_US.utf-8" >>"$BASHFILE"
-      #export LANG="en_US.UTF-8"
-      #export LC_CTYPE="en_US.UTF-8"
-   
-   # Run .bash_profile to have changes take, run $FILEPATH:
-   source "$BASHFILE"
-fi 
-#locale
-   # LANG="en_US.UTF-8"
-   # LC_COLLATE="en_US.UTF-8"
-   # LC_CTYPE="en_US.utf-8"
-   # LC_MESSAGES="en_US.UTF-8"
-   # LC_MONETARY="en_US.UTF-8"
-   # LC_NUMERIC="en_US.UTF-8"
-   # LC_TIME="en_US.UTF-8"
-   # LC_ALL=
-
-
-if grep -q "export ARCHFLAGS=" "$BASHFILE" ; then    
-   fancy_echo "ARCHFLAGS setting already in $BASHFILE" >>$LOGFILE
-else
-   fancy_echo "Adding ARCHFLAGS in $BASHFILE..." >>$LOGFILE
-   echo "export ARCHFLAGS=\"-arch x86_64\"" >>"$BASHFILE"
-   source "$BASHFILE"
-fi 
-
-
 ###### Install homebrew using whatever Ruby is installed:
 
 
@@ -690,6 +739,7 @@ if [[ "$MAC_TOOLS" == *"iterm"* ]]; then
       open -a "/Applications/iTerm.app"
    fi
    # http://sourabhbajaj.com/mac-setup/iTerm/README.html
+   # TODO: https://github.com/mbadolato/iTerm2-Color-Schemes/tree/master/schemes
 fi
 
 
@@ -794,34 +844,6 @@ if [[ "$MAC_TOOLS" == *"alfred"* ]]; then
 fi
 
 
-if [[ "$MAC_TOOLS" == *"mariadb"* ]]; then
-   # See https://wilsonmar.github.io/mysql-setup/
-   # See https://mariadb.com/kb/en/library/installing-mariadb-on-macos-using-homebrew/
-   # A "/etc/my.cnf" from another install may interfere with a Homebrew-built server starting up correctly.
-   if [ ! -d "/Applications/mariadb.app" ]; then 
-      fancy_echo "Installing MAC_TOOLS mariadb - password needed ..."
-      brew install mariadb
-      brew info mariadb >>$LOGFILE
-      brew list mariadb >>$LOGFILE
-      # There is also mariadb@10.0, mariadb@10.1, mariadb-connector-odbc 
-   else
-      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
-         fancy_echo "Upgrading MAC_TOOLS mariadb ..."
-         mysql --version
-         brew upgrade mariadb
-      fi
-   fi
-   echo -e "$(mysql --version)" >>$LOGFILE 
-      # mysql  Ver 15.1 Distrib 10.2.14-MariaDB, for osx10.13 (x86_64) using readline 5.1
-
-   # To avoid problems:
-   if [ ! -f "/usr/local/etc/my.cnf.d " ]; then #  NOT found:
-      mkdir /usr/local/etc/my.cnf.d 
-   fi
-   if [[ $TRYOUT == *"mariadb"* ]]; then
-      fancy_echo "Starting mariadb ..."
-   fi
-fi
 
 if [[ "$MAC_TOOLS" == *"others"* ]]; then
       echo "Installing MAC_TOOLS=others ..."; 
@@ -927,6 +949,9 @@ else
    echo "GIT_LANG=$GUI_LANG" >>$LOGFILE
    echo "JAVA_TOOLS=$JAVA_TOOLS" >>$LOGFILE
    echo "PYTHON_TOOLS=$PYTHON_TOOLS" >>$LOGFILE
+   echo "NODE_TOOLS=$NODE_TOOLS" >>$LOGFILE
+
+   echo "DATA_TOOLS=$DATA_TOOLS" >>$LOGFILE
    echo "TEST_TOOLS=$TEST_TOOLS" >>$LOGFILE
 
    echo "CLOUD=$CLOUD" >>$LOGFILE
@@ -948,7 +973,7 @@ else
    echo "TOMCAT_PORT=$TOMCAT_PORT" >>$LOGFILE  # from default 8080
    echo "JENKINS_PORT=$JENKINS_PORT" >>$LOGFILE  # from default 8080
    echo "GRAFANA_PORT=$GRAFANA_PORT" >>$LOGFILE  # from default 8080
-
+   echo "MINIKUBE_PORT=$MINKUBE_PORT" >>$LOGFILE  # from default 8080
    echo "TRYOUT=$TRYOUT" >>$LOGFILE
 fi 
 
@@ -1525,7 +1550,7 @@ fi
 if [[ "$GIT_EDITOR" == *"code"* ]]; then
     if ! command -v code >/dev/null; then
         fancy_echo "Installing Visual Studio Code text editor using Homebrew ..."
-        brew install visual-studio-code
+        brew install caskroom/cask/visual-studio-code
       brew info visual-studio-code >>$LOGFILE
       brew list visual-studio-code >>$LOGFILE
     else
@@ -1553,6 +1578,8 @@ if [[ "$GIT_EDITOR" == *"code"* ]]; then
    #open "/Applications/Visual Studio Code.app"
    #fancy_echo "Starting code in background ..."
    #code &
+
+   # $HOME/Library/Application Support/Code
 fi
 
 
@@ -2950,9 +2977,15 @@ fi
 
 
 # See https://cloud.google.com/sdk/docs/
-echo "CLOUD=$CLOUD"
+echo "CLOUD=\"$CLOUD\""
 
-if [[ $CLOUD == *"vagrant"* ]]; then  # /usr/local/bin/vagrant
+if [[ $CLOUD == *"icloud"* ]]; then
+   if [ ! -d "/Library/Mobile Documents/com~apple~CloudDocs/" ]; then # found dir:
+      fancy_echo "CLOUD=icloud folder has $(find . -type f | wc -l) files ..."
+   fi
+fi
+
+if [[ $CLOUD == *"vagrant"* ]]; then
    VIRTUALBOX_INSTALL # pre-requisite
    if ! command -v vagrant >/dev/null; then
       fancy_echo "Installing vagrant ..."
@@ -3237,6 +3270,7 @@ else
    fi
 fi
 
+
 if [[ $CLOUD == *"minikube"* ]]; then 
    # See https://kubernetes.io/docs/tasks/tools/install-minikube/
    PYTHON_INSTALL  # function defined at top of this file.
@@ -3275,22 +3309,53 @@ if [[ $CLOUD == *"minikube"* ]]; then
       fancy_echo "TRYOUT run minikube ..."
       kubectl cluster-info
       #kubectl cluster-info dump  # for diagnostis
+      # based on https://kubernetes.io/docs/getting-started-guides/minikube/
+      fancy_echo "TRYOUT CLOUD=\"minikube\" starting (Downloading Minikube ISO) ..."
+      minikube start
+      # Subsequent calls:
+         # Starting local Kubernetes v1.9.4 cluster...
+         # Starting VM...
+         # Getting VM IP address...
+         # Setting up certs...
+         # Connecting to cluster...
+         # Setting up kubeconfig...
+         # Starting cluster components...
+         # Kubectl is now configured to use the cluster.
+         # Loading cached images from config file.
+      minikube ip
+         # 192.168.99.101
+      # Using MINIKUBE_PORT="8083" in secrets.sh
 
-      # See https://kubernetes.io/docs/getting-started-guides/minikube/
-      # minikube start
-         # Starting local Kubernetes cluster...
-         # Running pre-create checks...
-         # Creating machine...
-         # Starting local Kubernetes cluster...
+      kubectl run hello-minikube --image=k8s.gcr.io/echoserver:1.4 --port="$MINIKUBE_PORT"
+          # deployment "hello-minikube" created
+      export no_proxy=$no_proxy,$(minikube ip)
+      kubectl expose deployment hello-minikube --type=NodePort
+          # service "hello-minikube" exposed
+      kubectl get svc
+          # NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+          # hello-minikube   NodePort    10.103.43.52   <none>        8083:30407/TCP   11s
+          # kubernetes       ClusterIP   10.96.0.1      <none>        443/TCP          28m
+      kubectl get pod
+          # NAME                              READY     STATUS    RESTARTS   AGE
+          # hello-minikube-798bc4dc8f-8nx7h   1/1       Running   1          8m
+      minikube service hello-minikube --url
+          # http://192.168.99.101:30407
+      curl $(minikube service hello-minikube --url)
+          # curl: (7) Failed to connect to 192.168.99.101 port 30123: Connection refused
+          # CLIENT VALUES:
+          # client_address=192.168.99.1
+          # command=GET
+          # real path=/ ....
+      minikube dashboard  # http://192.168.99.101:30000/#!/overview?namespace=default
 
-      # kubectl run hello-minikube --image=k8s.gcr.io/echoserver:1.4 --port=8080
-         # deployment "hello-minikube" created
-      # kubectl expose deployment hello-minikube --type=NodePort
-         # service "hello-minikube" exposed
-   fi
-else
-   if [[ $TRYOUT == *"minikube"* ]]; then
-      fancy_echo "ERROR: \"minikube\" needs to be in CLOUD for TRYOUT."
+
+      kubectl delete services hello-minikube
+         # RESPONSE: service "hello-minikube" deleted
+      kubectl delete deployment hello-minikube
+         # deployment.extensions "hello-minikube" deleted
+      minikube stop
+         # Stopping local Kubernetes cluster...
+         # Machine stopped.
    fi
 fi
 
@@ -3377,7 +3442,7 @@ fi
 FILE="$USER@$(uname -n)"  # computer node name.
 fancy_echo "Diving into folder ~/.ssh ..."
 
-if [ ! -d ".ssh" ]; then # found:
+if [ ! -d ".ssh" ]; then # found dir:
    fancy_echo "Making ~/.ssh folder ..."
    mkdir ~/.ssh
 fi
@@ -3558,17 +3623,17 @@ fi
    fi
 
 
-# Browser add-ons:
+   if [[ $GIT_BROWSER == *"others"* ]]; then  # contains azure.
+      fancy_echo "Browser add-ons: "
+      #brew cask install --appdir="/Applications" flash-player  # https://github.com/caskroom/homebrew-cask/blob/master/Casks/flash-player.rb
+      #brew cask install --appdir="/Applications" adobe-acrobat-reader
+      #brew cask install --appdir="/Applications" adobe-air
+      #brew cask install --appdir="/Applications" silverlight
 
-   # TODO:
-   #brew cask install --appdir="/Applications" flash-player  # https://github.com/caskroom/homebrew-cask/blob/master/Casks/flash-player.rb
-   #brew cask install --appdir="/Applications" adobe-acrobat-reader
-   #brew cask install --appdir="/Applications" adobe-air
-   #brew cask install --appdir="/Applications" silverlight
+      # TODO: install opencv for Selenium to recognize images
+      # TODO: install tesseract for Selenium to recognize text within images
+   fi
 
-
-   # TODO: install opencv for Selenium to recognize images
-   # TODO: install tesseract for Selenium to recognize text within images
 
 # TODO: http://www.agiletrailblazers.com/blog/the-5-step-guide-for-selenium-cucumber-and-gherkin
    # brew install ruby
@@ -3583,6 +3648,54 @@ fi
    #   fancy_echo "TRYOUT run bdd ..."
     #       ruby test.rb
     # fi
+
+
+######### DATA_TOOLS :: 
+
+if [[ "$DATA_TOOLS" == *"mariadb"* ]]; then
+   # See https://wilsonmar.github.io/mysql-setup/
+   # See https://mariadb.com/kb/en/library/installing-mariadb-on-macos-using-homebrew/
+   # A "/etc/my.cnf" from another install may interfere with a Homebrew-built server starting up correctly.
+   if [ ! -d "/Applications/mariadb.app" ]; then 
+      fancy_echo "Installing DATA_TOOLS mariadb - password needed ..."
+      brew install mariadb
+      brew info mariadb >>$LOGFILE
+      brew list mariadb >>$LOGFILE
+      # There is also mariadb@10.0, mariadb@10.1, mariadb-connector-odbc 
+   else
+      if [[ "${MY_RUNTYPE,,}" == *"upgrade"* ]]; then
+         fancy_echo "Upgrading DATA_TOOLS mariadb ..."
+         mysql --version
+         brew upgrade mariadb
+      fi
+   fi
+   echo -e "$(mysql --version)" >>$LOGFILE 
+      # mysql  Ver 15.1 Distrib 10.2.14-MariaDB, for osx10.13 (x86_64) using readline 5.1
+
+   # To avoid problems:
+   if [ ! -f "/usr/local/etc/my.cnf.d " ]; then #  NOT found:
+      mkdir /usr/local/etc/my.cnf.d 
+   fi
+   if [[ $TRYOUT == *"mariadb"* ]]; then
+      fancy_echo "Starting mariadb ..."
+   fi
+fi
+
+
+if [[ "$DATA_TOOLS" == *"others"* ]]; then
+   fancy_echo "DATA_TOOLS=others ..."
+#  brew install mongodb
+#  brew install mysql       #  mysql@5.5, mysql@5.6
+#  brew install postgresql  # postgresql@9.4, postgresql@9.5, postgresql@9.6
+#  brew cask install --appdir="/Applications" evernote
+#  dbunit?
+#  brew cask install --appdir="/Applications" google-drive
+#  brew cask install --appdir="/Applications" dropbox
+#  brew cask install --appdir="/Applications" amazon-drive
+fi
+ 
+
+######### TEST_TOOLS :: 
 
 
 if [[ $TEST_TOOLS == *"protractor"* ]]; then  # contains .
@@ -3919,12 +4032,13 @@ if [[ "$LOCALHOSTS" == *"jenkins"* ]]; then
    fi
    fancy_echo -e "LOCALHOSTS=jenkins :: $(jenkins --version)" >>$LOGFILE
    
-   if [[ $TRYOUT == *"jenkins"* ]]; then
+   if [[ $TRYOUT == *"jenkins"* ]] || [[ $TRYOUT == *"all"* ]]; then
       JENKINS_VERSION=$(jenkins --version)  # 2.113
-      PS_OUTPUT=$(ps -ef | grep jenkins)
-      if grep -q "jenkins: master process" "$PS_OUTFILE" ; then 
-         fancy_echo "LOCALHOSTS=jenkins running on $PS_OUTPUT." >>$LOGFILE
+      PID="ps -A | grep -m1 'jenkins' | grep -v "grep" | awk '{print $1}'"
+      if [ ! -z "$PID" ]; then 
+         fancy_echo "LOCALHOSTS=jenkins running on PID=$PID." >>$LOGFILE
       else
+         # Before Jenkinsfile config.
          # Custom JENKINS_PORT="8086" defined in secrets.sh within this script
          #JENKINS_CONF="/usr/local/Cellar/Jenkins/$JENKINS_VERSION/homebrew.mxcl.jenkins.plist"
          JENKINS_CONF="/usr/local/opt/jenkins/homebrew.mxcl.jenkins.plist"
@@ -3948,14 +4062,15 @@ if [[ "$LOCALHOSTS" == *"jenkins"* ]]; then
          JENKINS_SECRET=$(<$HOME/.jenkins/secrets/initialAdminPassword)
          echo "$JENKINS_SECRET"
 
-         # TODO: Call Selenium script to paste the number on screen's Administrator Password field:
+         # Call Python Selenium script to paste the number on screen's Administrator Password field:
          # <input id="security-token" class="form-control" type="password" name="j_password">
-         python tests/jenkins_secret_chrome.py   $JENKINS_PORT  $JENKINS_SECRET
+         python tests/jenkins_secret_setup.py  "chrome"  $JENKINS_PORT  $JENKINS_SECRET
 
-         PID="ps -A | grep -m1 'jenkins' | awk '{print $1}'"
-         fancy_echo "Shutting downn jenkins $PID ..."
-         kill $PID
-
+         PID="ps -A | grep -m1 'jenkins' | grep -v "grep" | awk '{print $1}'"
+         fancy_echo "jenkins $PID ..."
+         if [[ $TRYOUT_KEEP != *"jenkins"* ]]; then
+            kill $PID
+         fi
       fi 
    fi
 fi
@@ -4070,3 +4185,4 @@ DIFF=$((TIME_END-TIME_START))
 MSG="End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
 fancy_echo "$MSG"
 echo -e "\n$MSG" >>$LOGFILE
+say "script ended."  # through speaker
