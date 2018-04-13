@@ -3167,6 +3167,8 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
        # azure-cli (2.0.30)
 
    if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
+      AZ_TENANT="$(az account show --query 'tenantId' -o tsv)"
+      
       # NOTE: Logging in through command line is not supported. For cross-check, try 'az login' to authenticate through browser.
       # TODO: Create a service principal see https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest
 
@@ -3794,9 +3796,10 @@ if [[ "$DATA_TOOLS" == *"mongodb"* ]]; then
       fi
       if [ ! -d "$MONGODB_DATA_PATH" ]; then 
          fancy_echo "Defining MongoDB permissions [Enter password] ..."
-         sudo chown -R `id -un` $MONGODB_DATA_PATH
+         sudo chown -R `id -un` $MONGODB_DATA_PATH  # ls -l -R /media/craig/  
       fi
-      # configuration file for Ubuntu in /etc/mongodb.conf
+      # configuration file for Ubuntu in /etc/mongodb.conf  dbPath to $MONGODB_DATA_PATH
+
       # TODO: Check if mongodb already up.
          fancy_echo "Starting mongodb in background ..."
          mongod --dbpath $MONGODB_DATA_PATH & 
@@ -3806,6 +3809,8 @@ if [[ "$DATA_TOOLS" == *"mongodb"* ]]; then
 
          fancy_echo "Doing mongo interactive shell ..."
          mongo & 
+
+         # TODO: Do something within mongo that's idempotent
    fi
 
    if [[ "$TRYOUT_KEEP" != *"mongodb"* ]]; then
