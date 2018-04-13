@@ -65,6 +65,7 @@ CLOUD=""
    AZ_PASSWORD=""
    AZ_TENANT=""
    AZ_REGION=""
+   AZ_APP_ID=""
 
    GCP_PROJECT=""
    GCP_USER=""
