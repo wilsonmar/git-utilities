@@ -47,7 +47,7 @@ DATA_TOOLS=""
          # mariadb, postgresql, mongodb
          # others (dbunit?, mysql?, evernote?)
          # others (google-drive-file-stream, dropbox, box, amazon-drive )
-   MONGODB_DATA_PATH="$HOME/mongodb" # default.
+   MONGODB_DATA_PATH="/usr/local/var/mongodb" # default.
 TEST_TOOLS=""
         # selenium, sikulix, golum, dbunit?
         # Drivers for scripting language depend on what is defined in $GIT_LANG.
