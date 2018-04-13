@@ -3167,6 +3167,10 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
        # azure-cli (2.0.30)
 
    if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
+      # See https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest
+      # az login -u $AZURE_USER -p $AZURE_PASSWORD
+      # BUT: Logging in through command line is not supported. For cross-check, try 'az login' to authenticate through browser.
+
       # TODO(wisdom): Invoke a Python Selenium test script to do Device Login:
       # On az login - open a web browser to https://microsoft.com/devicelogin 
       # and enter the code BS3FNKPB3 to authenticate. Click Continue.
