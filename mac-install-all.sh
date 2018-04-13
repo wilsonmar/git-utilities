@@ -3167,10 +3167,13 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
        # azure-cli (2.0.30)
 
    if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
+      # NOTE: Logging in through command line is not supported. For cross-check, try 'az login' to authenticate through browser.
+      # TODO: Create a service principal see https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest
+
+      # TODO: Login using service principal from variables in secrets.sh:
       # See https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest
-      # based on variables in secrets.sh:
       # az login --service-principal -u $AZ_USER -p $AZ_PASSWORD --tenant $AZ_TENANT
-      # BUT: Logging in through command line is not supported. For cross-check, try 'az login' to authenticate through browser.
+      # Get tenantID from: az account show --query 'tenantId' -o tsv
 
       # TODO(wisdom): Invoke a Python Selenium test script to do Device Login:
       # On az login - open a web browser to https://microsoft.com/devicelogin 
