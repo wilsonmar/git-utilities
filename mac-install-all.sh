@@ -317,7 +317,7 @@ if [[ "$MAC_TOOLS" == *"iterm"* ]]; then
          echo "alias export CLICOLOR=1" >>"$BASHFILE"
       fi
 
-   if [[ $TRYOUT == *"iterm"* ]]; then
+   if [[ $TRYOUT == *"iterm"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting iTerm ..." >>$LOGFILE
       open -a "/Applications/iTerm.app"
    fi
@@ -419,7 +419,7 @@ if [[ "$MAC_TOOLS" == *"alfred"* ]]; then
          echo "alias alfred='open -a \"/Applications/alfred 3.app\"'" >>"$BASHFILE"
       fi
 
-   if [[ $TRYOUT == *"alfred"* ]]; then
+   if [[ $TRYOUT == *"alfred"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting alfred ..." >>$LOGFILE
       open -a "/Applications/alfred 3.app"
    fi
@@ -805,7 +805,7 @@ function GROOVY_INSTALL(){
          source "$BASHFILE"
       fi
    
-   if [[ $TRYOUT == *"groovy"* ]]; then
+   if [[ $TRYOUT == *"groovy"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT = groovy = run a Groovy script :"
       groovy tests/groovy_smoketest
    fi
@@ -899,7 +899,7 @@ function SCALA_INSTALL(){
    #echo -e "sbt : $(sbt -version)" >>$LOGFILE
      # Getting org.scala-sbt sbt 1.1.4  (this may take some time)...
 
-   if [[ $TRYOUT == *"scala"* ]]; then
+   if [[ $TRYOUT == *"scala"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT = run program HelloWorld.scala :"
       scala tests/HelloWorld.scala
    fi
@@ -1032,7 +1032,7 @@ if [[ "$GIT_CLIENT" == *"cola"* ]]; then
    fi
    git-cola --version
       # cola version 3.0
-   if [[ $TRYOUT == *"cola"* ]]; then
+   if [[ $TRYOUT == *"cola"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting git-cola in background ..."
       git-cola &
    fi
@@ -1056,7 +1056,7 @@ if [[ "$GIT_CLIENT" == *"github"* ]]; then
            fancy_echo "GIT_CLIENT=\"github\" already installed" >>$LOGFILE
         fi
     fi
-   if [[ $TRYOUT == *"github"* ]]; then
+   if [[ $TRYOUT == *"github"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Opening GitHub Desktop GUI ..." 
       open "/Applications/GitHub Desktop.app"
    fi
@@ -1087,7 +1087,7 @@ if [[ "$GIT_CLIENT" == *"gitkraken"* ]]; then
        source "$BASHFILE"
    fi 
    gitkraken -v
-   if [[ $TRYOUT == *"gitkraken"* ]]; then
+   if [[ $TRYOUT == *"gitkraken"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Opening GitKraken ..."
       open "/Applications/GitKraken.app"
    fi
@@ -1109,7 +1109,7 @@ if [[ "$GIT_CLIENT" == *"sourcetree"* ]]; then
            fancy_echo "GIT_CLIENT=\"sourcetree\" already installed:" >>$LOGFILE
         fi
     fi
-   if [[ $TRYOUT == *"sourcetree"* ]]; then
+   if [[ $TRYOUT == *"sourcetree"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Opening Sourcetree ..."
       open "/Applications/Sourcetree.app"
    fi
@@ -1130,7 +1130,7 @@ if [[ "$GIT_CLIENT" == *"smartgit"* ]]; then
            fancy_echo "GIT_CLIENT=\"smartgit\" already installed:"
         fi
     fi
-   if [[ $TRYOUT == *"smartgit"* ]]; then
+   if [[ $TRYOUT == *"smartgit"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Opening SmartGit ..."
       open "/Applications/SmartGit.app"
    fi
@@ -1153,7 +1153,7 @@ if [[ "$GIT_CLIENT" == *"tower"* ]]; then
         fi
     fi
     # version?
-   if [[ $TRYOUT == *"tower"* ]]; then
+   if [[ $TRYOUT == *"tower"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Opening Tower ..."
       open "/Applications/Tower.app"
    fi
@@ -1179,7 +1179,7 @@ if [[ "$GIT_CLIENT" == *"magit"* ]]; then
         fi
     fi
    # TODO: magit -v
-   if [[ $TRYOUT == *"magit"* ]]; then
+   if [[ $TRYOUT == *"magit"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Cannot Start magit in background ..." >>$LOGFILE
       #magit & 
    fi
@@ -1203,7 +1203,7 @@ if [[ "$GIT_CLIENT" == *"gitup"* ]]; then
       fi
    fi
    # gitup -v does not work
-   if [[ $TRYOUT == *"gitup"* ]]; then
+   if [[ $TRYOUT == *"gitup"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting GitUp in background ..." >>$LOGFILE
       gitup &
    fi
@@ -1373,9 +1373,10 @@ if [[ "$GIT_TOOLS" == *"git-gerrit"* ]]; then
          brew upgrade git-gerrit 
       fi
    fi
+   # TODO: git-gerrit init
    #fancy_echo "   git-gerrit :" >>$LOGFILE
 
-   if [[ $TRYOUT == *"git-gerrit"* ]]; then
+   if [[ $TRYOUT == *"git-gerrit"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Cannot Start git-gerrit in background ..." >>$LOGFILE
       #magit & 
    fi
@@ -2202,7 +2203,7 @@ if [[ "$GIT_TOOLS" == *"hooks"* ]]; then
       fancy_echo "git-commit file found in .git/hooks. Skipping ..."
    fi
 
-   if [[ $TRYOUT == *"hooks"* ]]; then
+   if [[ $TRYOUT == *"hooks"* ]] || [[ $TRYOUT == *"all"* ]]; then
       if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
          PYTHON_PGM="hooks/basic-python2"
          if [[ $TRYOUT == *"cleanup"* ]]; then
@@ -2476,7 +2477,7 @@ if [[ "$JAVA_TOOLS" == *"junit5"* ]]; then
    fancy_echo "There is no brew install junit because it is installed by adding it within Maven or Gradle." 
    # TODO: Insert java-junit5-maven.xml as a dependency to maven pom.xml
 
-   if [[ $TRYOUT == *"HelloJUnit5"* ]]; then
+   if [[ $TRYOUT == *"HelloJUnit5"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT = HelloJUnit5 explained by @jstevenperry at https://ibm.co/2uWIwcp"
       git clone https://github.com/makotogo/HelloJUnit5.git --depth=1
       pushd HelloJUnit5
@@ -2599,7 +2600,7 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
 
    mv jmeter*.jar $JMETER_HOME/lib/ext
 
-   if [[ $TRYOUT == *"HelloJUnit5"* ]]; then
+   if [[ $TRYOUT == *"HelloJUnit5"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT = HelloJUnit5 explained by @jstevenperry at https://ibm.co/2uWIwcp"
       git clone https://github.com/makotogo/HelloJUnit5.git --depth=1
       pushd HelloJUnit5
@@ -2625,7 +2626,7 @@ if [[ "$JAVA_TOOLS" == *"jmeter"* ]]; then
       fi
    fi
 
-   if [[ $TRYOUT == *"jmeter"* ]]; then
+   if [[ $TRYOUT == *"jmeter"* ]] || [[ $TRYOUT == *"all"* ]]; then
       jmeter &  # GUI
    fi
 
@@ -2696,7 +2697,7 @@ if [[ "$PYTHON_TOOLS" == *"robotframework"* ]]; then
    fancy_echo "$(pip freeze | grep robotframework)"  >>$LOGFILE
       # robotframework==3.0.3
 
-   if [[ $TRYOUT == *"robotframework"* ]]; then
+   if [[ $TRYOUT == *"robotframework"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TODO: TRYOUT robotframework" 
    fi
 fi
@@ -2914,7 +2915,7 @@ if [[ "$LOCALHOSTS" == *"nginx"* ]]; then
    # Docroot is:    /usr/local/var/www
    # Files load to: /usr/local/etc/nginx/servers/.
    # Default port   /usr/local/etc/nginx/nginx.conf to 8080 so nginx can run without sudo.
-   if [[ $TRYOUT == *"nginx"* ]]; then
+   if [[ $TRYOUT == *"nginx"* ]] || [[ $TRYOUT == *"all"* ]]; then
       PS_OUTPUT=$(ps -ef | grep nginx)
       if grep -q "nginx: master process" "$PS_OUTFILE" ; then 
          fancy_echo "LOCALHOSTS=nginx running on $PS_OUTPUT." >>$LOGFILE
@@ -2952,7 +2953,7 @@ if [[ "$LOCALHOSTS" == *"tomcat"* ]]; then
       fi
    fi
    fancy_echo -e "LOCALHOSTS=tomcat :: $(tomcat -v)" >>$LOGFILE
-   if [[ $TRYOUT == *"tomcat"* ]]; then
+   if [[ $TRYOUT == *"tomcat"* ]] || [[ $TRYOUT == *"all"* ]]; then
       PS_OUTPUT=$(ps -ef | grep tomcat)
       if grep -q "/Library/java" "$PS_OUTFILE" ; then 
          fancy_echo "LOCALHOSTS=tomcat running on $PS_OUTPUT." >>$LOGFILE
@@ -3029,7 +3030,7 @@ if [[ $CLOUD == *"vagrant"* ]]; then
    echo -e "\n$(vagrant --version)" >>$LOGFILE
 
 
-   if [[ $TRYOUT == *"hooks"* ]]; then
+   if [[ $TRYOUT == *"hooks"* ]] || [[ $TRYOUT == *"all"* ]]; then
       if [[ $GIT_LANG == *"python"* ]]; then  # contains azure.
          PYTHON_PGM="hooks/basic-python2"
 
@@ -3165,7 +3166,11 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
    echo -e "\n$(az --version | grep azure-cli)" >>$LOGFILE
        # azure-cli (2.0.30)
 
-   # https://www.robinosborne.co.uk/2014/11/18/scripting-a-statsd-mongodb-elasticsearch-metrics-server-on-azure-with-powershell/
+   if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
+      # To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code BS3FNKPB3 to authenticate.
+
+      # https://www.robinosborne.co.uk/2014/11/18/scripting-a-statsd-mongodb-elasticsearch-metrics-server-on-azure-with-powershell/
+   fi
 fi
 
 
@@ -3212,7 +3217,7 @@ if [[ $CLOUD == *"openstack"* ]]; then  # contains openstack.
       # openstack (2.0.30)
       # ... and many other lines.
 
-   if [[ $TRYOUT == *"openstack"* ]]; then  # contains openstack.
+   if [[ $TRYOUT == *"openstack"* ]] || [[ $TRYOUT == *"all"* ]]; then
       OPENSTACK_PROJECT="openstack1"
       # Start the VirtualEnvironment software:
       virtualenv "$OPENSTACK_PROJECT"
@@ -3275,7 +3280,7 @@ if [[ $CLOUD == *"docker"* ]]; then  # contains gcp.
        # Experimental:	false
        # Orchestrator:	swarm
 
-   if [[ $TRYOUT == *"docker"* ]]; then  # run docker
+   if [[ $TRYOUT == *"docker"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT run docker ..."
       docker-machine create default
 
@@ -3333,7 +3338,7 @@ if [[ $CLOUD == *"minikube"* ]]; then
    fi
    echo -e "\n$(minikube version)" >>$LOGFILE  # version: v0.25.2 
 
-   if [[ $TRYOUT == *"minikube"* ]]; then  # run minikube
+   if [[ $TRYOUT == *"minikube"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT run minikube ..."
       kubectl cluster-info
       #kubectl cluster-info dump  # for diagnostis
@@ -3423,7 +3428,7 @@ if [[ $CLOUD == *"cf"* ]]; then  # contains aws.
    cf --version
       # cf version 6.35.2+88a03e995.2018-03-15
 
-   if [[ $TRYOUT == *"cf"* ]]; then  # run minikube
+   if [[ $TRYOUT == *"cf"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "TRYOUT run cf ..."
    fi
 else
@@ -3577,7 +3582,7 @@ fi
          rm chromedriver.log
       fi 
 
-      if [[ $TRYOUT == *"chrome"* ]]; then
+      if [[ $TRYOUT == *"chrome"* ]] || [[ $TRYOUT == *"all"* ]]; then
          PS_OUTPUT=$(ps -ef | grep chromedriver)
          if grep -q "chromedriver --port" "$PS_OUTPUT" ; then    
             fancy_echo "chromedriver already running." >>$LOGFILE
@@ -3612,7 +3617,7 @@ fi
          source "$BASHFILE"
       fi 
 
-      if [[ $TRYOUT == *"chrome"* ]]; then
+      if [[ $TRYOUT == *"chrome"* ]] || [[ $TRYOUT == *"all"* ]]; then
          PS_OUTPUT=$(ps -ef | grep geckodriver)
          if grep -q "geckodriver --port" "$PS_OUTPUT" ; then    
             fancy_echo "geckodriver already running." >>$LOGFILE
@@ -3644,7 +3649,7 @@ fi
       fancy_echo "PHANTOM_VERSION=$PHANTOM_VERSION"
       # NOTE: "export phantomjs= not nessary with brew install.
 
-      if [[ $TRYOUT == *"phantomjs"* ]]; then
+      if [[ $TRYOUT == *"phantomjs"* ]] || [[ $TRYOUT == *"all"* ]]; then
          phantomjs tests/phantomjs-smoke.js
          # More code at http://phantomjs.org/quick-start.html
       fi
@@ -3705,8 +3710,8 @@ if [[ "$DATA_TOOLS" == *"mariadb"* ]]; then
    if [ ! -f "/usr/local/etc/my.cnf.d " ]; then #  NOT found:
       mkdir /usr/local/etc/my.cnf.d 
    fi
-   if [[ $TRYOUT == *"mariadb"* ]]; then
-      fancy_echo "Starting mariadb ..."
+   if [[ $TRYOUT == *"mariadb"* ]] || [[ $TRYOUT == *"all"* ]]; then
+      fancy_echo "TODO: Starting mariadb ..."
    fi
 fi
 
@@ -3731,7 +3736,7 @@ if [[ "$DATA_TOOLS" == *"postgresql"* ]]; then
    fancy_echo "$(pg_ctl --version)" >>$LOGFILE 
       # pg_ctl (PostgreSQL) 10.3
 
-   if [[ $TRYOUT == *"postgresql"* ]]; then
+   if [[ $TRYOUT == *"postgresql"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting postgresql ..."
       pg_ctl -D /usr/local/var/postgres start
       # listening on IPv4 address "127.0.0.1", port 5432 default port
@@ -3767,7 +3772,7 @@ if [[ "$DATA_TOOLS" == *"mongodb"* ]]; then
    fancy_echo "$(mongo --version | grep "MongoDB shell")" >>$LOGFILE 
       # MongoDB shell version 3.6.3
 
-   if [[ $TRYOUT == *"mongodb"* ]]; then
+   if [[ $TRYOUT == *"mongodb"* ]] || [[ $TRYOUT == *"all"* ]]; then
       if [ ! -d "$MONGODB_DATA_PATH" ]; then 
          fancy_echo "Creating MONGODB_DATA_PATH $MONGODB_DATA_PATH ..."
          # TODO: Create multi-level folder
@@ -3945,7 +3950,7 @@ if [[ "$MON_TOOLS" == *"wireshark"* ]]; then
    fi
    echo -e "$(tshark -v | grep TShark)" >>$LOGFILE  # wireshark v6.0.0-beta.7
 
-   if [[ $TRYOUT == *"wireshark"* ]]; then
+   if [[ $TRYOUT == *"wireshark"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting TShark to Wireshark.app ..." >>$LOGFILE
       #open -a "/Applications/Wireshark.app"
       tshark -O TCP -c 2  # caputure x TCP packets then stop.
@@ -3985,7 +3990,7 @@ if [[ "$VIZ_TOOLS" == *"grafana"* ]]; then
       fi
    fi
 
-   if [[ $TRYOUT == *"grafana"* ]]; then
+   if [[ $TRYOUT == *"grafana"* ]] || [[ $TRYOUT == *"all"* ]]; then
 
       #GRAFANA_PORT="3000"  # per outputs.
       # http_port=1234
@@ -4091,7 +4096,7 @@ if [[ "$MEDIA_TOOLS" == *"kindle"* ]]; then
       fi
    #echo -e "$(Kindle -v)" >>$LOGFILE  # Kindle v6.0.0-beta.7
 
-   if [[ $TRYOUT == *"kindle"* ]]; then
+   if [[ $TRYOUT == *"kindle"* ]] || [[ $TRYOUT == *"all"* ]]; then
       fancy_echo "Starting Kindle ..." >>$LOGFILE
       open -a "/Applications/Kindle.app"
    fi
@@ -4232,7 +4237,7 @@ echo -e "$(git config --list)" >>$LOGFILE
 ######### Open editor to show log:
 
 
-if [[ $TRYOUT == *"editor"* ]]; then
+if [[ $TRYOUT == *"editor"* ]] || [[ $TRYOUT == *"all"* ]]; then
    fancy_echo "Opening editor in background to display log ..."
    case "$GIT_EDITOR" in
         atom)
