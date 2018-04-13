@@ -3168,15 +3168,15 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
 
    if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
       # See https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest
-      # az login -u $AZURE_USER -p $AZURE_PASSWORD
+      # based on variables in secrets.sh:
+      # az login --service-principal -u $AZ_USER -p $AZ_PASSWORD --tenant $AZ_TENANT
       # BUT: Logging in through command line is not supported. For cross-check, try 'az login' to authenticate through browser.
 
       # TODO(wisdom): Invoke a Python Selenium test script to do Device Login:
       # On az login - open a web browser to https://microsoft.com/devicelogin 
       # and enter the code BS3FNKPB3 to authenticate. Click Continue.
-      # based on AZURE_USER and AZURE_PASSWORD in secrets.sh:
          # <input id="security-token" class="form-control" type="password" name="j_password">
-         python tests/az_login_setup.py  "chrome"  $AZURE_USER  $AZURE_PASSWORD
+         python tests/az_login_setup.py  "chrome"  $AZ_USER  $AZ_PASSWORD
 
       # Create a new instance, then exit just to prove out it works.
       
