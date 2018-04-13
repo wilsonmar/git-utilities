@@ -3170,7 +3170,9 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
       # TODO(wisdom): Invoke a Python Selenium test script to do Device Login:
       # On az login - open a web browser to https://microsoft.com/devicelogin 
       # and enter the code BS3FNKPB3 to authenticate. Click Continue.
-      # Enter your AZURE_USER and AZURE_PASSWORD
+      # based on AZURE_USER and AZURE_PASSWORD in secrets.sh:
+         # <input id="security-token" class="form-control" type="password" name="j_password">
+         python tests/az_login_setup.py  "chrome"  $AZURE_USER  $AZURE_PASSWORD
 
       # Create a new instance, then exit just to prove out it works.
       
