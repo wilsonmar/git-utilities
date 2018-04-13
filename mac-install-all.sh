@@ -1812,7 +1812,7 @@ if [[ "$GIT_EDITOR" == *"sts"* ]]; then
            echo "alias sts='open -a \"/Applications/STS.app\"'" >>"$BASHFILE"
            source "$BASHFILE"
         fi 
-    git config --global core.editor sts
+    git config --global core.editor textedit
     # TODO: sts --version
 
    #fancy_echo "Opening STS ..."
@@ -3167,9 +3167,14 @@ if [[ $CLOUD == *"azure"* ]]; then  # contains azure.
        # azure-cli (2.0.30)
 
    if [[ $TRYOUT == *"az"* ]] || [[ $TRYOUT == *"all"* ]]; then
-      # To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code BS3FNKPB3 to authenticate.
+      # TODO(wisdom): Invoke a Python Selenium test script to do Device Login:
+      # On az login - open a web browser to https://microsoft.com/devicelogin 
+      # and enter the code BS3FNKPB3 to authenticate. Click Continue.
+      # Enter your AZURE_USER and AZURE_PASSWORD
 
-      # https://www.robinosborne.co.uk/2014/11/18/scripting-a-statsd-mongodb-elasticsearch-metrics-server-on-azure-with-powershell/
+      # Create a new instance, then exit just to prove out it works.
+      
+      # See https://www.robinosborne.co.uk/2014/11/18/scripting-a-statsd-mongodb-elasticsearch-metrics-server-on-azure-with-powershell/
    fi
 fi
 
