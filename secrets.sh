@@ -61,6 +61,7 @@ CLOUD=""
    AWS_REGION="us-west-1"
 
    AZURE_USER=""
+   AZURE_PASSWORD=""
    AZURE_KEY=""
    AZURE_REGION=""
 
