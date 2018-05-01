@@ -1,17 +1,3 @@
----
-layout: post
-title: "Install, configure, and test all on a MacOS laptop"
-excerpt: "Everything you need to be a professional developer"
-tags: [API, devops, evaluation]
-Categories: Devops
-filename: README.md
-image:
-  feature: https://cloud.githubusercontent.com/assets/300046/14612210/373cb4e2-0553-11e6-8a1a-4b5e1dabe181.jpg
-  credit: And Beyond
-  creditlink: http://www.andbeyond.com/chile/places-to-go/easter-island.htm
-comments: true
----
-<i>{{ page.excerpt }}</i>
 
 This article explains the script that builds a Mac machine with "everything" needed by a professional developer.
 
