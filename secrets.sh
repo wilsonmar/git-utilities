@@ -1,5 +1,5 @@
-#!/bin/bash
-# secrets.sh in https://github.com/wilsonmar/DevSecOps
+#!/usr/local/bin/bash
+# secrets.sh in https://github.com/wilsonmar/mac-install-all
 # referenced by macos-install-all.sh in the same repo.
 # This file name secrets.sh should be specified in .gitignore so 
 #    it doesn't upload to a public GitHub/GitLab/BitBucket/etc.
