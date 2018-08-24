@@ -4,7 +4,7 @@
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
 # Remember to chmod +x git-basics.sh first, then paste this command in your terminal
-# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)" whatever
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
 clear
 echo -e "\n>>>"
@@ -48,12 +48,15 @@ git add don
 git commit -m"initial don. Second commit."
 echo ">>> NOTE: chris and don got committed together."
 
-MSG="7. I'm Ed. I escape from commitment by being edited."
+MSG="7. I'm Ed. I escape from commitment by being edited. In the way now."
 echo -e "\n>>> $MSG"
 echo $MSG>ed
 git add ed
 git commit -m "initial ed. Third commit."
 echo "Now I'm outside." >>ed  # concatenated.
+echo ">>> cat ed to show two lines:"
+cat ed
+echo ">>> End of file."
 
 MSG="8. I'm Finn. I escaped but got added back, but not committed."
 echo -e "\n>>> $MSG"
@@ -105,11 +108,13 @@ echo -e "\n>>> Listing files again in folder $WORKING_FOLDER before going back i
 ls -a
 echo -e "\n>>> 13. git checkout HEAD@{4} when Don was committed:"
 git checkout HEAD@{4}
-echo -e "\n>>> Git reflog after checkout HEAD@{4}:"
-git reflog -n 3
+echo -e "\n>>> Git reflog -n 6 after checkout HEAD@{4}:"
+git reflog -n 6
 echo -e "\n>>> Listing files in folder $WORKING_FOLDER after checkout:"
 ls -a
 echo ">>> NOTE: finn, george wasn't committed yet."
+echo -e "\n>>> cat ed contents: It doesn't contain 2nd line:"
+cat ed
 
 echo -e "\n>>> Git status -s -b after checkout:"
 git status -s -b
@@ -117,11 +122,27 @@ echo ">>> NOTE: Untracked files still there on the sidelines."
 
 echo -e "\n>>> 14. git checkout back to master:"
 git checkout master
+
 echo -e "\n>>> Git reflog after checkout master:"
 git reflog -n 3
+
 echo -e "\n>>> Listing files in folder $WORKING_FOLDER :"
 ls -al
 echo ">>> NOTE: The whole gang is back together."
+
+echo -e "\n>>> 15a. git stash pop:"
+git stash pop
+
+echo -e "\n>>> Git status -s -b after stack pop:"
+git status -s -b
+
+echo -e "\n>>> cat ed"
+cat ed
+echo ">>> NOTE: 2nd line should appear now."
+
+echo -e "\n>>> git stash list after pop:"
+git stash list
+echo ">>> nothing returns if the list is empty."
 
 exit
 
