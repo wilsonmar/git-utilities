@@ -1,10 +1,10 @@
 #!/bin/bash
-# This is git-basics.sh from https://github.com/wilsonmar/git-utilities
-# Described in https://wilsonmar.github.io/git-basics
+# This is git-stash.sh from https://github.com/wilsonmar/git-utilities
+# Described in https://wilsonmar.github.io/git-stash
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
-# Remember to chmod +x git-basics.sh first, then paste this command in your terminal
-# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
+# Remember to chmod +x git-stash.sh first, then paste this command in your terminal
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-stash.sh)"
 
 clear
 echo -e "\n>>>"
@@ -24,7 +24,7 @@ git init  # to initialized empty repository
    # Initialized empty Git repository in /Users/wilsonmar/git_repo/.git/
 
 echo -e "\n>>> 2. Create README.md & .gitignore:"
-echo "#git-basics.sh">README.md
+echo "#git-stash.sh">README.md
 echo "amy">.gitignore
 MSG="2. Add README.md and .gitignore to staging"
 echo ">>> 2. git add & commit -m\"$MSG\" (no response)"
