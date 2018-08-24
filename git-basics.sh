@@ -19,16 +19,18 @@ cd ~/
 rm -rf $WORKING_FOLDER
 mkdir  $WORKING_FOLDER
    cd  $WORKING_FOLDER
-echo -e "\n>>> 1. git init in $PWD:"
+echo -e "\n>>> 1. git init within $PWD:"
 git init  # to initialized empty repository
    # Initialized empty Git repository in /Users/wilsonmar/git_repo/.git/
 
-echo -e "\n>>> 2. First commit of README.md and .gitignore:"
+echo -e "\n>>> 2. Create README.md & .gitignore:"
 echo "#git-basics.sh">README.md
 echo "amy">.gitignore
+MSG="2. First commit of README.md and .gitignore"
+echo ">>> 2. git add & commit -m\"$MSG\""
 git add .
-git commit -m"First commit of README.md and .gitignore"
-   # [master (root-commit) 98e3829] First commit of README.md and .gitignore
+git commit -m"$MSG"
+   # [master (root-commit) 98e3829] 2. First commit of README.md and .gitignore
    #  2 files changed, 2 insertions(+)
    #  create mode 100644 .gitignore
    #  create mode 100644 README.md
@@ -42,12 +44,12 @@ echo -e "\n>>> $MSG"
 echo $MSG>bob
 
 MSG="5. I'm Chris. I visit the Index."
-echo -e "\n>>> $MSG"
+echo -e "\n>>> git add chris ($MSG)"
 echo $MSG>chris
 git add chris
 
 MSG="6. I'm Don. I got commited once."
-echo -e "\n>>> $MSG"
+echo -e "\n>>> add & commit -m\"$MSG\""
 echo $MSG>don
 git add don
 git commit -m"initial don. Second commit."
@@ -79,6 +81,7 @@ git commit -m"initial finn. Fourth commit."
     #  1 file changed, 1 insertion(+)
     #  create mode 100644 finn
 echo "Now I'm outside." >>finn
+echo ">>> git add finn"
 git add finn
 
 echo -e "\n>>> cat finn"
@@ -129,7 +132,7 @@ git checkout HEAD@{4}
    # Aborting
 
 echo -e "\n>>> 12a. git stash:"
-git stash save "working on new Harry."
+git stash save "working on ed outside after adding Harry."
 echo -e "\n>>> 12b. git stash list:"
 git stash list
 echo -e "\n>>> 12c. git stash show:"
@@ -195,15 +198,15 @@ git status -s -b
    # ?? bob
    # ?? harry
 
+echo -e "\n>>> git stash list after pop:"
+git stash list
+echo ">>> nothing returns if the list is empty."
+
 echo -e "\n>>> cat ed"
 cat ed
    # 7. I'm Ed. I escape from commitment by being edited. In the way now.
    # Now I'm outside.
 echo ">>> NOTE: 2nd line should appear now."
-
-echo -e "\n>>> git stash list after pop:"
-git stash list
-echo ">>> nothing returns if the list is empty."
 
 exit
 
