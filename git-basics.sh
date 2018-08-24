@@ -48,14 +48,14 @@ git add don
 git commit -m"initial don. Second commit."
 echo ">>> NOTE: chris and don got committed together."
 
-MSG="7. I'm Ed. I escape from commitment by being edited. I haven't gone back."
+MSG="7. I'm Ed. I escape from commitment by being edited."
 echo -e "\n>>> $MSG"
 echo $MSG>ed
 git add ed
 git commit -m "initial ed. Third commit."
 echo "Now I'm outside." >>ed  # concatenated.
 
-MSG="8. I'm Finn. I escaped but got added back."
+MSG="8. I'm Finn. I escaped but got added back, but not committed."
 echo -e "\n>>> $MSG"
 echo $MSG>finn
 git add finn
