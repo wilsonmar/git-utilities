@@ -4,7 +4,7 @@
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
 # Remember to chmod +x git-basics.sh first, then paste this command in your terminal
-# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-settings/master/git-basics.sh)" whatever
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)" whatever
 
 clear
 echo -e "\n>>>"
