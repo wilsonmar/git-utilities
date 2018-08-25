@@ -1,4 +1,4 @@
-$ ./git-basics.sh
+$ ./git-basics.sh 
 
 
 >>>
@@ -10,7 +10,7 @@ $ ./git-basics.sh
 >>> 1. git init within /Users/wilsonmar/git_stash-demo:
 Initialized empty Git repository in /Users/wilsonmar/git_stash-demo/.git/
 >>> 2. git add & commit -m"2. Add README.md and .gitignore to staging"
-[master (root-commit) 18cc968] 1st commit - 2. Add README.md and .gitignore to staging
+[master (root-commit) 0df9945] 1st commit - 2. Add README.md and .gitignore to staging
  2 files changed, 2 insertions(+)
  create mode 100644 .gitignore
  create mode 100644 README.md
@@ -24,14 +24,14 @@ Initialized empty Git repository in /Users/wilsonmar/git_stash-demo/.git/
 >>> git add does not issue a response message unless there is an error.
 
 >>> git add & commit 
-[master daf2482] 2nd commit - 6. I'm Don. I got commited once.
+[master e51ffe6] 2nd commit - 6. I'm Don. I got committed once.
  2 files changed, 2 insertions(+)
  create mode 100644 chris
  create mode 100644 don
 >>> NOTE: chris and don got committed together.
 
 >>> 7. I'm Ed. But I'll soon be modified.
-[master c9a6933] 3rd commit - 7. I'm Ed. But I'll soon be modified.
+[master 4629764] 3rd commit - 7. I'm Ed. But I'll soon be modified.
  1 file changed, 1 insertion(+)
  create mode 100644 ed
 >>> Add 2nd line to file ed. cat ed shows two lines:
@@ -40,7 +40,7 @@ Now I'm outside.
 >>> End of file we're actively working on.
 
 >>> 8. I'm Finn. I  got edited and added back, but not committed.
-[master f7c62d5] 4th commit - 8. I'm Finn. I  got edited and added back, but not committed.
+[master 81d5d30] 4th commit - 8. I'm Finn. I  got edited and added back, but not committed.
  1 file changed, 1 insertion(+)
  create mode 100644 finn
 >>> git add finn
@@ -48,11 +48,11 @@ Now I'm outside.
 >>> cat finn shows two lines:
 8. I'm Finn. I got edited and added back, but not committed.
 Now I'm outside.
->>> 9. finn and george are commited together as 2 files:
-[master 5218696] 5th commit - 9a. I'm George. I'm a frequent traveler.
+>>> 9. finn and george are committed together as 2 files:
+[master 505c338] 5th commit - 9a. I'm George. I'm a frequent traveler.
  2 files changed, 2 insertions(+)
  create mode 100644 george
-[master 478bbec] 6th commit - 9b. George is committed again.
+[master 7636fc1] 6th commit - 9b. George is committed again.
  1 file changed, 1 insertion(+)
 
 >>> 10. I'm Harry.
@@ -70,20 +70,20 @@ Now I'm outside.
 >>> PROTIP: The M nex to file ed means Modified and thus being tracked by Git.
 
 >>> 13. git log after initial commits:
-* 478bbec 6th commit - 9b. George is committed again. 1 second ago
-* 5218696 5th commit - 9a. I'm George. I'm a frequent traveler. 1 second ago
-* f7c62d5 4th commit - 8. I'm Finn. I  got edited and added back, but not committed. 1 second ago
-* c9a6933 3rd commit - 7. I'm Ed. But I'll soon be modified. 1 second ago
-* daf2482 2nd commit - 6. I'm Don. I got commited once. 1 second ago
-* 18cc968 1st commit - 2. Add README.md and .gitignore to staging 1 second ago
+* 7636fc1 6th commit - 9b. George is committed again. 0 seconds ago
+* 505c338 5th commit - 9a. I'm George. I'm a frequent traveler. 0 seconds ago
+* 81d5d30 4th commit - 8. I'm Finn. I  got edited and added back, but not committed. 0 seconds ago
+* 4629764 3rd commit - 7. I'm Ed. But I'll soon be modified. 0 seconds ago
+* e51ffe6 2nd commit - 6. I'm Don. I got committed once. 0 seconds ago
+* 0df9945 1st commit - 2. Add README.md and .gitignore to staging 0 seconds ago
 
 >>> 14. git reflog (of git actions) after initial commits:
-478bbec (HEAD -> master) HEAD@{0}: commit: 6th commit - 9b. George is committed again.
-5218696 HEAD@{1}: commit: 5th commit - 9a. I'm George. I'm a frequent traveler.
-f7c62d5 HEAD@{2}: commit: 4th commit - 8. I'm Finn. I got edited and added back, but not committed.
-c9a6933 HEAD@{3}: commit: 3rd commit - 7. I'm Ed. But I'll soon be modified.
-daf2482 HEAD@{4}: commit: 2nd commit - 6. I'm Don. I got commited once.
-18cc968 HEAD@{5}: commit (initial): 1st commit - 2. Add README.md and .gitignore to staging
+7636fc1 (HEAD -> master) HEAD@{0}: commit: 6th commit - 9b. George is committed again.
+505c338 HEAD@{1}: commit: 5th commit - 9a. I'm George. I'm a frequent traveler.
+81d5d30 HEAD@{2}: commit: 4th commit - 8. I'm Finn. I got edited and added back, but not committed.
+4629764 HEAD@{3}: commit: 3rd commit - 7. I'm Ed. But I'll soon be modified.
+e51ffe6 HEAD@{4}: commit: 2nd commit - 6. I'm Don. I got committed once.
+0df9945 HEAD@{5}: commit (initial): 1st commit - 2. Add README.md and .gitignore to staging
 
 >>> 15. git checkout HEAD@{4} attempt (at TIME TRAVEL):
 error: Your local changes to the following files would be overwritten by checkout:
@@ -120,7 +120,7 @@ do so (now or later) by using -b with the checkout command again. Example:
 
   git checkout -b <new-branch-name>
 
-HEAD is now at c9a6933 3rd commit - 7. I'm Ed. But I'll soon be modified.
+HEAD is now at 4629764 3rd commit - 7. I'm Ed. But I'll soon be modified.
 
 >>> 21. cat ed contents: It doesn't contain 2nd line:
 7. I'm Ed. But I'll soon be modified.
@@ -131,12 +131,12 @@ HEAD is now at c9a6933 3rd commit - 7. I'm Ed. But I'll soon be modified.
 >>> Notice finn and george are not included because they happen after the point of checkout.
 
 >>> 23. git reflog -n 6 after checkout HEAD@{4}:
-c9a6933 (HEAD) HEAD@{0}: checkout: moving from master to HEAD@{4}
-478bbec (master) HEAD@{1}: reset: moving to HEAD
-478bbec (master) HEAD@{2}: commit: 6th commit - 9b. George is committed again.
-5218696 HEAD@{3}: commit: 5th commit - 9a. I'm George. I'm a frequent traveler.
-f7c62d5 HEAD@{4}: commit: 4th commit - 8. I'm Finn. I got edited and added back, but not committed.
-c9a6933 (HEAD) HEAD@{5}: commit: 3rd commit - 7. I'm Ed. But I'll soon be modified.
+4629764 (HEAD) HEAD@{0}: checkout: moving from master to HEAD@{4}
+7636fc1 (master) HEAD@{1}: reset: moving to HEAD
+7636fc1 (master) HEAD@{2}: commit: 6th commit - 9b. George is committed again.
+505c338 HEAD@{3}: commit: 5th commit - 9a. I'm George. I'm a frequent traveler.
+81d5d30 HEAD@{4}: commit: 4th commit - 8. I'm Finn. I got edited and added back, but not committed.
+4629764 (HEAD) HEAD@{5}: commit: 3rd commit - 7. I'm Ed. But I'll soon be modified.
 >>> NOTE: finn, george are included in reflog because it lists all actions.
 
 >>> 24. Line "Touched while away" is added to file don:
@@ -149,14 +149,14 @@ c9a6933 (HEAD) HEAD@{5}: commit: 3rd commit - 7. I'm Ed. But I'll soon be modifi
 
 >>> 26. git checkout back to master:
 M	don
-Previous HEAD position was c9a6933 3rd commit - 7. I'm Ed. But I'll soon be modified.
+Previous HEAD position was 4629764 3rd commit - 7. I'm Ed. But I'll soon be modified.
 Switched to branch 'master'
 
 >>> 27. Listing files shows the whole gang is back together (from amy to george).
 .          ..         .git       .gitignore README.md  amy        bob        chris      don        ed         finn       george     harry
 
 >>> 28. git status shows file after getting back to master:
-6. I'm Don. I got commited once.
+6. I'm Don. I got committed once.
 Touched while away
 >>> Modification to don is carried forward.
 
@@ -176,7 +176,7 @@ Untracked files:
 	harry
 
 no changes added to commit (use "git add" and/or "git commit -a")
-Dropped refs/stash@{0} (f2124b421855dfad7e996e97364228789dcca228)
+Dropped refs/stash@{0} (12ae8d8eddb6f7234e87be3b3952ee8be5b489c7)
 
 >>> 30. Git status -s -b after stack pop:
 ## master
@@ -194,9 +194,9 @@ Now I'm outside.
 >>> nothing returns if the list is empty.
 
 >>> 33. git reflog after checkout master:
-478bbec (HEAD -> master) HEAD@{0}: checkout: moving from c9a693369ab476e068dbd73477b7efdf5cdab811 to master
-c9a6933 HEAD@{1}: checkout: moving from master to HEAD@{4}
-478bbec (HEAD -> master) HEAD@{2}: reset: moving to HEAD
+7636fc1 (HEAD -> master) HEAD@{0}: checkout: moving from 4629764ce79419c24b659837896392e2cf5c0bc3 to master
+4629764 HEAD@{1}: checkout: moving from master to HEAD@{4}
+7636fc1 (HEAD -> master) HEAD@{2}: reset: moving to HEAD
 
 >>> 34a. Some prefer an alternate to stash in checking out a branch:
 git checkout -b tmpbranch:
@@ -209,7 +209,7 @@ Switched to a new branch 'tmpbranch'
 >>> end of file
 
 >>> 34c. git add & commit -m"saving harry" 
-[tmpbranch 8a5829e] saving harry
+[tmpbranch afff8a1] saving harry
  1 file changed, 1 insertion(+)
  create mode 100644 harry
 

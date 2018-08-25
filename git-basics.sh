@@ -19,9 +19,14 @@ cd ~/
 rm -rf $WORKING_FOLDER
 mkdir  $WORKING_FOLDER
    cd  $WORKING_FOLDER
+
 echo -e "\n>>> 1. git init within $PWD:"
 git init  # to initialized empty repository
    # Initialized empty Git repository in /Users/wilsonmar/git_repo/.git/
+
+# Mute warnings on Windows machines:
+git config --global core.safecrlf false
+   # No response is expected.
 
 echo "#git-basics.sh">README.md
 echo "amy">.gitignore
@@ -49,12 +54,12 @@ echo $MSG>chris
 git add chris
 echo ">>> git add does not issue a response message unless there is an error."
 
-MSG="6. I'm Don. I got commited once."
+MSG="6. I'm Don. I got committed once."
 echo -e "\n>>> git add & commit "
 echo $MSG>don
 git add don
 git commit -m"2nd commit - $MSG"
-   # [master f6e6fb3] 2nd commit - 6. I'm Don. I got commited once.
+   # [master f6e6fb3] 2nd commit - 6. I'm Don. I got committed once.
    #  2 files changed, 2 insertions(+)
    #  create mode 100644 chris
    #  create mode 100644 don
@@ -87,7 +92,7 @@ git add finn
 echo -e "\n>>> cat finn shows two lines:"
 cat finn
 
-echo ">>> 9. finn and george are commited together as 2 files:"
+echo ">>> 9. finn and george are committed together as 2 files:"
 MSG="9a. I'm George. I'm a frequent traveler."
 echo $MSG>george
 git add george
@@ -121,7 +126,7 @@ git log --pretty=format:"%h %s %ad" --graph --since=10.days --date=relative
    # * 473b096 5th commit - 9a. I'm George. My first commit. 0 seconds ago
    # * c21af48 4th commit - 8. I'm Finn. I  got edited and added back, but not committed. 0 seconds ago
    # * 4e4bada 3rd commit - 7. I'm Ed. But I'll soon escape by being edited. 0 seconds ago
-   # * f6e6fb3 2nd commit - 6. I'm Don. I got commited once. 0 seconds ago
+   # * f6e6fb3 2nd commit - 6. I'm Don. I got committed once. 0 seconds ago
    # * 4ca8a19 1st commit - 2. Add README.md and .gitignore to staging 0 seconds ago
 
 echo -e "\n>>> 14. git reflog (of git actions) after initial commits:"
@@ -130,7 +135,7 @@ git reflog
    # 473b096 HEAD@{1}: commit: 5th commit - 9a. I'm George. My first commit.
    # c21af48 HEAD@{2}: commit: 4th commit - 8. I'm Finn. I got edited and added back, but not committed.
    # 4e4bada HEAD@{3}: commit: 3rd commit - 7. I'm Ed. But I'll soon escape by being edited.
-   # f6e6fb3 HEAD@{4}: commit: 2nd commit - 6. I'm Don. I got commited once.
+   # f6e6fb3 HEAD@{4}: commit: 2nd commit - 6. I'm Don. I got committed once.
    # 4ca8a19 HEAD@{5}: commit (initial): 1st commit - 2. Add README.md and .gitignore to staging
 
 echo -e "\n>>> 15. git checkout HEAD@{4} attempt (at TIME TRAVEL):"
