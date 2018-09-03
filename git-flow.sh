@@ -9,11 +9,11 @@
 
 function fancy_echo() {
   local fmt="$1"; shift
-  printf "\\n   >>> $fmt\\n" "$@"
+  printf "\\n    >>> $fmt\\n" "$@"
 }
 function c_echo() {
   local fmt="$1"; shift
-  printf "\\n $ $fmt\\n" "$@"
+  printf "\\n  $ $fmt\\n" "$@"
 }
 command_exists() {
   command -v "$@" > /dev/null 2>&1
@@ -35,6 +35,8 @@ RUNTYPE="reuse"
 REPO_USING="git@github.com:wilsonmar/git-utilities"
 SAMPLE_ACCT="wilsonmar"
 SAMPLE_REPO="some-repo"
+OTHER_ACCT="hotwilson"
+OTHER_REPO="some-repo"
 NEW_BRANCH="feat1"
 
 fancy_echo "1.1 Local machine metadata ..."
@@ -134,24 +136,68 @@ fancy_echo "2.2 sample global git config..."
 c_echo "git config --global core.safecrlf false"
         git config --global core.safecrlf false
 
-fancy_echo "2.3 git config --list ..."
+fancy_echo "2.3 git config --list  # (could be a long file) ..."
 # git config --list
 
+fancy_echo "2.4 Create gits folder ..."
+   c_echo "mkdir gits && cd gits"
+           mkdir gits && cd gits
 
-fancy_echo "3.x Cloud reponsitory setup:"
+fancy_echo "2.5 Make account container ..."
+   c_echo "mkdir myacct && cd myacct"
+           mkdir myacct && cd myacct
 
-fancy_echo "3.1 Fork is done manually on GitHub/GitLab."
-# 1. fork https://github.com/wilsonmar/git-utilities
+fancy_echo "2.6 create local-repo & git init"
+           mkdir local-repo && cd local-repo
+           git init
 
-fancy_echo "3.2 ssh-keygen is done manually."
+fancy_echo "3.1 ssh-keygen is done manually, just once."
 
 c_echo "ls -a ~/.ssh"
         ls -a ~/.ssh
 
-fancy_echo "4.1 Make account container ..."
+   # Based on https://hub.github.com/
+      if ! command_exists hub ; then
+         fancy_echo "3.2 Brew installing hub add-in to Git ..."
+         brew install hub
+      else
+         fancy_echo "3.2 hub already installed for Git to manage GitHub."
+      fi
 
-c_echo "mkdir myacct && cd myacct"
-        mkdir myacct && cd myacct
+fancy_echo "3.3 Delete fork created by previous run ..."
+
+fancy_echo "3.4 Use hub to clone and fork ..."
+
+c_echo "hub clone \"$OTHER_ACCT/$OTHER_REPO\""
+      hub clone "$OTHER_ACCT/$OTHER_REPO" # hotwilson/some-repo"
+c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
+      cd "$OTHER_REPO"
+      echo "PWD=$PWD"
+      git remote -v
+      ls -al
+
+c_echo "hub fork \"$OTHER_ACCT/$OTHER_REPO\""
+      hub fork "$OTHER_ACCT/$OTHER_REPO" 
+c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
+      cd "$OTHER_REPO"
+      echo "PWD=$PWD"
+      git remote -v
+      ls -al
+
+hub remote add "$SAMPLE_ACCT"  # wilsonmar
+git remote rename origin upstream
+git remote rename "$SAMPLE_ACCT" origin
+
+c_echo "git pull --all"
+        git pull --all
+
+fancy_echo "3.5 git remote -v ..."
+      git remote -v
+
+
+# 1. fork https://github.com/hotwilson/some-repo to wilsonmar
+
+fancy_echo "4.1 ??? ..."
 
 fancy_echo "4.2 git clone $SAMPLE_ACCT/$SAMPLE_REPO ..."
 
@@ -222,7 +268,6 @@ fancy_echo "6.6 git log --oneline"
         git log --pretty=format:"%h %s %ad" --graph --date=relative
 
 #fancy_echo "6.7 git rebase -i is optional"
- #       git checkout master
  
 
 
@@ -248,8 +293,8 @@ fancy_echo "7.4 git push origin --tags"
 fancy_echo "7.5 git checkout master "
         git checkout master
 
-fancy_echo "7.6 git branch -d feat1  # to remove locally"
-        git branch -d "$NEW_BRANCH"
+fancy_echo "7.6 git branch -D feat1  # to remove locally"
+        git branch -D "$NEW_BRANCH"
 
 fancy_echo "7.7 git push origin :feat1  # to remove in cloud"
         git push origin :"$NEW_BRANCH"
@@ -257,20 +302,20 @@ fancy_echo "7.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "8.1 git remote add upstream https://github.com/... "
-         git remote add upstream https://github.com/hotwilson/git-utilities
-echo ">>> No output expected."
-
-fancy_echo "8.2 Press a change in the Upstream remote ... "
-         read -rsp $'Press any key after Upstream is changed ...\n' -n 1 key
+fancy_echo "8.1 Use a different browser to login to the other's repo ... "
+         read -rsp $'Press any key after adding a file ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
+
+fancy_echo "8.2 git remote add upstream https://github.com/... "
+         git remote add upstream https://github.com/hotwilson/some-repo
+    echo ">>> No output expected."
 
 fancy_echo "8.3 git remote -v "
          git remote -v  
 
-fancy_echo "8.4 git fetch upstream (all branches, inculuding master)"
-         git fetch upstream 
+fancy_echo "8.4 git fetch upstream (not all branches, just master)"
+         git fetch upstream master
 
 fancy_echo "8.5 git checkout master "
         git checkout master
@@ -285,11 +330,8 @@ fancy_echo "8.8 git push origin master"
          git push origin master
 
 
-
-
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
 DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
-echo -e "\n $DIFF MB of disk space consumed during this script run."
 # 380691344 / 182G = 2091710.681318681318681 blocks per GB
 # 182*1024=186368 MB
 # 380691344 / 186368 G = 2042 blocks per MB
@@ -297,5 +339,5 @@ echo -e "\n $DIFF MB of disk space consumed during this script run."
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
 MSG="End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
-fancy_echo "$MSG"
+fancy_echo "$MSG and $DIFF MB disk space consumed."
 #say "script ended."  # through speaker

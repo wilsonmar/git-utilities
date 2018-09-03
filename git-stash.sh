@@ -21,9 +21,9 @@ cd ~/
 rm -rf $WORKING_FOLDER
 mkdir  $WORKING_FOLDER
    cd  $WORKING_FOLDER
-fancy_echo "0. WORKING_FOLDER is $PWD:"
+fancy_echo "1. WORKING_FOLDER is $PWD:"
 
-fancy_echo "1. git init within $PWD:"
+fancy_echo "0. git init within $PWD:"
 git init  # to initialized empty repository
    # Initialized empty Git repository in /Users/wilsonmar/git_repo/.git/
 
