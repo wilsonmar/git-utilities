@@ -86,6 +86,7 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
       fancy_echo "1.5 Downloading git-flow.sh from GitHub for next run ..."
       curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-flow.sh"
            # 10835 bytes Received
+      # TODO: 
    else
       fancy_echo "1.5 Using existing git-flow.sh ..."
    fi
@@ -104,7 +105,7 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-flow-workspace"
    echo "MYACCT=$MYACCT" # wilsonmar
    echo "REPO_USING=$REPO_USING" # git@github.com:wilsonmar/git-utilities"
-   echo "SAMPLE_REPO=$SAMPLE_REPO" # some-repo
+   echo "SAMPLE_REPO=$SAMPLE_REPO" # local-repo
    echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
    echo "NEW_BRANCH=$NEW_BRANCH"   # feat1"
@@ -154,9 +155,11 @@ fancy_echo "2.1 Git Config ..."
 fancy_echo "2.1 Attribution for git commits ..."
 c_echo "git config --global user.name \"USER_NAME\""
         git config --global user.name "$USER_NAME"
+      # git config --global user.name "wilson Mar"
 
 c_echo "git config --global user.email \"$USER_EMAIL\""
         git config --global user.email  "$USER_EMAIL"
+      # git config --global user.email "wilsonmar+GitHub@gmail.com"
 
 fancy_echo "2.2 sample global git config..."
 c_echo "git config --global core.safecrlf false"
@@ -173,14 +176,15 @@ fancy_echo "2.5 NO myacct container ..."
 #      fi
 #           cd myacct
 
-fancy_echo "2.6 mkdir local-repo && cd local-repo"
-      if [ ! -d "local-repo" ]; then
-                 mkdir local-repo 
-      fi
-           cd local-repo
+# $SAMPLE_REPO="local-repo"
+fancy_echo "2.6 mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
+           if [ ! -d "$SAMPLE_REPO" ]; then
+                mkdir "$SAMPLE_REPO"
+           fi
+           cd "$SAMPLE_REPO"
 
 fancy_echo "2.7 git init"
-           git init
+                git init
 
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
@@ -197,8 +201,9 @@ c_echo "ls -a ~/.ssh"
          fancy_echo "3.2 $HUB_VERSION already installed for Git to manage GitHub."
       fi
 
-fancy_echo "3.3 Delete fork in GitHub created by previous run ..."
-         read -rsp $'Press any key after deleting ...\n' -n 1 key
+fancy_echo "3.3 Delete \"$OTHER_REPO\" repo forked during previous run ..."
+c_echo "hub delete \"$OTHER_REPO\""
+        hub delete  "$OTHER_REPO"
 
 fancy_echo "3.4 Use hub to clone and fork ..."
 c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
@@ -228,7 +233,7 @@ c_echo "git pull --all"
         git pull --all
 
 fancy_echo "3.5 git remote -v ..."
-      git remote -v
+                git remote -v
 
 fancy_echo "3.6 Manually see the fork in your cloud account  ..."
 #         read -rsp $'Press any key after deleting ...\n' -n 1 key
@@ -244,21 +249,21 @@ fancy_echo "3.7 cd into repo $MYACCT/$SAMPLE_REPO ..."
         echo "PWD=$PWD"
 
 fancy_echo "3.8 ls -al files and folders at $PWD ..."
-        ls -al
+                ls -al
 
 fancy_echo "3.9 git remote -v = remote ..."
-   git remote -v
+                git remote -v
 
 fancy_echo "3.10 git branch -avv (to list master ..."
-   git branch -avv
+                 git branch -avv
 
 
 fancy_echo "4.1 Checkout new branch ..."
-c_echo "git checkout -b $NEW_BRANCH"
-        git checkout -b $NEW_BRANCH
+       c_echo "git checkout -b \"$NEW_BRANCH\""
+               git checkout -b  "$NEW_BRANCH"
 
 fancy_echo "4.2 git branch -avv"
-        git branch -avv
+                git branch -avv
 
 fancy_echo "4.3 Add and configure .gitignore file ..."
 
@@ -276,46 +281,45 @@ c_echo "echo \"peace\" >newfile.md"
    fi
 
 fancy_echo "4.4 cat .gitignore to view contents:"
-        cat .gitignore
+                cat .gitignore
 
 fancy_echo "4.5 git status -s -b [gsl]"
-        git status -s -b
+                git status -s -b
 
 
 fancy_echo "5.1 cat .git/config  # attribution for local repo"
-        cat .git/config
+                cat .git/config
 
 fancy_echo "5.2 git diff --cached"
                 git diff --cached
 
 fancy_echo "5.3 git add . -A "
-        git add . -A
+                git add . -A
 
 fancy_echo "5.4 git diff --cached"
                 git diff --cached
 
 fancy_echo "5.5 git status -s -b [gsl] again"
-        git status -s -b
+                git status -s -b
 
 fancy_echo "5.6 git log origin..HEAD"
-        git log origin..HEAD
+                git log origin..HEAD
 
-fancy_echo "5.7 git commit -m\"Add .DS_Store to .gitignore @hotwilson\" "
-        git commit -m"Add .DS_Store to .gitignore @hotwilson"
+fancy_echo "5.7 git commit -m\"Add .DS_Store to .gitignore @$OTHER_ACCT\" "
+                git commit -m "Add .DS_Store to .gitignore @$OTHER_ACCT"
 
 fancy_echo "5.8 git reflog -5"
-        git reflog -5
+                git reflog -5
 
 fancy_echo "5.9 git log --oneline"
-        git log --oneline
-        git log --pretty=format:"%h %s %ad" --graph --date=relative
+                git log --oneline
+              # git log --pretty=format:"%h %s %ad" --graph --date=relative
 
 #fancy_echo "5.10 git rebase -i is optional"
  
 
-
 fancy_echo "6.1 git push origin $NEW_BRANCH"
-        git push origin "$NEW_BRANCH"
+                git push origin "$NEW_BRANCH"
 
 # TODO: Stop if above not successful.
 
@@ -336,13 +340,13 @@ fancy_echo "6.4 git push origin --tags"
 # TODO: Stop if above not successful.
 
 fancy_echo "6.5 git checkout master "
-        git checkout master
+                git checkout master
 
 fancy_echo "6.6 git branch -D feat1  # to remove locally"
-        git branch -D "$NEW_BRANCH"
+                git branch -D "$NEW_BRANCH"
 
 fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
-        git push origin :"$NEW_BRANCH"
+                git push origin :"$NEW_BRANCH"
 
 
 # Check manually on GitHub for new tag.
@@ -353,26 +357,41 @@ fancy_echo "8.1 Use a different browser to login to the other's repo ... "
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
 
 fancy_echo "8.2 git remote add upstream https://github.com/... "
-         git remote add upstream https://github.com/hotwilson/some-repo
+                git remote add upstream https://github.com/hotwilson/some-repo
     echo ">>> No output expected."
 
 fancy_echo "8.3 git remote -v "
-         git remote -v  
+                git remote -v  
 
 fancy_echo "8.4 git fetch upstream (not all branches, just master)"
-         git fetch upstream master
+                git fetch upstream master
 
 fancy_echo "8.5 git checkout master "
-        git checkout master
+                git checkout master
 
 fancy_echo "8.6 git diff HEAD @{u} --name-only"
-         git diff HEAD @{u} --name-only
+                git diff HEAD @{u} --name-only
 
 fancy_echo "8.7 git merge upstream/master"
-         git merge upstream/master
+                git merge upstream/master
 
 fancy_echo "8.8 git push origin master"
-         git push origin master
+                git push origin master
+
+
+fancy_echo "9.1 Change something on the origin in GitHub ..."
+         read -rsp $'Press any key after adding a file ...\n' -n 1 key
+
+fancy_echo "9.2 git fetch origin master"
+                git fetch origin master
+
+fancy_echo "9.3 git diff master..origin/master"
+                git diff master..origin/master
+                #gitk master..origin/master
+
+fancy_echo "9.4 git fetch origin master"
+                git push origin master
+
 
 
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
