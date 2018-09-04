@@ -139,17 +139,23 @@ c_echo "git config --global core.safecrlf false"
 fancy_echo "2.3 git config --list  # (could be a long file) ..."
 # git config --list
 
-fancy_echo "2.4 Create gits folder ..."
-   c_echo "mkdir gits && cd gits"
-           mkdir gits && cd gits
+fancy_echo "2.4 NO Create gits folder ..."
 
-fancy_echo "2.5 Make account container ..."
-   c_echo "mkdir myacct && cd myacct"
-           mkdir myacct && cd myacct
+fancy_echo "2.5 NO myacct container ..."
+#      if [ ! -d "myacct" ]; then
+#                 mkdir myacct 
+#      fi
+#           cd myacct
 
-fancy_echo "2.6 create local-repo & git init"
-           mkdir local-repo && cd local-repo
+fancy_echo "2.6 mkdir local-repo && cd local-repo"
+      if [ ! -d "local-repo" ]; then
+                 mkdir local-repo 
+      fi
+           cd local-repo
+
+fancy_echo "2.7 git init"
            git init
+
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
 
@@ -164,9 +170,12 @@ c_echo "ls -a ~/.ssh"
          fancy_echo "3.2 hub already installed for Git to manage GitHub."
       fi
 
-fancy_echo "3.3 Delete fork created by previous run ..."
+fancy_echo "3.3 Delete fork in GitHub created by previous run ..."
+         read -rsp $'Press any key after deleting ...\n' -n 1 key
 
 fancy_echo "3.4 Use hub to clone and fork ..."
+c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
+        cd && cd  "$WORKSPACE_FOLDER"
 
 c_echo "hub clone \"$OTHER_ACCT/$OTHER_REPO\""
       hub clone "$OTHER_ACCT/$OTHER_REPO" # hotwilson/some-repo"
@@ -194,41 +203,40 @@ c_echo "git pull --all"
 fancy_echo "3.5 git remote -v ..."
       git remote -v
 
+fancy_echo "3.6 Manually see the fork in your cloud account  ..."
+#         read -rsp $'Press any key after deleting ...\n' -n 1 key
 
 # 1. fork https://github.com/hotwilson/some-repo to wilsonmar
 
-fancy_echo "4.1 ??? ..."
-
-fancy_echo "4.2 git clone $SAMPLE_ACCT/$SAMPLE_REPO ..."
-
+#fancy_echo "4.2 git clone $SAMPLE_ACCT/$SAMPLE_REPO ..."
 # if RUNTYPE != "reuse"
-   git clone "git@github.com:$SAMPLE_ACCT/$SAMPLE_REPO" --depth=1
+#   git clone "git@github.com:$SAMPLE_ACCT/$SAMPLE_REPO" --depth=1
 
-fancy_echo "4.3 cd into repo $SAMPLE_ACCT/$SAMPLE_REPO ..."
+fancy_echo "3.7 cd into repo $SAMPLE_ACCT/$SAMPLE_REPO ..."
+        cd "$SAMPLE_REPO"
+        echo "PWD=$PWD"
 
-cd "$SAMPLE_REPO"
-
-fancy_echo "4.4 ls -al files and folders at $PWD ..."
+fancy_echo "3.8 ls -al files and folders at $PWD ..."
         ls -al
 
-fancy_echo "4.5 git remote -v = remote ..."
+fancy_echo "3.9 git remote -v = remote ..."
    git remote -v
 
-fancy_echo "4.6 git branch -avv (to list master ..."
+fancy_echo "3.10 git branch -avv (to list master ..."
    git branch -avv
 
 
-fancy_echo "5.1 Checkout new branch ..."
+fancy_echo "4.1 Checkout new branch ..."
 c_echo "git checkout -b $NEW_BRANCH"
         git checkout -b $NEW_BRANCH
 
-fancy_echo "5.2 git branch -avv"
+fancy_echo "4.2 git branch -avv"
         git branch -avv
 
-fancy_echo "5.3 Add and configure .gitignore file ..."
+fancy_echo "4.3 Add and configure .gitignore file ..."
 
-c_echo "echo \"hello\" >newfile.md"
-        echo  "hello"  >newfile.md
+c_echo "echo \"peace\" >newfile.md"
+        echo  "peace"  >newfile.md
 
    if [ ! -d ".gitignore" ]; then # NOT found:
       c_echo "touch .gitignore"
@@ -240,16 +248,26 @@ c_echo "echo \"hello\" >newfile.md"
               echo -e "\n.DS_Store" >>.gitignore
    fi
 
-fancy_echo "5.4 cat .gitignore to view contents:"
+fancy_echo "4.4 cat .gitignore to view contents:"
         cat .gitignore
 
-fancy_echo "5.5 git status -s -b [gsl]"
+fancy_echo "4.5 git status -s -b [gsl]"
         git status -s -b
 
-#fancy_echo "6.1 attribution for local repo"
+fancy_echo "5.x removed"
+# 4.6 no update-index
 
-fancy_echo "6.2 git add . -A "
+fancy_echo "6.1 cat .git/config  # attribution for local repo"
+        cat .git/config
+
+fancy_echo "6.2 git diff --cached"
+                git diff --cached
+
+fancy_echo "6.3 git add . -A "
         git add . -A
+
+fancy_echo "6.4 git diff --cached"
+                git diff --cached
 
 fancy_echo "6.3 git status -s -b [gsl] again"
         git status -s -b
