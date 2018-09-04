@@ -282,7 +282,7 @@ fancy_echo "5.8 git reflog -5"
 fancy_echo "5.9 git log --oneline"
         git log --oneline
         git log --pretty=format:"%h %s %ad" --graph --date=relative
-exit
+
 #fancy_echo "5.10 git rebase -i is optional"
  
 
