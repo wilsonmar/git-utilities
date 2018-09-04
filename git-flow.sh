@@ -1,11 +1,18 @@
 #!/bin/bash
 # This is git-flow.sh from https://github.com/wilsonmar/git-utilities
 # by WilsonMar@gmail.com
-# Described in https://wilsonmar.github.io/git-flow
+# Described in https://github.com/wilsonmar/git-utilities/blob/master/git-flow.sh
+
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
 # Remember to chmod +x git-flow.sh first, then paste this command in your terminal
 # sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-flow.sh)"
+
+RUNTYPE="reuse"
+       #remove
+       #update
+       #reuse (previous version of repository)
+
 
 function fancy_echo() {
   local fmt="$1"; shift
@@ -19,25 +26,8 @@ command_exists() {
   command -v "$@" > /dev/null 2>&1
 }
 
+
 clear
-
-RUNTYPE="reuse"
-       #remove
-       #update
-       #reuse (previous version of repository)
-
-   #  Define folder name if it's not specified in 1st command argument:
-               WORKSPACE_FOLDER="$1"
-   if [[ -z "${WORKSPACE_FOLDER// }"  ]]; then  #it's blank so assign default:
-               WORKSPACE_FOLDER="git-flow-workspace"
-   fi
-#REPO_USING="https://github.com/hotwilson/git-utilities"
-REPO_USING="git@github.com:wilsonmar/git-utilities"
-SAMPLE_ACCT="wilsonmar"
-SAMPLE_REPO="some-repo"
-OTHER_ACCT="hotwilson"
-OTHER_REPO="some-repo"
-NEW_BRANCH="feat1"
 
 fancy_echo "1.1 Local machine metadata ..."
 
@@ -56,35 +46,100 @@ c_echo "uname -a "
    c_echo "sw_vers "
       echo -e "$(sw_vers)"
 
-MAC_USERID=$(id -un 2>/dev/null || true)  # example: wilsonmar
-   echo "MAC_USERID=$MAC_USERID"
-
 
 fancy_echo "1.2 Ensure Homebrew client is installed ..."
    # Remove to be done manually.
    if ! command_exists brew ; then
        RUBY_VERSION="$(ruby --version)"
-       fancy_echo "Installing homebrew using in-built $RUBY_VERSION ..." 
+       fancy_echo "1.2 Installing homebrew using in-built $RUBY_VERSION ..." 
        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
        brew tap caskroom/cask
    else
        # Upgrade if run-time attribute contains "upgrade":
        if [[ "${RUNTYPE}" == *"update"* ]]; then
           BREW_VERSION="$(brew --version | grep "Homebrew ")"
-          fancy_echo "Brew upgrading $BREW_VERSION ..." 
+          fancy_echo "1.2 Brew upgrading $BREW_VERSION ..." 
           brew update 
        fi
    fi
    echo "$(brew --version)"
 
-fancy_echo "1.3 Ensure Git client(s) availabilty ..."
+###
+   if ! command_exists git ; then
+       fancy_echo "1.3 Installing git using Homebrew ..." 
+       brew install git
+   else
+       GIT_VERSION="$( git --version )"
+       fancy_echo "1.3 $GIT_VERSION installed ..."
+   fi
 
-c_echo "git --version"
-        git --version
+###
+   # Alternately, clone in github.com/wilsonmar/git-utilities
+   cd ~/
+      if [ ! -d "git-utilities" ]; then
+           mkdir git-utilities
+      fi
+              cd git-utilities
+   fancy_echo "1.4 Persistent folder $PWD ..."
+
+   if [ ! -f "git-flow.sh" ]; then
+      fancy_echo "1.5 Downloading git-flow.sh from GitHub for next run ..."
+      curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-flow.sh"
+           # 10835 bytes Received
+   else
+      fancy_echo "1.5 Using existing git-flow.sh ..."
+   fi
 
 
-fancy_echo "1.4 WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
+   if [ ! -f "git-flow.env" ]; then
+      fancy_echo "1.6 Downloading git-flow.env from GitHub ..."
+      curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-flow.env"
+           # 15 bytes Received
+   else
+      fancy_echo "1.6 Using existing git-flow.env ..."
+   fi
+   source git-flow.env
+   echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
+   echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
+   echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-flow-workspace"
+   echo "MYACCT=$MYACCT" # wilsonmar
+   echo "REPO_USING=$REPO_USING" # git@github.com:wilsonmar/git-utilities"
+   echo "SAMPLE_REPO=$SAMPLE_REPO" # some-repo
+   echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
+   echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
+   echo "NEW_BRANCH=$NEW_BRANCH"   # feat1"
 
+   ALIAS_FILENAME="aliases.txt"
+   if [ ! -f "$ALIAS_FILENAME" ]; then
+      fancy_echo "1.7 Downloading $ALIAS_FILENAME from GitHub ..."
+      curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/$ALIAS_FILENAME"
+           # 1727 bytes Received
+   else
+      fancy_echo "1.7 Using existing $ALIAS_FILENAME ..."
+   fi
+
+   BASHFILE="$HOME/.bash_profile"
+      if [ ! -f "$BASHFILE" ]; then
+         fancy_echo "1.8 $BASHFILE not found. Creating it ..."
+         # echo "Created by git-flow.sh" >>$BASHFILE
+      else
+         fancy_echo "1.8 $BASHFILE found ..."
+         ls -al "$BASHFILE"  # 9462 bytes
+      fi
+
+   if grep "$ALIAS_FILENAME" "$BASHFILE" ; then # already in file:
+      fancy_echo "1.9 $ALIAS_FILENAME already found in $BASHFILE."
+   else
+      fancy_echo "1.9 Concatenating aliases file $ALIAS_FILENAME into $BASHFILE ..."
+      ls -al $BASHFILE 
+      ls -al $ALIAS_FILENAME 
+      echo $ALIAS_FILENAME >>$BASHFILE
+      c_echo "source \"$BASHFILE\" "
+              source  "$BASHFILE"  # requires password.
+# ./git-flow.sh: line 143: ~/.bash_profile: No such file or directory
+   fi 
+
+fancy_echo "1.10 Volatile WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
    # Delete folder from last run:
    cd ~/
        rm -rf $WORKSPACE_FOLDER
@@ -94,43 +149,14 @@ c_echo "cd \$WORKSPACE_FOLDER"
         echo "at pwd=$PWD ..."
 
 
-   ALIAS_FILENAME="aliases.txt"
-   BASHFILE="~/.bash_profile"
-fancy_echo "1.5 Ensure ALIAS_FILENAME=$ALIAS_FILENAME for ~/.bash_profile ..."
-ls -al "$BASHFILE"  # 9462 bytes
-      if [ ! -f "$BASHFILE" ]; then
-         fancy_echo "$BASHFILE not found. Creating it ..."
-         # echo "Created by git-flow.sh" >>$BASHFILE
-      fi
-
-   # Alternately, clone in git-utilities
-
-fancy_echo "1.6 Ensure $ALIAS_FILENAME  is configured under ~/.bash_profile ..."
-if grep "$ALIAS_FILENAME" "$BASHFILE" ; then # already in file:
-   fancy_echo "$ALIAS_FILENAME already in $BASHFILE."
-else
-   echo "at pwd=$PWD ..."
-   curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/$ALIAS_FILENAME"
-           # 1345 bytes
-
-   fancy_echo "Concatenating aliases file $ALIAS_FILENAME into $BASHFILE ..."
-#   cat "$HOME/$ALIAS_FILENAME" >> "$BASHFILE"
-      ls -al $ALIAS_FILENAME 
-
-# DEBUGGING:
-#   c_echo "source $BASHFILE"
-#             source "$BASHFILE"  # requires password.
-# TODO: If not right, exit here.
-fi 
-
 fancy_echo "2.1 Git Config ..."
 
 fancy_echo "2.1 Attribution for git commits ..."
-c_echo "git config --global user.name \"Wilson Mar\""
-        git config --global user.name "Wilson Mar"
+c_echo "git config --global user.name \"USER_NAME\""
+        git config --global user.name "$USER_NAME"
 
-c_echo "git config --global user.id \"wilsonmar+GitHub@gmail.com\""
-        git config --global user.id "wilsonmar+GitHub@gmail.com"
+c_echo "git config --global user.email \"$USER_EMAIL\""
+        git config --global user.email  "$USER_EMAIL"
 
 fancy_echo "2.2 sample global git config..."
 c_echo "git config --global core.safecrlf false"
@@ -167,7 +193,8 @@ c_echo "ls -a ~/.ssh"
          fancy_echo "3.2 Brew installing hub add-in to Git ..."
          brew install hub
       else
-         fancy_echo "3.2 hub already installed for Git to manage GitHub."
+         HUB_VERSION="$( hub version | grep "hub" )"
+         fancy_echo "3.2 $HUB_VERSION already installed for Git to manage GitHub."
       fi
 
 fancy_echo "3.3 Delete fork in GitHub created by previous run ..."
@@ -193,9 +220,9 @@ c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       git remote -v
       ls -al
 
-hub remote add "$SAMPLE_ACCT"  # wilsonmar
+hub remote add "$MYACCT"  # wilsonmar
 git remote rename origin upstream
-git remote rename "$SAMPLE_ACCT" origin
+git remote rename "$MYACCT" origin
 
 c_echo "git pull --all"
         git pull --all
@@ -208,11 +235,11 @@ fancy_echo "3.6 Manually see the fork in your cloud account  ..."
 
 # 1. fork https://github.com/hotwilson/some-repo to wilsonmar
 
-#fancy_echo "4.2 git clone $SAMPLE_ACCT/$SAMPLE_REPO ..."
+#fancy_echo "4.2 git clone $MYACCT/$SAMPLE_REPO ..."
 # if RUNTYPE != "reuse"
-#   git clone "git@github.com:$SAMPLE_ACCT/$SAMPLE_REPO" --depth=1
+#   git clone "git@github.com:$MYACCT/$SAMPLE_REPO" --depth=1
 
-fancy_echo "3.7 cd into repo $SAMPLE_ACCT/$SAMPLE_REPO ..."
+fancy_echo "3.7 cd into repo $MYACCT/$SAMPLE_REPO ..."
         cd "$SAMPLE_REPO"
         echo "PWD=$PWD"
 
