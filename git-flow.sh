@@ -254,67 +254,67 @@ fancy_echo "4.4 cat .gitignore to view contents:"
 fancy_echo "4.5 git status -s -b [gsl]"
         git status -s -b
 
-fancy_echo "5.x removed"
-# 4.6 no update-index
 
-fancy_echo "6.1 cat .git/config  # attribution for local repo"
+fancy_echo "5.1 cat .git/config  # attribution for local repo"
         cat .git/config
 
-fancy_echo "6.2 git diff --cached"
+fancy_echo "5.2 git diff --cached"
                 git diff --cached
 
-fancy_echo "6.3 git add . -A "
+fancy_echo "5.3 git add . -A "
         git add . -A
 
-fancy_echo "6.4 git diff --cached"
+fancy_echo "5.4 git diff --cached"
                 git diff --cached
 
-fancy_echo "6.3 git status -s -b [gsl] again"
+fancy_echo "5.5 git status -s -b [gsl] again"
         git status -s -b
 
-fancy_echo "6.4 git log origin..HEAD"
+fancy_echo "5.6 git log origin..HEAD"
         git log origin..HEAD
 
-fancy_echo "6.4 git commit -m\"Add .DS_Store to .gitignore @hotwilson\" "
+fancy_echo "5.7 git commit -m\"Add .DS_Store to .gitignore @hotwilson\" "
         git commit -m"Add .DS_Store to .gitignore @hotwilson"
 
-fancy_echo "6.5 git reflog -5"
+fancy_echo "5.8 git reflog -5"
         git reflog -5
 
-fancy_echo "6.6 git log --oneline"
+fancy_echo "5.9 git log --oneline"
         git log --oneline
         git log --pretty=format:"%h %s %ad" --graph --date=relative
-
-#fancy_echo "6.7 git rebase -i is optional"
+exit
+#fancy_echo "5.10 git rebase -i is optional"
  
 
 
-fancy_echo "7.1 git push origin $NEW_BRANCH"
+fancy_echo "6.1 git push origin $NEW_BRANCH"
         git push origin "$NEW_BRANCH"
 
 # TODO: Stop if above not successful.
 
 #  To get rid of tag from prior run, manually delete repo and
 #  Fork again. This is not working:
-fancy_echo "7.2 git push --tag origin :v1.2.3  # : to remove tag in cloud"
-        git push --tag origin :v1.2.3
+#fancy_echo "6.2 git push --tag origin :v1.2.3  # : to remove tag in cloud"
+#                git push --tag origin :v1.2.3
 
-fancy_echo "7.2 git tag -a v1.2.3 -m \"New version\" "
+fancy_echo "6.3 git tag -a v1.2.3 -m \"New version\" "
                 git tag -a v1.2.3 -m  "New version"
 # See annotated tag https://git-scm.com/book/en/v2/Git-Basics-Tagging
 
-fancy_echo "7.4 git push origin --tags"
+# 6.3
+
+fancy_echo "6.4 git push origin --tags"
                 git push origin --tags
 
 # TODO: Stop if above not successful.
 
-fancy_echo "7.5 git checkout master "
+fancy_echo "6.5 git checkout master "
         git checkout master
 
-fancy_echo "7.6 git branch -D feat1  # to remove locally"
+fancy_echo "6.6 git branch -D feat1  # to remove locally"
         git branch -D "$NEW_BRANCH"
 
-fancy_echo "7.7 git push origin :feat1  # to remove in cloud"
+fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
         git push origin :"$NEW_BRANCH"
 
 
