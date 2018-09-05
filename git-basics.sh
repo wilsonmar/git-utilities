@@ -100,6 +100,7 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
       fancy_echo "1.6 Using existing git-basics.env ..."
    fi
    source git-basics.env
+   echo "GITHOST=$GITHOST"               # "github.com" or "gitlab.com"
    echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
    echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-basics-workspace"
@@ -299,8 +300,8 @@ c_echo "echo \"peace\" >newfile.md"
               echo -e "\n.DS_Store" >>.gitignore
    fi
 
-fancy_echo "4.4 cat .gitignore to view contents:"
-                cat .gitignore
+fancy_echo "4.4 tail -3 .gitignore to view last 3 lines of contents:"
+                tail -3 .gitignore
 
 fancy_echo "4.5 git status -s -b [gsl]"
                 git status -s -b
@@ -375,8 +376,8 @@ fancy_echo "8.1 Use a different browser to login to $OTHER_ACCT/$OTHER_REPO ... 
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
 
-fancy_echo "8.2 git remote add upstream https://github.com/$OTHER_ACCT/$OTHER_REPO ..."
-                git remote add upstream "https://github.com/$OTHER_ACCT/$OTHER_REPO"
+fancy_echo "8.2 git remote add upstream https://$GITHOST/$OTHER_ACCT/$OTHER_REPO ..."
+                git remote add upstream "https://$GITHOST/$OTHER_ACCT/$OTHER_REPO"
     echo ">>> No output expected."
 
 fancy_echo "8.3 git remote -v "
