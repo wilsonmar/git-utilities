@@ -104,7 +104,6 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-basics-workspace"
    echo "MYACCT=$MYACCT" # wilsonmar
-   echo "REPO_USING=$REPO_USING" # git@github.com:wilsonmar/git-utilities"
    echo "SAMPLE_REPO=$SAMPLE_REPO" # local-repo
    echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
@@ -383,8 +382,11 @@ fancy_echo "8.2 git remote add upstream https://github.com/$OTHER_ACCT/$OTHER_RE
 fancy_echo "8.3 git remote -v "
                 git remote -v  
 
-fancy_echo "8.4 git fetch upstream (not all branches, just master)"
-                git fetch upstream master
+fancy_echo "8.4a git fetch upstream master --dry-run  # not all branches"
+                 git fetch upstream master --dry-run
+
+fancy_echo "8.4b git fetch upstream master # not all branches"
+                 git fetch upstream master
 
 fancy_echo "8.5 git checkout master "
                 git checkout master
