@@ -110,6 +110,20 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
    echo "NEW_BRANCH=$NEW_BRANCH"   # feat1"
 
+  # Assign userid to be GitHub ID if not changed:
+  MAC_USERID=$(id -un 2>/dev/null || true)  # example: wilsonmar
+    #   echo "MAC_USERID=$MAC_USERID"
+   if [[ "$MYACCT" != "wilsonmar" ]]; then # it was changed.
+      fancy_echo "1.6 Hello $MYACCT" 
+#   elif [[ "$MAC_USERID" == *"$MYACCT"* ]]; then
+#      fancy_echo "1.6 $MAC_USERID == $MYACCT"
+   else
+      fancy_echo "1.6 Assuming \"$MAC_USERID\" is your GitHub and Gmail account ..."
+      MYACCT="$MAC_USERID"
+      USER_EMAIL="$MAC_USERID@gmail.com"
+   fi
+
+
    ALIAS_FILENAME="aliases.txt"
    if [ ! -f "$ALIAS_FILENAME" ]; then
       fancy_echo "1.7 Downloading $ALIAS_FILENAME from GitHub ..."
