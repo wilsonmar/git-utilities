@@ -150,9 +150,9 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
       fancy_echo "1.9 $ALIAS_FILENAME already found in $BASHFILE."
    else
       fancy_echo "1.9 Concatenating aliases file $ALIAS_FILENAME into $BASHFILE ..."
-      ls -al $BASHFILE 
-      ls -al $ALIAS_FILENAME 
-      echo $ALIAS_FILENAME >>$BASHFILE
+      ls -al "$BASHFILE" 
+      ls -al "$ALIAS_FILENAME" 
+      echo "$ALIAS_FILENAME" >>"$BASHFILE"
       c_echo "source \"$BASHFILE\" "
               source  "$BASHFILE"  # requires password.
 # ./git-flow.sh: line 143: ~/.bash_profile: No such file or directory
@@ -161,9 +161,9 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
 fancy_echo "1.10 Volatile WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
    # Delete folder from last run:
    cd ~/
-       rm -rf $WORKSPACE_FOLDER
-       mkdir  $WORKSPACE_FOLDER
-          cd  $WORKSPACE_FOLDER
+       rm -rf "$WORKSPACE_FOLDER"
+       mkdir  "$WORKSPACE_FOLDER"
+          cd  "$WORKSPACE_FOLDER"
 c_echo "cd \$WORKSPACE_FOLDER"
         echo "at pwd=$PWD ..."
 
@@ -237,7 +237,8 @@ c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       ls -al
 
 c_echo "hub fork \"$OTHER_ACCT/$OTHER_REPO\""
-      hub fork "$OTHER_ACCT/$OTHER_REPO" 
+        hub fork "$OTHER_ACCT/$OTHER_REPO" 
+
 c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       cd "$OTHER_REPO"
       echo "PWD=$PWD"
@@ -375,8 +376,8 @@ fancy_echo "8.1 Use a different browser to login to the $OTHER_ACCT/$OTHER_REPO 
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
 
-fancy_echo "8.2 git remote add upstream https://github.com/... "
-                git remote add upstream https://github.com/hotwilson/some-repo
+fancy_echo "8.2 git remote add upstream https://github.com/$OTHER_ACCT/$OTHER_REPO ..."
+                git remote add upstream "https://github.com/$OTHER_ACCT/$OTHER_REPO"
     echo ">>> No output expected."
 
 fancy_echo "8.3 git remote -v "
