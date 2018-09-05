@@ -395,8 +395,8 @@ fancy_echo "8.5 git checkout master "
 fancy_echo "8.6 git diff HEAD @{u} --name-only"
                 git diff HEAD @{u} --name-only
 
-fancy_echo "8.7 git merge upstream/master"
-                git merge upstream/master
+fancy_echo "8.7 git merge upstream/master -m\"8.7\""
+                git merge upstream/master -m "8.7"
 
 fancy_echo "8.8 git push origin master"
                 git push origin master
@@ -412,8 +412,8 @@ fancy_echo "9.3 git diff master..origin/master"
                 git diff master..origin/master
                 #gitk master..origin/master
 
-fancy_echo "9.4 git merge origin/master -m\"thank you\""
-                git merge origin/master -m "thank you"
+fancy_echo "9.4 git merge origin/master -m\"9.4 thank you\""
+                git merge origin/master -m "9.4 thank you"
 
 
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
