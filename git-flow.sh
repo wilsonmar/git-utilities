@@ -222,6 +222,7 @@ c_echo "ls -a ~/.ssh"
 fancy_echo "3.3 Delete \"$OTHER_REPO\" repo forked during previous run ..."
 c_echo "hub delete \"$OTHER_REPO\""
         hub delete  "$OTHER_REPO"
+      echo "Not Found is OK if it was not created last run."
 
 fancy_echo "3.4 Use hub to clone and fork ..."
 c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
