@@ -331,8 +331,8 @@ fancy_echo "5.7 git commit -m\"Add .DS_Store to .gitignore @$OTHER_ACCT\" "
 fancy_echo "5.8 git reflog -5"
                 git reflog -5
 
-fancy_echo "5.9 git log --oneline"
-                git log --oneline
+fancy_echo "5.9 git log --oneline -5"  # | tail -n 10 
+                git log --oneline -5
               # git log --pretty=format:"%h %s %ad" --graph --date=relative
 
 #fancy_echo "5.10 git rebase -i is optional"
@@ -405,16 +405,15 @@ fancy_echo "8.8 git push origin master"
 fancy_echo "9.1 Change something on the origin in GitHub $MYACCT/$OTHER_REPO ..."
          read -rsp $'Press any key after adding a file ...\n' -n 1 key
 
-fancy_echo "9.2 git fetch origin master"
-                git fetch origin master
+fancy_echo "9.2 git fetch origin" 
+                git fetch origin
 
 fancy_echo "9.3 git diff master..origin/master"
                 git diff master..origin/master
                 #gitk master..origin/master
 
-fancy_echo "9.4 git merge origin master"
-                git merge origin master
-
+fancy_echo "9.4 git merge origin/master -m\"thank you\""
+                git merge origin/master -m "thank you"
 
 
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
