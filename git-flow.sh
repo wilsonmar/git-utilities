@@ -120,7 +120,11 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    else
       fancy_echo "1.6 Assuming \"$MAC_USERID\" is your GitHub and Gmail account ..."
       MYACCT="$MAC_USERID"
+      USER_NAME="$MAC_USERID"
       USER_EMAIL="$MAC_USERID@gmail.com"
+   echo "MYACCT=$MYACCT"           # wilsonmar
+   echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
+   echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    fi
 
 
@@ -365,7 +369,7 @@ fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "8.1 Use a different browser to login to the other's repo ... "
+fancy_echo "8.1 Use a different browser to login to the $OTHER_ACCT/$OTHER_REPO ... "
          read -rsp $'Press any key after adding a file ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
@@ -393,7 +397,7 @@ fancy_echo "8.8 git push origin master"
                 git push origin master
 
 
-fancy_echo "9.1 Change something on the origin in GitHub ..."
+fancy_echo "9.1 Change something on the origin in GitHub $MYACCT/$OTHER_REPO ..."
          read -rsp $'Press any key after adding a file ...\n' -n 1 key
 
 fancy_echo "9.2 git fetch origin master"
