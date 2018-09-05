@@ -371,7 +371,7 @@ fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "8.1 Use a different browser to login to the $OTHER_ACCT/$OTHER_REPO ... "
+fancy_echo "8.1 Use a different browser to login to $OTHER_ACCT/$OTHER_REPO ... "
          read -rsp $'Press any key after adding a file ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
@@ -409,8 +409,8 @@ fancy_echo "9.3 git diff master..origin/master"
                 git diff master..origin/master
                 #gitk master..origin/master
 
-fancy_echo "9.4 git fetch origin master"
-                git push origin master
+fancy_echo "9.4 git merge origin master"
+                git merge origin master
 
 
 
