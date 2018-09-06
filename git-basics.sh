@@ -224,7 +224,7 @@ fancy_echo "2.6 rm & mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
               fi
                        cd "$SAMPLE_REPO"
 fancy_echo "At $PWD"
-
+exit
 fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
       echo "using git init & add & commit ..."
                 git init
