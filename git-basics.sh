@@ -10,7 +10,7 @@
 
 RUNTYPE=""
        # remove
-       # update
+       # upgrade
        # reset  (to wipe out files saved in git-utilities)
        # reuse (previous version of repository)
 
@@ -22,7 +22,7 @@ function c_echo() {
   local fmt="$1"; shift
   printf "\\n  $ $fmt\\n" "$@"
 }
-command_exists() {
+command_exists() {  # newer than which {command}
   command -v "$@" > /dev/null 2>&1
 }
 
@@ -76,11 +76,23 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
 
 ## Based on https://hub.github.com/
       if ! command_exists hub ; then
-         fancy_echo "1.4 brew install hub  # add-in to Git ..."
+         fancy_echo "1.4a brew install hub  # add-in to Git ..."
          brew install hub
       else
          HUB_VERSION="$( hub version | grep "hub" )"
-         fancy_echo "1.4 $HUB_VERSION already installed for Git to manage GitHub."
+         fancy_echo "1.4a $HUB_VERSION already installed for Git to manage GitHub."
+      fi
+
+## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
+# for GitHub API calls to process JSON:
+      if ! command_exists jq ; then
+         fancy_echo "1.4b brew install jq  # add-in to Git ..."
+         brew install jq
+         # For the most recent version: 
+         # brew install --HEAD jq
+      else
+         JQ_VERSION="$( jq --version )"
+         fancy_echo "1.4b $JQ_VERSION already installed for Git to process JSON."
       fi
 
 ###
@@ -98,10 +110,11 @@ c_echo "source git-basics.env"
         source git-basics.env
 
    echo "GITHOST=$GITHOST"               # "github.com" or "gitlab.com"
-   echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
-   echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
+   echo "MYACCT_USER_NAME=$MYACCT_USER_NAME"     # "Wilson Mar"
+   echo "MYACCT_USER_EMAIL=$MYACCT_USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-basics-workspace"
-   echo "MYACCT=$MYACCT" # wilsonmar
+   echo "MYACCT_USERID=$MYACCT_USERID" # wilsonmar
+  #echo "MYACCT_PASSWORD should never be displayed.
    echo "SAMPLE_REPO=$SAMPLE_REPO" # local-init
    echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
@@ -110,18 +123,18 @@ c_echo "source git-basics.env"
   # Assign userid to be GitHub ID if not changed:
   MAC_USERID=$(id -un 2>/dev/null || true)  # example: wilsonmar
     #   echo "MAC_USERID=$MAC_USERID"
-   if [[ "$MYACCT" != "wilsonmar" ]]; then # it was changed.
-      fancy_echo "1.6 Hello $MYACCT" 
+   if [[ "$MYACCT_USERID" != "wilsonmar" ]]; then # it was changed.
+      fancy_echo "1.6 Hello $MYACCT_USERID" 
 #   elif [[ "$MAC_USERID" == *"$MYACCT"* ]]; then
 #      fancy_echo "1.6 $MAC_USERID == $MYACCT"
    else
       fancy_echo "1.6 Assuming \"$MAC_USERID\" is your GitHub and Gmail account ..."
-      MYACCT="$MAC_USERID"
-      USER_NAME="$MAC_USERID"
-      USER_EMAIL="$MAC_USERID@gmail.com"
-   echo "MYACCT=$MYACCT"           # wilsonmar
-   echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
-   echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
+      MYACCT_USERID="$MAC_USERID"
+      MYACCT_USER_NAME="$MAC_USERID"
+      MYACCT_USER_EMAIL="$MAC_USERID@gmail.com"
+   echo "MYACCT_USERID=$MYACCT_USERID"           # wilsonmar
+   echo "MYACCT_USER_NAME=$MYACCT_USER_NAME"     # "Wilson Mar"
+   echo "MYACCT_USER_EMAIL=$MYACCT_USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    fi
 
 
@@ -148,9 +161,9 @@ fancy_echo "1.6 Create persistent folder git-scripts in $PWD ..."
    fi
 
 
-fancy_echo "1.8 To halt processing for customizations, press control+c or "
-read -rsp $'1.8 press any key to continue default processing ...\n' -n 1 key
-
+#fancy_echo "1.8 To halt processing for customizations, press control+c or "
+#read -rsp $'1.8 press any key to continue default processing ...\n' -n 1 key
+# Comment the above two lines out when you're editing this script for local run.
 
    ALIAS_FILENAME="aliases.txt"
    if [ ! -f "$ALIAS_FILENAME" ]; then
@@ -192,16 +205,21 @@ fancy_echo "1.12 Volatile WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
 c_echo "cd \$WORKSPACE_FOLDER"
         echo "at pwd=$PWD ..."
 
+# TODO: Windows too instead of Mac only:
+fancy_echo "1.13 Get public SSH public key in ..."
+      export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
+# if $RSA_PUBLIC_KEY blank, then error.
+
 
 fancy_echo "2.1 Git Config ..."
 
 fancy_echo "2.1 Attribution for git commits ..."
-c_echo "git config --global user.name \"USER_NAME\""
-        git config --global user.name "$USER_NAME"
+c_echo "git config --global user.name \"MYACCT_USER_NAME\""
+        git config --global user.name "$MYACCT_USER_NAME"
       # git config --global user.name "wilson Mar"
 
-c_echo "git config --global user.email \"$USER_EMAIL\""
-        git config --global user.email  "$USER_EMAIL"
+c_echo "git config --global user.email \"$MYACCT_USER_EMAIL\""
+        git config --global user.email  "$MYACCT_USER_EMAIL"
       # git config --global user.email "wilsonmar+GitHub@gmail.com"
 
 fancy_echo "2.2 sample global git config..."
@@ -211,14 +229,9 @@ c_echo "git config --global core.safecrlf false"
 fancy_echo "2.3 git config --list  # (could be a long file) ..."
 # git config --list
 
-
 fancy_echo "2.4 NO Create gits folder ..."
 
 fancy_echo "2.5 NO myacct container ..."
-#      if [ ! -d "myacct" ]; then
-#                 mkdir myacct 
-#      fi
-#           cd myacct
 
 # $SAMPLE_REPO="local-init"
 fancy_echo "2.6 mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
@@ -228,37 +241,87 @@ fancy_echo "2.6 mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
            cd "$SAMPLE_REPO"
 
 fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
-fancy_echo "2.7 git init & add & commit ..."
+fancy_echo "using git init & add & commit ..."
                 git init
 
-echo "$SAMPLE_REPO" >README.md
-echo ".DS_Store" >.gitignore
-git add --all
-git status -s -b
-git commit -m "Add README & gitignore"
+fancy_echo "2.8 Create files, add, commit ..."
+   echo "$SAMPLE_REPO is the repo name." >README.md
+   echo ".DS_Store" >.gitignore
+   ls -al
+   git add .
+   git status -s -b
+   git commit -m "Add README & gitignore"
+exit
 
-#fancy_echo "8.2 git remote add hub-made  https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
-#                git remote add hub-made "https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO"
-#    echo ">>> No output expected."
+fancy_echo "2.9 Delete \"$SAMPLE_REPO\" repo created during previous run ..."
 
-fancy_echo "2.8 Delete \"$SAMPLE_REPO\" repo forked during previous run ..."
-    c_echo "hub delete \"$SAMPLE_REPO\""
-RESPONSE=$("hub delete   $SAMPLE_REPO ")
-echo RESPONSE
-#      echo "Not Found is OK if it was not created last run."
-read -rsp $'Press any key after deleting ...\n' -n 1 key
+# Because this doesn't work:
+#    c_echo "hub delete \"$SAMPLE_REPO\""
+#RESPONSE=$("hub delete   $SAMPLE_REPO ")
+#echo RESPONSE
+#read -rsp $'Press any key after deleting ...\n' -n 1 key
+
+# Since no need to create another token if one already exists:
+if [ "$GITHUB_TOKEN" = "" ]; then  # Not run before
+          echo "******** Creating Auth GITHUB_TOKEN to delete repo later : "
+    GITHUB_TOKEN=$(curl -v -u "$MYACCT_USERID:$MYACCT_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
+       # Do not 
+               echo "GITHUB_TOKEN=$GITHUB_TOKEN" # secret
+       # API Token (32 character long string) is unique among all GitHub users.
+       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
+       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+
+    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information
+else
+          echo "******** Verifying Auth GITHUB_TOKEN to delete repo later : "
+exit
+   #    FIX: Commented out due to syntax error near unexpected token `|'
+    GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
+            echo "******** authorizations_url=$GITHUB_AVAIL"
+       # https://api.github.com/authorizations"
+fi
+exit
+
+####
+            echo "******** Checking GITHUB repo exists (_AVAIL) from prior run: "
+    GITHUB_AVAIL=$(curl -X GET https://api.github.com/repos/${MYACCT_USERID}/${REPONAME} | jq ".full_name")
+            echo "GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
+       # Expecting "full_name": "wilsonmar/git-sample-repo",
+       # TODO: Fix return of null.
+
+if [ "$GITHUB_AVAIL" = "${MYACCT_USERID}/${REPONAME}" ]; then  # Not run before
+          echo "******** Deleting GITHUB_REPO created earlier : "
+        # TODO: Delete repo in GitHub.com Settings if it already exists:
+      # Based on https://gist.github.com/JadedEvan/5639254
+      # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
+    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${MYACCT_USERID}/${REPONAME} | jq ".full_name")
+      # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
+            echo "GITHUB_AVAIL=$GITHUB_AVAIL deleted."
+else
+          echo "******** No GITHUB repo known to delete. "
+fi
+
+#### Create repo in GitHub:
+          echo "******** Creating GITHUB repo. "
+    GITHUB_AVAIL=$(curl -u $MYACCT_USERID:$MYACCT_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${REPONAME:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
+            echo "GITHUB_AVAIL=$GITHUB_AVAIL created."
+       MYACCT_PASSWORD=""  # No longer needed.
+
+exit
 
 c_echo "hub create -d \"Add from local git init\""
         hub create -d  "Add from local git init"
 
-fancy_echo "2.9 Go check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
-fancy_echo "2.10 Rename ..."
+fancy_echo "2.11 git remote -v ..."
+        git remote -v
 
-git remote -v
+fancy_echo "2.12 Manually check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
+
+#git remote -v
 #git push -u origin master
-c_echo "git remote rename origin local-init"
-        git remote rename origin local-init
-git remote -v
+#c_echo "git remote rename origin local-init"
+#        git remote rename origin local-init
+#git remote -v
 
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
@@ -294,14 +357,14 @@ c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       git remote -v
       ls -al
 
-c_echo "hub remote add \"$MYACCT\""
-        hub remote add "$MYACCT"  # wilsonmar
+c_echo "hub remote add \"$MYACCT_USERID\""
+        hub remote add  "$MYACCT_USERID"  # wilsonmar
 
 c_echo "git remote rename origin upstream"
         git remote rename origin upstream
 
-c_echo "git remote rename "$MYACCT" origin"
-        git remote rename "$MYACCT" origin
+c_echo "git remote rename "$MYACCT_USERID" origin"
+        git remote rename "$MYACCT_USERID" origin
 
 c_echo "git pull --all"
         git pull --all
@@ -314,11 +377,11 @@ fancy_echo "3.6 Manually see the fork in your cloud account  ..."
 
 # 1. fork https://github.com/hotwilson/some-repo to wilsonmar
 
-#fancy_echo "4.2 git clone $MYACCT/$SAMPLE_REPO ..."
+#fancy_echo "4.2 git clone $MYACCT_USERID/$SAMPLE_REPO ..."
 # if RUNTYPE != "reuse"
-#   git clone "git@github.com:$MYACCT/$SAMPLE_REPO" --depth=1
+#   git clone "git@github.com:$MYACCT_USERID/$SAMPLE_REPO" --depth=1
 
-fancy_echo "3.7 cd into repo $MYACCT/$SAMPLE_REPO ..."
+fancy_echo "3.7 cd into repo $MYACCT_USERID/$SAMPLE_REPO ..."
         cd "$SAMPLE_REPO"
         echo "PWD=$PWD"
 
@@ -423,7 +486,7 @@ fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "7.1 On origin   $MYACCT/$OTHER_REPO, create a Pull/Merge Request."
+fancy_echo "7.1 On origin   $MYACCT_USERID/$OTHER_REPO, create a Pull/Merge Request."
 fancy_echo "7.2 On upstream $OTHER_CCT/$OTHER_REPO, Squash and merge."
 fancy_echo "7.3 In upstream $OTHER_ACCT/$OTHER_REPO, Add file."
          read -rsp $'Press any key after creating a new file in that repo ...\n' -n 1 key
@@ -457,7 +520,7 @@ fancy_echo "8.8 git push origin master"
                 git push origin master
 
 
-fancy_echo "9.1 Change something on the origin in GitHub $MYACCT/$OTHER_REPO ..."
+fancy_echo "9.1 Change something on the origin in GitHub $MYACCT_USERID/$OTHER_REPO ..."
          read -rsp $'Press any key after adding a file ...\n' -n 1 key
 
 fancy_echo "9.2 git fetch origin" 
