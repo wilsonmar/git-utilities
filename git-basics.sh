@@ -8,11 +8,11 @@
 # Remember to chmod +x git-basics.sh first, then paste this command in your terminal
 # sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
-RUNTYPE="reuse"
-       #remove
-       #update
-       #reuse (previous version of repository)
-
+RUNTYPE=""
+       # remove
+       # update
+       # reset  (to wipe out files saved in git-utilities)
+       # reuse (previous version of repository)
 
 function fancy_echo() {
   local fmt="$1"; shift
@@ -224,7 +224,7 @@ c_echo "hub delete \"$OTHER_REPO\""
         hub delete  "$OTHER_REPO"
       echo "Not Found is OK if it was not created last run."
 
-fancy_echo "3.4 Use hub to clone and fork ..."
+fancy_echo "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
         cd && cd  "$WORKSPACE_FOLDER"
 
@@ -236,8 +236,9 @@ c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       git remote -v
       ls -al
 
+fancy_echo "3.5 Use hub to fork \"$OTHER_ACCT/$OTHER_REPO\" ..."
 c_echo "hub fork \"$OTHER_ACCT/$OTHER_REPO\""
-        hub fork "$OTHER_ACCT/$OTHER_REPO" 
+        hub fork  "$OTHER_ACCT/$OTHER_REPO" 
 
 c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       cd "$OTHER_REPO"
@@ -245,14 +246,19 @@ c_echo "cd \"$OTHER_REPO\" && PWD && git remote -v && ls -al ..."
       git remote -v
       ls -al
 
-hub remote add "$MYACCT"  # wilsonmar
-git remote rename origin upstream
-git remote rename "$MYACCT" origin
+c_echo "hub remote add \"$MYACCT\""
+        hub remote add "$MYACCT"  # wilsonmar
+
+c_echo "git remote rename origin upstream"
+        git remote rename origin upstream
+
+c_echo "git remote rename "$MYACCT" origin"
+        git remote rename "$MYACCT" origin
 
 c_echo "git pull --all"
         git pull --all
 
-fancy_echo "3.5 git remote -v ..."
+fancy_echo "3.5 git remote -v"
                 git remote -v
 
 fancy_echo "3.6 Manually see the fork in your cloud account  ..."
@@ -371,10 +377,11 @@ fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "8.1 Use a different browser to login to $OTHER_ACCT/$OTHER_REPO ... "
-         read -rsp $'Press any key after adding a file ...\n' -n 1 key
+fancy_echo "7.x Request request, use a different browser to $OTHER_ACCT/$OTHER_REPO."
+         read -rsp $'Press any key after adding a file in $OTHER_ACCT/$OTHER_REPO ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
+
 
 fancy_echo "8.2 git remote add upstream https://$GITHOST/$OTHER_ACCT/$OTHER_REPO ..."
                 git remote add upstream "https://$GITHOST/$OTHER_ACCT/$OTHER_REPO"
@@ -412,8 +419,8 @@ fancy_echo "9.3 git diff master..origin/master"
                 git diff master..origin/master
                 #gitk master..origin/master
 
-fancy_echo "9.4 git merge origin/master -m\"9.4 thank you\""
-                git merge origin/master -m "9.4 thank you"
+fancy_echo "9.4 git merge origin/master -m\"9.4 thank you\" --no-edit"
+                git merge origin/master -m "9.4 thank you"  --no-edit
 
 
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
