@@ -73,33 +73,30 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
        fancy_echo "1.3 $GIT_VERSION installed ..."
    fi
 
-###
-   # Alternately, clone in github.com/wilsonmar/git-utilities
-   cd ~/
-      if [ ! -d "git-utilities" ]; then
-           mkdir git-utilities
+
+## Based on https://hub.github.com/
+      if ! command_exists hub ; then
+         fancy_echo "1.4 brew install hub  # add-in to Git ..."
+         brew install hub
+      else
+         HUB_VERSION="$( hub version | grep "hub" )"
+         fancy_echo "1.4 $HUB_VERSION already installed for Git to manage GitHub."
       fi
-              cd git-utilities
-   fancy_echo "1.4 Persistent folder $PWD ..."
 
-   if [ ! -f "git-basics.sh" ]; then
-      fancy_echo "1.5 Downloading git-basics.sh from GitHub for next run ..."
-      curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh"
-           # 10835 bytes Received
-      # TODO: 
-   else
-      fancy_echo "1.5 Using existing git-basics.sh ..."
-   fi
-
+###
+   cd ~/
+fancy_echo "1.5 At $PWD ..."
 
    if [ ! -f "git-basics.env" ]; then
-      fancy_echo "1.6 Downloading git-basics.env from GitHub ..."
+      fancy_echo "1.5 Downloading git-basics.env from GitHub ..."
       curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.env"
            # 15 bytes Received
    else
-      fancy_echo "1.6 Using existing git-basics.env ..."
+      fancy_echo "1.5 Using existing git-basics.env ..."
    fi
-   source git-basics.env
+c_echo "source git-basics.env"
+        source git-basics.env
+
    echo "GITHOST=$GITHOST"               # "github.com" or "gitlab.com"
    echo "USER_NAME=$USER_NAME"     # "Wilson Mar"
    echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
@@ -128,28 +125,56 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    fi
 
 
+fancy_echo "1.6 Create persistent folder git-scripts in $PWD ..."
+
+      if [ ! -d "git-scripts" ]; then
+         c_echo "mkdir git-scripts && cd git-scripts"
+                 mkdir git-scripts && cd git-scripts
+#      else
+#           # if flagged to do it:
+#           rm -rf git-scripts
+#           mkdir git-scripts
+      fi
+
+
+### 
+   if [ ! -f "git-basics.sh" ]; then
+      fancy_echo "1.7 Downloading git-basics.sh from GitHub for next run ..."
+      curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh"
+           # 10835 bytes Received
+      # TODO: 
+   else
+      fancy_echo "1.7 Using existing git-basics.sh ..."
+   fi
+
+
+fancy_echo "1.8 To halt processing for customizations, press control+c or "
+read -rsp $'1.8 press any key to continue default processing ...\n' -n 1 key
+
+
    ALIAS_FILENAME="aliases.txt"
    if [ ! -f "$ALIAS_FILENAME" ]; then
-      fancy_echo "1.7 Downloading $ALIAS_FILENAME from GitHub ..."
+      fancy_echo "1.9 Downloading $ALIAS_FILENAME from GitHub ..."
       curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/$ALIAS_FILENAME"
            # 1727 bytes Received
    else
-      fancy_echo "1.7 Using existing $ALIAS_FILENAME ..."
+      fancy_echo "1.9 Using existing $ALIAS_FILENAME ..."
    fi
 
    BASHFILE="$HOME/.bash_profile"
       if [ ! -f "$BASHFILE" ]; then
-         fancy_echo "1.8 $BASHFILE not found. Creating it ..."
+         fancy_echo "1.10 $BASHFILE not found. Creating it ..."
          # echo "Created by git-basics.sh" >>$BASHFILE
       else
-         fancy_echo "1.8 $BASHFILE found ..."
+         fancy_echo "1.10 $BASHFILE found ..."
          ls -al "$BASHFILE"  # 9462 bytes
       fi
 
+
    if grep "$ALIAS_FILENAME" "$BASHFILE" ; then # already in file:
-      fancy_echo "1.9 $ALIAS_FILENAME already found in $BASHFILE."
+      fancy_echo "1.11 $ALIAS_FILENAME already found in $BASHFILE."
    else
-      fancy_echo "1.9 Concatenating aliases file $ALIAS_FILENAME into $BASHFILE ..."
+      fancy_echo "1.11 Concatenating aliases file $ALIAS_FILENAME into $BASHFILE ..."
       ls -al "$BASHFILE" 
       ls -al "$ALIAS_FILENAME" 
       echo "$ALIAS_FILENAME" >>"$BASHFILE"
@@ -158,7 +183,7 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
 # ./git-basics.sh: line 143: ~/.bash_profile: No such file or directory
    fi 
 
-fancy_echo "1.10 Volatile WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
+fancy_echo "1.12 Volatile WORKSPACE_FOLDER=$WORKSPACE_FOLDER ..."
    # Delete folder from last run:
    cd ~/
        rm -rf "$WORKSPACE_FOLDER"
@@ -187,15 +212,6 @@ fancy_echo "2.3 git config --list  # (could be a long file) ..."
 # git config --list
 
 
-## Based on https://hub.github.com/
-      if ! command_exists hub ; then
-         fancy_echo "2.4 brew install hub  # add-in to Git ..."
-         brew install hub
-      else
-         HUB_VERSION="$( hub version | grep "hub" )"
-         fancy_echo "2.4 $HUB_VERSION already installed for Git to manage GitHub."
-      fi
-
 fancy_echo "2.4 NO Create gits folder ..."
 
 fancy_echo "2.5 NO myacct container ..."
@@ -212,7 +228,7 @@ fancy_echo "2.6 mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
            cd "$SAMPLE_REPO"
 
 fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
-fancy_echo "2.7 git init"
+fancy_echo "2.7 git init & add & commit ..."
                 git init
 
 echo "$SAMPLE_REPO" >README.md
@@ -225,21 +241,25 @@ git commit -m "Add README & gitignore"
 #                git remote add hub-made "https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO"
 #    echo ">>> No output expected."
 
-fancy_echo "2.7b Delete \"$SAMPLE_REPO\" repo forked during previous run ..."
-c_echo "hub delete \"$SAMPLE_REPO\""
-        hub delete  "$SAMPLE_REPO"
-      echo "Not Found is OK if it was not created last run."
+fancy_echo "2.8 Delete \"$SAMPLE_REPO\" repo forked during previous run ..."
+    c_echo "hub delete \"$SAMPLE_REPO\""
+RESPONSE=$("hub delete   $SAMPLE_REPO ")
+echo RESPONSE
+#      echo "Not Found is OK if it was not created last run."
+read -rsp $'Press any key after deleting ...\n' -n 1 key
+
 c_echo "hub create -d \"Add from local git init\""
         hub create -d  "Add from local git init"
 
-fancy_echo "2.7c Go check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
+fancy_echo "2.9 Go check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
+fancy_echo "2.10 Rename ..."
 
 git remote -v
 #git push -u origin master
 c_echo "git remote rename origin local-init"
         git remote rename origin local-init
+git remote -v
 
-exit
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
 
@@ -248,8 +268,9 @@ c_echo "ls -a ~/.ssh"
 
 fancy_echo "3.3 Delete \"$OTHER_REPO\" repo forked during previous run ..."
 c_echo "hub delete \"$OTHER_REPO\""
-        hub delete  "$OTHER_REPO"
-      echo "Not Found is OK if it was not created last run."
+        hub delete "$OTHER_REPO"
+#      echo "Not Found is OK if it was not created last run."
+read -rsp $'Press any key after deleting ...\n' -n 1 key
 
 fancy_echo "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
@@ -404,8 +425,10 @@ fancy_echo "6.7 git push origin :feat1  # to remove in cloud"
 
 # Check manually on GitHub for new tag.
 
-fancy_echo "7.x Request request, use a different browser to $OTHER_ACCT/$OTHER_REPO."
-         read -rsp $'Press any key after adding a file in $OTHER_ACCT/$OTHER_REPO ...\n' -n 1 key
+fancy_echo "7.1 On origin   $MYACCT/$OTHER_REPO, create a Pull/Merge Request."
+fancy_echo "7.2 On upstream $OTHER_CCT/$OTHER_REPO, Squash and merge."
+fancy_echo "7.3 In upstream $OTHER_ACCT/$OTHER_REPO, Add file."
+         read -rsp $'Press any key after creating a new file in that repo ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
 
@@ -449,6 +472,8 @@ fancy_echo "9.3 git diff master..origin/master"
 fancy_echo "9.4 git merge origin/master -m\"9.4 thank you\" --no-edit"
                 git merge origin/master -m "9.4 thank you"  --no-edit
 
+fancy_echo "9.5 git diff master..origin/master  # again to verify"
+                git diff master..origin/master
 
 FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
 DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
