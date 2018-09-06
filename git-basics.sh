@@ -406,8 +406,6 @@ fancy_echo "6.3 git tag -a v1.2.3 -m \"New version\" "
                 git tag -a v1.2.3 -m  "New version"
 # See annotated tag https://git-scm.com/book/en/v2/Git-Basics-Tagging
 
-# 6.3
-
 fancy_echo "6.4 git push origin --tags"
                 git push origin --tags
 
