@@ -105,7 +105,7 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
    echo "USER_EMAIL=$USER_EMAIL"   # "wilsonmar+GitHub@gmail.com"
    echo "WORKSPACE_FOLDER=$WORKSPACE_FOLDER" # git-basics-workspace"
    echo "MYACCT=$MYACCT" # wilsonmar
-   echo "SAMPLE_REPO=$SAMPLE_REPO" # local-repo
+   echo "SAMPLE_REPO=$SAMPLE_REPO" # local-init
    echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
    echo "NEW_BRANCH=$NEW_BRANCH"   # feat1"
@@ -186,6 +186,16 @@ c_echo "git config --global core.safecrlf false"
 fancy_echo "2.3 git config --list  # (could be a long file) ..."
 # git config --list
 
+
+## Based on https://hub.github.com/
+      if ! command_exists hub ; then
+         fancy_echo "2.4 brew install hub  # add-in to Git ..."
+         brew install hub
+      else
+         HUB_VERSION="$( hub version | grep "hub" )"
+         fancy_echo "2.4 $HUB_VERSION already installed for Git to manage GitHub."
+      fi
+
 fancy_echo "2.4 NO Create gits folder ..."
 
 fancy_echo "2.5 NO myacct container ..."
@@ -194,30 +204,47 @@ fancy_echo "2.5 NO myacct container ..."
 #      fi
 #           cd myacct
 
-# $SAMPLE_REPO="local-repo"
+# $SAMPLE_REPO="local-init"
 fancy_echo "2.6 mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
            if [ ! -d "$SAMPLE_REPO" ]; then
                 mkdir "$SAMPLE_REPO"
            fi
            cd "$SAMPLE_REPO"
 
+fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
 fancy_echo "2.7 git init"
                 git init
 
+echo "$SAMPLE_REPO" >README.md
+echo ".DS_Store" >.gitignore
+git add --all
+git status -s -b
+git commit -m "Add README & gitignore"
+
+#fancy_echo "8.2 git remote add hub-made  https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
+#                git remote add hub-made "https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO"
+#    echo ">>> No output expected."
+
+fancy_echo "2.7b Delete \"$SAMPLE_REPO\" repo forked during previous run ..."
+c_echo "hub delete \"$SAMPLE_REPO\""
+        hub delete  "$SAMPLE_REPO"
+      echo "Not Found is OK if it was not created last run."
+c_echo "hub create -d \"Add from local git init\""
+        hub create -d  "Add from local git init"
+
+fancy_echo "2.7c Go check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
+
+git remote -v
+#git push -u origin master
+c_echo "git remote rename origin local-init"
+        git remote rename origin local-init
+
+exit
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
 
 c_echo "ls -a ~/.ssh"
         ls -a ~/.ssh
-
-   # Based on https://hub.github.com/
-      if ! command_exists hub ; then
-         fancy_echo "3.2 Brew installing hub add-in to Git ..."
-         brew install hub
-      else
-         HUB_VERSION="$( hub version | grep "hub" )"
-         fancy_echo "3.2 $HUB_VERSION already installed for Git to manage GitHub."
-      fi
 
 fancy_echo "3.3 Delete \"$OTHER_REPO\" repo forked during previous run ..."
 c_echo "hub delete \"$OTHER_REPO\""
