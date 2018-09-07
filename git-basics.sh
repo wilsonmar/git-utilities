@@ -224,7 +224,7 @@ fancy_echo "2.6 rm & mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
               fi
                        cd "$SAMPLE_REPO"
 fancy_echo "At $PWD"
-exit
+
 fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
       echo "using git init & add & commit ..."
                 git init
@@ -243,22 +243,27 @@ fancy_echo "2.9a Attempt to Delete \"$SAMPLE_REPO\" repo created during previous
 #    c_echo "hub delete \"$SAMPLE_REPO\""
 #RESPONSE=$("hub delete   $SAMPLE_REPO ")
 #echo RESPONSE
+   ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
+   # for GitHub API calls to process JSON:
 #read -rsp $'Press any key after deleting ...\n' -n 1 key
 
 
-fancy_echo "a. GitHub API ..."
+fancy_echo "a. Trying GitHub API ..."
 
-DELETE_MANUALLY="yes"
+# CODING NOTE: This use of GitHub API is not working, so I'm using a toggle, which
+# begins with "dont use"
 
-# TODO: Windows too instead of Mac only:
 fancy_echo "a.1 Get public SSH public key in ..."
       export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
-# TODO: if $RSA_PUBLIC_KEY blank, then exit
+   # TODO: if $RSA_PUBLIC_KEY blank, then exit
+   # TODO: Windows too instead of Mac only:
 
    if ! command_exists brew ; then
          fancy_echo "a.2 brew command needed. Exiting ..."
-         exit
-   fi
+        
+   else
+      ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
+      # for GitHub API calls to process JSON:
       if ! command_exists jq ; then
          fancy_echo "a.2 brew install jq  # add-in to Git ..."
          brew install jq
@@ -269,27 +274,50 @@ fancy_echo "a.1 Get public SSH public key in ..."
          fancy_echo "a.2 $JQ_VERSION already installed for Git to process JSON."
       fi
 
+      if ! command_exists curl ; then
+         fancy_echo "a.3 brew install curl REST API ..."
+         # To avoid error: curl: (1) Protocol ""https" not supported or disabled in libcurl
+         # brew rm curl && brew install curl --with-openssl 
+         brew install curl --with-nghttp2
+         brew link curl --force
+      else
+         CURL_VERSION="$( curl --version | grep "curl" )"
+         fancy_echo "a.3 $CURL_VERSION already installed."
+      fi
+   fi
+
+
+fancy_echo "a.3 Verify user name is valid ..."
+
+c_echo "RESPONSE=$(curl --http2 –i \"https://api.github.com/users/$MYACCT_USERID\")"
+        RESPONSE_JSON=$(curl --http2 –include "https://api.github.com/users/$MYACCT_USERID")
+#        curl -H Content-Type:application/json ~
+        curl --http2 –include "https://api.github.com/users/$MYACCT_USERID"
+echo "should return JSON: $RESPONSE"
+
+exit
+
+
 if [[ "${MYACCT_PASSWORD}" == "secret here" ]]; then
-   fancy_echo "a.2 MYACCT_PASSWORD was not changed from plug value."
+   fancy_echo "a.4 MYACCT_PASSWORD was not changed from plug value."
    # manually delete
 else   # password was changed:
-   fancy_echo "a.2 MYACCT_PASSWORD was changed from plug value. Proceed."
+   fancy_echo "a.4 MYACCT_PASSWORD was changed from plug value. Proceed."
 
-   ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
-   # for GitHub API calls to process JSON:
    # Since no need to create another token if one already exists:
    if [ ! "$GITHUB_TOKEN" = "" ]; then  # run before
-      fancy_echo "a.3 ******** Creating Auth GITHUB_TOKEN to delete repo later : "
+      fancy_echo "a.4 Creating Auth GITHUB_TOKEN to delete repo later : "
+      echo "$MYACCT_USERID:$MYACCT_PASSWORD"
       GITHUB_TOKEN=$(curl -v -u "$MYACCT_USERID:$MYACCT_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # Do not fanch_echo "a.3 GITHUB_TOKEN=$GITHUB_TOKEN" # secret
+       # Do not fancy_echo "a.3 GITHUB_TOKEN=$GITHUB_TOKEN" # secret
        # API Token (32 character long string) is unique among all GitHub users.
        # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
        # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
 
-    # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information
+       # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information
    else
    #   if [ ! "$GITHUB_TOKEN" = "" ]; then  # run before
-      fancy_echo "a.3 Verifying Auth GITHUB_TOKEN to delete repo later : "
+      fancy_echo "a.5 Verifying Auth GITHUB_TOKEN to delete repo later : "
       #    FIX: Commented out due to syntax error near unexpected token `|'
       GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
       echo "a.4 ******** authorizations_url=$GITHUB_AVAIL"
@@ -307,15 +335,15 @@ fi
 exit
 
 if [ "$GITHUB_AVAIL" == "${MYACCT_USERID}/${SAMPLE_REPO}" ]; then  # Not run before
-    fancy_echo "a.5 ******** Deleting GITHUB_REPO created earlier : "
+    fancy_echo "a.6 ******** Deleting GITHUB_REPO created earlier : "
         # TODO: Delete repo in GitHub.com Settings if it already exists:
       # Based on https://gist.github.com/JadedEvan/5639254
       # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
     GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${MYACCT_USERID}/${SAMPLE_REPO} | jq ".full_name")
       # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
-      fancy_echo "a.5 GITHUB_AVAIL=$GITHUB_AVAIL deleted."
+      fancy_echo "a.6 GITHUB_AVAIL=$GITHUB_AVAIL deleted."
 else
-      fancy_echo "a.5 ******** No GITHUB repo known to delete. "
+      fancy_echo "a.6 ******** No GITHUB repo known to delete. "
 fi
 
 fancy_echo "2.9 Delete \"$SAMPLE_REPO\" repo created during previous run ..."

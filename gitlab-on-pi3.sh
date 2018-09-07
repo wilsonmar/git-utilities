@@ -39,6 +39,7 @@ sudo nano /etc/gitlab/gitlab.rb
 # nginx['listen_port'] = 9999
 # nginx['listen_https'] = false
 # unicorn['port'] = 7777
+# QUESTION: What's the unicorn port for?
 	read -rsp $'Press any key after deleting ...\n' -n 1 key
 
 echo "3. Start gitlab-ctl"
@@ -64,3 +65,4 @@ sudo gitlab-ctl stop
 echo "6.3 Tail GitLab logs"
 sudo gitlab-ctl tail
 
+# https://stackoverflow.com/questions/849308/pull-push-from-multiple-remote-locations
