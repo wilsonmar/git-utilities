@@ -3,7 +3,7 @@
 # by WilsonMar@gmail.com
 # Described in https://wilsonmar.github.io/gitlab-on-pie3.md
 
-# This script installs GitLab CE on a Raspberry Pi 3 (64-bit),
+# This script installs GitLab CE on a Raspberry Pi 3 (64-bit) Stretch version,
 # so you can store stuff for less than $50 (less than a year of GitHub subscription)
 # sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/gitlab-on-pi3.sh)"
 
@@ -18,13 +18,14 @@
 
 #Raspbian armhf AFAIK is not binary compatible with debian armhf, unless omnibus packages ship all binary stuff (e.g. therubyracer) statically linked (or only depend on binary stuff present in jessie repository).
 # Raspbian armhf == armv6zk -mfpu=vfpv2
-# Debian armhf == armv7l -mfpu=vfpv3
+# Debian   armhf == armv7l  -mfpu=vfpv3
 
 echo "1.1 install and configure the necessary dependencies."
-sudo apt-get install curl openssh-server ca-certificates postfix apt-transport-https
+sudo apt-get install -y curl openssh-server ca-certificates apt-transport-https
 
 echo "1.2 install postfix. To send emails from your GitLab server select ‘Internet Site’ during setup."
 sudo apt-get install -y postfix
+   # TODO: Manually set SMTP to local - See https://pimylifeup.com/raspberry-pi-gitlab/
 
 echo "1.3 add GPG keys to update GitLab server."
 curl https://packages.gitlab.com/gpg.key | sudo apt-key add -
