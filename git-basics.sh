@@ -227,7 +227,7 @@ fancy_echo "At $PWD"
 
 fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
       echo "using git init & add & commit ..."
-                git init
+                  git init
 
 fancy_echo "2.8 Create files, add, commit ..."
    echo "$SAMPLE_REPO is the repo name." >README.md
@@ -237,128 +237,18 @@ fancy_echo "2.8 Create files, add, commit ..."
    git status -s -b
    git commit -m "Add README & gitignore"
 
-fancy_echo "2.9a Attempt to Delete \"$SAMPLE_REPO\" repo created during previous run ..."
-
+fancy_echo "2.9 Manually delete \"$SAMPLE_REPO\" repo created during previous run ..."
 # Because this doesn't work:
 #    c_echo "hub delete \"$SAMPLE_REPO\""
 #RESPONSE=$("hub delete   $SAMPLE_REPO ")
 #echo RESPONSE
    ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
    # for GitHub API calls to process JSON:
-#read -rsp $'Press any key after deleting ...\n' -n 1 key
+    read -rsp $'Press any key after manually deleting ...\n' -n 1 key
 
 
-fancy_echo "a. Trying GitHub API ..."
-
-# CODING NOTE: This use of GitHub API is not working, so I'm using a toggle, which
-# begins with "dont use"
-
-fancy_echo "a.1 Get public SSH public key in ..."
-      export RSA_PUBLIC_KEY=$(cat ~/.ssh/id_rsa.pub)
-   # TODO: if $RSA_PUBLIC_KEY blank, then exit
-   # TODO: Windows too instead of Mac only:
-
-   if ! command_exists brew ; then
-         fancy_echo "a.2 brew command needed. Exiting ..."
-        
-   else
-      ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
-      # for GitHub API calls to process JSON:
-      if ! command_exists jq ; then
-         fancy_echo "a.2 brew install jq  # add-in to Git ..."
-         brew install jq
-         # For the most recent version: 
-         # brew install --HEAD jq
-      else
-         JQ_VERSION="$( jq --version )"
-         fancy_echo "a.2 $JQ_VERSION already installed for Git to process JSON."
-      fi
-
-      if ! command_exists curl ; then
-         fancy_echo "a.3 brew install curl REST API ..."
-         # To avoid error: curl: (1) Protocol ""https" not supported or disabled in libcurl
-         # brew rm curl && brew install curl --with-openssl 
-         brew install curl --with-nghttp2
-         brew link curl --force
-      else
-         CURL_VERSION="$( curl --version | grep "curl" )"
-         fancy_echo "a.3 $CURL_VERSION already installed."
-      fi
-   fi
-
-
-fancy_echo "a.3 Verify user name is valid ..."
-
-c_echo "RESPONSE=$(curl --http2 –i \"https://api.github.com/users/$MYACCT_USERID\")"
-        RESPONSE_JSON=$(curl --http2 –include "https://api.github.com/users/$MYACCT_USERID")
-#        curl -H Content-Type:application/json ~
-        curl --http2 –include "https://api.github.com/users/$MYACCT_USERID"
-echo "should return JSON: $RESPONSE"
-
-exit
-
-
-if [[ "${MYACCT_PASSWORD}" == "secret here" ]]; then
-   fancy_echo "a.4 MYACCT_PASSWORD was not changed from plug value."
-   # manually delete
-else   # password was changed:
-   fancy_echo "a.4 MYACCT_PASSWORD was changed from plug value. Proceed."
-
-   # Since no need to create another token if one already exists:
-   if [ ! "$GITHUB_TOKEN" = "" ]; then  # run before
-      fancy_echo "a.4 Creating Auth GITHUB_TOKEN to delete repo later : "
-      echo "$MYACCT_USERID:$MYACCT_PASSWORD"
-      GITHUB_TOKEN=$(curl -v -u "$MYACCT_USERID:$MYACCT_PASSWORD" -X POST https://api.github.com/authorizations -d "{\"scopes\":[\"delete_repo\"], \"note\":\"token with delete repo scope\"}" | jq ".token")
-       # Do not fancy_echo "a.3 GITHUB_TOKEN=$GITHUB_TOKEN" # secret
-       # API Token (32 character long string) is unique among all GitHub users.
-       # Response: X-OAuth-Scopes: user, public_repo, repo, gist, delete_repo scope.
-       # See https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
-
-       # WORKFLOW: Manually see API Tokens on GitHub | Account Settings | Administrative Information
-   else
-   #   if [ ! "$GITHUB_TOKEN" = "" ]; then  # run before
-      fancy_echo "a.5 Verifying Auth GITHUB_TOKEN to delete repo later : "
-      #    FIX: Commented out due to syntax error near unexpected token `|'
-      GITHUB_AVAIL=$(curl -v -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | jq ".authorizations_url")
-      echo "a.4 ******** authorizations_url=$GITHUB_AVAIL"
-       # https://api.github.com/authorizations"
-
-      fancy_echo "a.5 Checking GITHUB repo exists (_AVAIL) from prior run ... "
-      URL="https://api.github.com/repos/$MYACCT_USERID/$SAMPLE_REPO"
-      fancy_echo "a.5 GITHUB_AVAIL URL=$URL"
-      GITHUB_AVAIL=$(curl -X GET $URL | jq ".full_name")
-      fancy_echo "a.5 GITHUB_AVAIL=$GITHUB_AVAIL (null if not exist)"
-       # Expecting "full_name": "wilsonmar/git-sample-repo",
-       # TODO: Fix return of null.
-   fi
-fi
-exit
-
-if [ "$GITHUB_AVAIL" == "${MYACCT_USERID}/${SAMPLE_REPO}" ]; then  # Not run before
-    fancy_echo "a.6 ******** Deleting GITHUB_REPO created earlier : "
-        # TODO: Delete repo in GitHub.com Settings if it already exists:
-      # Based on https://gist.github.com/JadedEvan/5639254
-      # See http://stackoverflow.com/questions/19319516/how-to-delete-a-github-repo-using-the-api
-    GITHUB_AVAIL=$(curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${MYACCT_USERID}/${SAMPLE_REPO} | jq ".full_name")
-      # Response is 204 No Content per https://developer.github.com/v3/repos/#delete-a-repository
-      fancy_echo "a.6 GITHUB_AVAIL=$GITHUB_AVAIL deleted."
-else
-      fancy_echo "a.6 ******** No GITHUB repo known to delete. "
-fi
-
-fancy_echo "2.9 Delete \"$SAMPLE_REPO\" repo created during previous run ..."
-
-exit
- #### Create repo in GitHub:
-    fancy_echo "a.6 ******** Creating GITHUB repo. "
-    GITHUB_AVAIL=$(curl -u $MYACCT_USERID:$MYACCT_PASSWORD https://api.github.com/user/repos -d "{\"name\": \"${SAMPLE_REPO:-${CURRENTDIR}}\", \"description\": \"${DESCRIPTION}\", \"private\": false, \"has_issues\": false, \"has_downloads\": true, \"has_wiki\": false}" | jq ".full_name")
-      fancy_echo "a.6 GITHUB_AVAIL=$GITHUB_AVAIL created."
-       MYACCT_PASSWORD=""  # No longer needed.
-
-exit
-
-c_echo "hub create -d \"Add from local git init\""
-        hub create -d  "Add from local git init"
+c_echo "2.10 hub create -d \"Add from local git init\""
+             hub create -d  "Add from local git init"
 
 fancy_echo "2.11 git remote -v ..."
         git remote -v
