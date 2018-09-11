@@ -216,50 +216,6 @@ fancy_echo "2.4 NO Create gits folder ..."
 
 fancy_echo "2.5 NO myacct container ..."
 
-# Delete
-fancy_echo "2.6 rm & mkdir $SAMPLE_REPO && cd $SAMPLE_REPO"
-              if [ ! -d   "$SAMPLE_REPO" ]; then
-                   rm -rf "$SAMPLE_REPO"
-                   mkdir  "$SAMPLE_REPO"
-              fi
-                       cd "$SAMPLE_REPO"
-fancy_echo "At $PWD"
-
-fancy_echo "2.7 Create new repo \"$SAMPLE_REPO\" in GitHub ..."
-      echo "using git init & add & commit ..."
-                  git init
-
-fancy_echo "2.8 Create files, add, commit ..."
-   echo "$SAMPLE_REPO is the repo name." >README.md
-   echo ".DS_Store" >.gitignore
-   ls -al
-   git add .
-   git status -s -b
-   git commit -m "Add README & gitignore"
-
-fancy_echo "2.9 Manually delete \"$SAMPLE_REPO\" repo created during previous run ..."
-# Because this doesn't work:
-#    c_echo "hub delete \"$SAMPLE_REPO\""
-#RESPONSE=$("hub delete   $SAMPLE_REPO ")
-#echo RESPONSE
-   ## Based on https://github.com/stedolan/jq/wiki/Installation#mac-osx
-   # for GitHub API calls to process JSON:
-    read -rsp $'Press any key after manually deleting ...\n' -n 1 key
-
-
-c_echo "2.10 hub create -d \"Add from local git init\""
-             hub create -d  "Add from local git init"
-
-fancy_echo "2.11 git remote -v ..."
-        git remote -v
-
-fancy_echo "2.12 Manually check on https://$GITHOST/$OTHER_ACCT/$SAMPLE_REPO ..."
-
-#git remote -v
-#git push -u origin master
-#c_echo "git remote rename origin local-init"
-#        git remote rename origin local-init
-#git remote -v
 
 
 fancy_echo "3.1 ssh-keygen is done manually, just once."
