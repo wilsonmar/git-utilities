@@ -26,7 +26,6 @@ command_exists() {  # newer than which {command}
   command -v "$@" > /dev/null 2>&1
 }
 
-
 clear
 
 fancy_echo "1.1 Local machine metadata ..."
@@ -40,14 +39,30 @@ LOG_PREFIX=$(date +%Y-%m-%dT%H:%M:%S%z)-$((1 + RANDOM % 1000))
    #  LOGFILE="$0.$LOG_PREFIX.log"
 c_echo "$0 starting at $LOG_PREFIX ..."
 
+### OS detection:
 c_echo "uname -a "
    echo -e "$(uname -a)"
-   # if Mac/Darwin:
+
+platform='unknown'
+unamestr=$( uname )
+if [[ "$unamestr" == 'Darwin' ]]; then
+            platform='macos'
+elif [[ "$unamestr" == 'Linux' ]]; then
+              platform='linux'
+elif [[ "$unamestr" == 'FreeBSD' ]]; then
+              platform='freebsd'
+elif [[ "$unamestr" == 'Windows' ]]; then
+              platform='windows'
+fi
+echo "I'm $unamestr = $platform"
+
+
+if [[ $platform == 'macos' ]]; then
+
    c_echo "sw_vers "
       echo -e "$(sw_vers)"
 
-
-fancy_echo "1.2 Ensure Homebrew client is installed ..."
+   fancy_echo "1.2 Ensure Homebrew client is installed ..."
    # Remove to be done manually.
    if ! command_exists brew ; then
        RUBY_VERSION="$(ruby --version)"
@@ -63,25 +78,30 @@ fancy_echo "1.2 Ensure Homebrew client is installed ..."
        fi
    fi
    echo "$(brew --version)"
+fi
 
-###
    if ! command_exists git ; then
+     if [[ $platform == 'macos' ]]; then
        fancy_echo "1.3 Installing git using Homebrew ..." 
        brew install git
-   else
+     fi
+   fi
        GIT_VERSION="$( git --version )"
        fancy_echo "1.3 $GIT_VERSION installed ..."
-   fi
 
 
-## Based on https://hub.github.com/
-      if ! command_exists hub ; then
+   ## Based on https://hub.github.com/
+   if ! command_exists hub ; then
+     if [[ $platform == 'macos' ]]; then
          fancy_echo "1.4a brew install hub  # add-in to Git ..."
          brew install hub
-      else
+     fi
+   fi
          HUB_VERSION="$( hub version | grep "hub" )"
          fancy_echo "1.4a $HUB_VERSION already installed for Git to manage GitHub."
-      fi
+fi
+
+exit
 
 ###
    cd ~/
@@ -223,11 +243,7 @@ fancy_echo "3.1 ssh-keygen is done manually, just once."
 c_echo "ls -a ~/.ssh"
         ls -a ~/.ssh
 
-fancy_echo "3.3 Delete \"$OTHER_REPO\" repo forked during previous run ..."
-c_echo "hub delete \"$OTHER_REPO\""
-        hub delete "$OTHER_REPO"
-#      echo "Not Found is OK if it was not created last run."
-read -rsp $'Press any key after deleting ...\n' -n 1 key
+
 
 fancy_echo "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 c_echo "cd && cd \"$WORKSPACE_FOLDER\" "
