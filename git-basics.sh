@@ -101,7 +101,6 @@ if [[ $platform == 'macos' ]]; then
          fancy_echo "1.4a $HUB_VERSION already installed for Git to manage GitHub."
 fi
 
-exit
 
 ###
    cd ~/
