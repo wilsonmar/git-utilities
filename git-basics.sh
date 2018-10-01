@@ -78,7 +78,7 @@ if [[ $platform == 'macos' ]]; then
        fi
    fi
    echo "$(brew --version)"
-fi
+
 
    if ! command_exists git ; then
      if [[ $platform == 'macos' ]]; then
