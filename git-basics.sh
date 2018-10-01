@@ -6,7 +6,7 @@
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
 # Remember to chmod +x git-basics.sh first, then paste this command in your terminal
-# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
+# bash -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
 RUNTYPE=""
        # remove
@@ -51,8 +51,8 @@ elif [[ "$unamestr" == 'Linux' ]]; then
               platform='linux'
 elif [[ "$unamestr" == 'FreeBSD' ]]; then
               platform='freebsd'
-elif [[ "$unamestr" == 'Windows' ]]; then
-              platform='windows'
+elif [[ "$unamestr" == 'MINGW64_NT-6.1' ]]; then  # git bash on Windows 10
+              platform='windows'  # systeminfo on windows https://en.wikipedia.org/wiki/MinGW
 fi
 echo "I'm $unamestr = $platform"
 
