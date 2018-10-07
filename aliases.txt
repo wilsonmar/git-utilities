@@ -19,7 +19,7 @@ alias last20='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -20 | cut -f2-'
 alias dir='ls -alr'  # for windows habits
 alias ll='ls -FalhG'
 alias ga='git add .'
-function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
+function gas() { git status -s -b;  git add . -A ; git commit -m "$1" ; git push; }
 function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
 alias gb='git branch -avv'
 alias gbs='git status -s -b;git add . -A;git commit -m"Update";git push'
