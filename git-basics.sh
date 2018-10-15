@@ -1,11 +1,11 @@
 #!/bin/bash
 # This is git-basics.sh from https://github.com/wilsonmar/git-utilities
 # by WilsonMar@gmail.com
-# Described in https://github.com/wilsonmar/git-utilities/blob/master/git-basics.sh
+# described in https://wilsonmar.github.io/git-basics
 
 # This script performs the most common actions resulting in the various statuses,
 # so you can make changes and see the effect.
-# Remember to chmod +x git-basics.sh first, then paste this command in your terminal
+# chmod +x git-basics.sh first, then copy this command to paste in your terminal:
 # bash -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
 RUNTYPE=""
