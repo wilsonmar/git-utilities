@@ -1,9 +1,8 @@
 #!/bin/bash
 # This is git-basics.sh within https://github.com/wilsonmar/git-utilities
 # by WilsonMar@gmail.com
-# described in https://wilsonmar.github.io/git-basics
-# This script "types" what the reader is asked to manually type in,
-# to minimize troubleshooting. First:
+# To minimize troubleshooting, this script "types" what the reader is asked to manually type in the tutorial at
+# https://wilsonmar.github.io/git-basics
 # chmod +x git-basics.sh | then copy this command to paste in your terminal:
 # bash -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
