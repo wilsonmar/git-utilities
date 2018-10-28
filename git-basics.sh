@@ -171,7 +171,7 @@ echo_f "1.6 Create persistent folder git-scripts in $PWD ..."
 #read -rsp $'1.8 press any key to continue default processing ...\n' -n 1 key
 # Comment the above two lines out when you're editing this script for local run.
 
-   ALIAS_FILENAME="aliases.txt"
+   ALIAS_FILENAME="aliases.bash"
    if [ ! -f "$ALIAS_FILENAME" ]; then
       echo_f "1.9 Downloading $ALIAS_FILENAME from GitHub ..."
       curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/$ALIAS_FILENAME"
@@ -256,11 +256,14 @@ echo_f "3.1 ssh-keygen is done manually, just once."
 echo_c "ls -a ~/.ssh"
         ls -a ~/.ssh
 
-
-
 echo_f "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 echo_c "cd && cd \"$WORKSPACE_FOLDER\" "
         cd && cd  "$WORKSPACE_FOLDER"
+
+# Check if repo exists:
+# git ls-remote "$OTHER_ACCT/$OTHER_REPO" -q
+# echo $?
+# 0 means that the repo was found, otherwise you'll get a non-zero value.
 
 echo_c "hub clone \"$OTHER_ACCT/$OTHER_REPO\""
       hub clone "$OTHER_ACCT/$OTHER_REPO" # hotwilson/some-repo"
