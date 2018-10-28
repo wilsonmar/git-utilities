@@ -38,27 +38,28 @@ LOG_PREFIX=$(date +%Y-%m-%dT%H:%M:%S%z)-$((1 + RANDOM % 1000))
 echo_c "$0 starting at $LOG_PREFIX ..."
 
 ### OS detection:
-echo_c "uname -a "
-   echo -e "$(uname -a)"
-
-platform='unknown'
+echo_c "uname -a"
 unamestr=$( uname )
+echo "$unamestr"
+UNAME_PREFIX="${unamestr%%-*}" 
+              platform='unknown'
 if [[ "$unamestr" == 'Darwin' ]]; then
-            platform='macos'
+              platform='macos'
 elif [[ "$unamestr" == 'Linux' ]]; then
               platform='linux'
 elif [[ "$unamestr" == 'FreeBSD' ]]; then
               platform='freebsd'
-elif [[ "$unamestr" == 'MINGW64_NT-6.1' ]]; then  # git bash on Windows 10
+elif [[ "$UNAME_PREFIX" == 'MINGW64_NT' ]]; then  # MINGW64_NT-6.1 or MINGW64_NT-10 for Windows 10
               platform='windows'  # systeminfo on windows https://en.wikipedia.org/wiki/MinGW
 fi
-echo "I'm $unamestr = $platform"
+echo "I'm $platform"
 
 
 if [[ $platform == 'macos' ]]; then
 
    echo_c "sw_vers "
       echo -e "$(sw_vers)"
+      echo -e "/n$(xcode-select --version)"  # Example: xcode-select version 2354.
 
    echo_f "1.2 Ensure Homebrew client is installed ..."
    # Remove to be done manually.
@@ -228,6 +229,21 @@ echo_c "git config --global core.safecrlf false"
 
 echo_f "2.3 git config --list  # (could be a long file) ..."
 # git config --list
+
+# difftool command (after installing DiffMerge) analyzes differences among 3 files
+# Per https://sourcegear.com/diffmerge/webhelp/sec__git__mac.html
+        git config --global diff.tool diffmerge
+        git config --global difftool.diffmerge.cmd "/usr/local/bin/diffmerge \"\$LOCAL\" \"\$REMOTE\""
+        git config --global merge.tool diffmerge
+        git config --global mergetool.diffmerge.trustExitCode true
+        git config --global mergetool.diffmerge.cmd \
+        "/usr/local/bin/diffmerge --merge --result=\"\$MERGED\" \
+        \"\$LOCAL\" \"\$BASE\" \"\$REMOTE\""
+
+        # Change the font size:
+        # open -e "$HOME/Library/Preferences/SourceGear DiffMerge preferences"
+        # [file]
+        # Font:27:76:consolas
 
 echo_f "2.4 NO Create gits folder ..."
 
