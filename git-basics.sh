@@ -12,6 +12,18 @@ RUNTYPE=""
        # reset  (to wipe out files saved in git-utilities)
        # reuse (previous version of repository)
 
+# A description of these Bash generic code is at https://wilsonmar.github.io/
+
+# Set Colors based on aws_code_deploy.sh 
+bold="\e[1m"
+dim="\e[2m"
+underline="\e[4m"
+blink="\e[5m"
+reset="\e[0m"
+red="\e[31m"
+green="\e[32m"
+blue="\e[34m"
+
 function echo_f() {  # echo fancy comment
   local fmt="$1"; shift
   printf "\\n    >>> $fmt\\n" "$@"
@@ -260,10 +272,14 @@ echo_f "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 echo_c "cd && cd \"$WORKSPACE_FOLDER\" "
         cd && cd  "$WORKSPACE_FOLDER"
 
-# Check if repo exists:
+# Check if repo exists: if you have credentials for it:
 # git ls-remote "$OTHER_ACCT/$OTHER_REPO" -q
+#    -q if for quieting list of hashes.
+# git ls-remote https://github.com/hotwilson/some-repo -q
+# Username for 'https://github.com':
 # echo $?
 # 0 means that the repo was found, otherwise you'll get a non-zero value.
+# See https://gist.github.com/salcode/342391ccbaa8cbf48567 = Notes for bash scripting git commands 
 
 echo_c "hub clone \"$OTHER_ACCT/$OTHER_REPO\""
       hub clone "$OTHER_ACCT/$OTHER_REPO" # hotwilson/some-repo"
