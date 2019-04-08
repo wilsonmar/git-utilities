@@ -21,11 +21,12 @@
      SHA_TO="6e6d819"  # least recent 6e6d819
    SHA_FROM="b0de12f"  # most  recent
 
-   RELOAD_GITHUB_FROM="0"  # 1=YES, 0=No
-   RELOAD_GITHUB_TO="1"  # 1=YES, 0=No
+   RELOAD_GITHUB_FROM="1"  # 1=YES (remove folder from previous run), 0=No
+   RELOAD_GITHUB_TO="1"    # 1=YES, 0=No
    
    PAUSE_FOR_SHA="0"  # 1=YES, 0=No ()
 
+   PATCH_FILE="0new-feature.patch"
 
 # 2. Define utility functions:
 
@@ -94,10 +95,10 @@ function echo_c() {  # echo command
    echo_f "Create patch file(s) ..."
 
    # See https://git-scm.com/docs/git-format-patch 
-   git format-patch "$SHA_FROM^..$SHA_TO" --stdout > 0new-feature.patch
+   git format-patch "$SHA_FROM^..$SHA_TO" --stdout > "$PATCH_FILE"
       # NOTE: --stdout > 0new-feature.patch creates a single file from several patch files output.
          # See https://thoughtbot.com/blog/send-a-patch-to-someone-using-git-format-patch
-      #git format-patch -1  # for just the lastest commit
+      #git format-patch -1  # for just the lastest commit. See https://thoughtbot.com/blog/send-a-patch-to-someone-using-git-format-patch
    echo_f "List patches ..."
    ls -al *.patch
       # 0001-reset-for-secret-new-Gemfile.patch
@@ -128,8 +129,9 @@ function echo_c() {  # echo command
    ls -l $URL_FROM/0*.patch
 
    # See https://git-scm.com/docs/git-am/2.0.0 for options:
-   git am $URL_FROM/0*.patch
+   # git am $URL_FROM/0*.patch
       # -3 means trying the three-way merge if the patch fails to apply cleanly
+   cat "$URL_FROM/$PATCH_FILE" | git am
    if [ $? -eq 0 ]; then
       echo_f "No error ..."
    else
