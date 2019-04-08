@@ -62,8 +62,9 @@ function echo_c() {  # echo command
 
    cd ~
    cd "$REPO_FROM_CONTAINER"
-   echo_f "Now at PWD=$PWD"
-   ls -l | egrep '^d'  # list only folders using regular expression
+   echo_f "Directories now at PWD=$PWD" 
+   # list only folders using regular expression - ls -l | egrep '^d'  
+   ls -d */
 
 # 4. Delete the folder and download again:
 
@@ -92,9 +93,11 @@ function echo_c() {  # echo command
 
    echo_f "Create patch file(s) ..."
 
-   # See https://git-scm.com/docs/git-format-patch
-   git format-patch "$SHA_FROM^..$SHA_TO"
-   #git format-patch -1  # for just the lastest commit
+   # See https://git-scm.com/docs/git-format-patch 
+   git format-patch "$SHA_FROM^..$SHA_TO" --stdout > 0new-feature.patch
+      # NOTE: --stdout > 0new-feature.patch creates a single file from several patch files output.
+         # See https://thoughtbot.com/blog/send-a-patch-to-someone-using-git-format-patch
+      #git format-patch -1  # for just the lastest commit
    echo_f "List patches ..."
    ls -al *.patch
       # 0001-reset-for-secret-new-Gemfile.patch
@@ -126,17 +129,19 @@ function echo_c() {  # echo command
 
    # See https://git-scm.com/docs/git-am/2.0.0 for options:
    git am $URL_FROM/0*.patch
+      # -3 means trying the three-way merge if the patch fails to apply cleanly
    if [ $? -eq 0 ]; then
       echo_f "No error ..."
    else
-      echo_f "Error $? from statement. git am --show-current-patch ..."
-      git am --show-current-patch
-      exit
+      echo_f "Error $? from statement. git am --abort --show-current-patch ..."
+      git am --abort
+#      git am --show-current-patch
    fi
 
-   echo_f "Git log after git am:"
-   git log --oneline
-   # -3 means trying the three-way merge if the patch fails to apply cleanly
+      echo_f "Git log after git am:"
+      git log --oneline
+         # Note: the SHA of the patch that you merge with git am will not be the same SHA. 
+         # However, the commit message text will be intact.
 
 
 ### References
