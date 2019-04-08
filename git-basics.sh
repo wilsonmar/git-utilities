@@ -6,15 +6,18 @@
 # chmod +x git-basics.sh | then copy this command to paste in your terminal:
 # bash -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh)"
 
+# This is free software; see the source for copying conditions. There is NO
+# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 RUNTYPE=""
        # remove
        # upgrade
        # reset  (to wipe out files saved in git-utilities)
        # reuse (previous version of repository)
-
+ 
 # A description of these Bash generic code is at https://wilsonmar.github.io/
 
-# Set Colors based on aws_code_deploy.sh 
+### Set color variables (based on aws_code_deploy.sh): 
 bold="\e[1m"
 dim="\e[2m"
 underline="\e[4m"
@@ -24,9 +27,14 @@ red="\e[31m"
 green="\e[32m"
 blue="\e[34m"
 
+### Generic functions used across bash scripts:
 function echo_f() {  # echo fancy comment
   local fmt="$1"; shift
   printf "\\n    >>> $fmt\\n" "$@"
+}
+function echo_g() {  # echo fancy comment
+  local fmt="$1"; shift
+  printf "        $fmt\\n" "$@"
 }
 function echo_c() {  # echo command
   local fmt="$1"; shift
@@ -38,16 +46,17 @@ command_exists() {  # newer than which {command}
 
 clear
 
-echo_f "1.1 Local machine metadata ..."
-
 # For Git on Windows, see http://www.rolandfg.net/2014/05/04/intellij-idea-and-git-on-windows/
 TIME_START="$(date -u +%s)"
-FREE_DISKBLOCKS_START="$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6)"
-
+#FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) # no longer works
+FREE_DISKBLOCKS_START="$(df -P | awk '{print $4}' | sed -n 2p)"  # e.g. 342771200 from:
+   # Filesystem    512-blocks      Used Available Capacity  Mounted on
+   # /dev/disk1s1   976490568 611335160 342771200    65%    /
 LOG_PREFIX=$(date +%Y-%m-%dT%H:%M:%S%z)-$((1 + RANDOM % 1000))
    # ISO-8601 date plus RANDOM=$((1 + RANDOM % 1000))  # 3 digit random number.
    #  LOGFILE="$0.$LOG_PREFIX.log"
-echo_c "$0 starting at $LOG_PREFIX ..."
+echo_f "1.1 $0 within $PWD "
+echo_g "starting at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
 
 ### OS detection:
 echo_c "uname -a"
@@ -64,16 +73,16 @@ elif [[ "$unamestr" == 'FreeBSD' ]]; then
 elif [[ "$UNAME_PREFIX" == 'MINGW64_NT' ]]; then  # MINGW64_NT-6.1 or MINGW64_NT-10 for Windows 10
               platform='windows'  # systeminfo on windows https://en.wikipedia.org/wiki/MinGW
 fi
-echo "I'm $platform"
+echo "Platform: $platform"
 
 
 if [[ $platform == 'macos' ]]; then
 
-   echo_c "sw_vers "
+   echo_c "sw_vers"
       echo -e "$(sw_vers)"
       echo -e "/n$(xcode-select --version)"  # Example: xcode-select version 2354.
 
-   echo_f "1.2 Ensure Homebrew client is installed ..."
+   echo_f "1.2 Homebrew:"
    # Remove to be done manually.
    if ! command_exists brew ; then
        RUBY_VERSION="$(ruby --version)"
@@ -110,6 +119,11 @@ if [[ $platform == 'macos' ]]; then
    fi
          HUB_VERSION="$( hub version | grep "hub" )"
          echo_f "1.4a $HUB_VERSION already installed for Git to manage GitHub."
+
+# elif [[ $platform == 'linux' ]]; then
+   # ubuntu
+   # etc.
+
 fi
 
 
@@ -169,6 +183,7 @@ echo_f "1.6 Create persistent folder git-scripts in $PWD ..."
 
 
 ### 
+   # TODO: Replace if requested in env:
    if [ ! -f "git-basics.sh" ]; then
       echo_f "1.7 Downloading git-basics.sh from GitHub for next run ..."
       curl -O "https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-basics.sh"
@@ -200,7 +215,6 @@ echo_f "1.6 Create persistent folder git-scripts in $PWD ..."
          echo_f "1.10 $BASHFILE found ..."
          ls -al "$BASHFILE"  # 9462 bytes
       fi
-
 
    if grep "$ALIAS_FILENAME" "$BASHFILE" ; then # already in file:
       echo_f "1.11 $ALIAS_FILENAME already found in $BASHFILE."
@@ -268,6 +282,9 @@ echo_f "3.1 ssh-keygen is done manually, just once."
 echo_c "ls -a ~/.ssh"
         ls -a ~/.ssh
 
+echo_f "3.3 Manually delete $MYACCT_USERID/$OTHER_REPO so this script can create a new one ..."
+         read -rsp $'Press any key after deleting the repo ...\n' -n 1 key
+
 echo_f "3.4 Use hub to clone \"$OTHER_ACCT/$OTHER_REPO\" ..."
 echo_c "cd && cd \"$WORKSPACE_FOLDER\" "
         cd && cd  "$WORKSPACE_FOLDER"
@@ -312,10 +329,7 @@ echo_c "git pull --all"
         git pull --all
 
 echo_f "3.5 git remote -v"
-                git remote -v
-
-echo_f "3.6 Manually see the fork in your cloud account  ..."
-#         read -rsp $'Press any key after deleting ...\n' -n 1 key
+            git remote -v
 
 # 1. fork https://github.com/hotwilson/some-repo to wilsonmar
 
@@ -430,7 +444,7 @@ echo_f "6.7 git push origin :feat1  # to remove in cloud"
 
 echo_f "7.1 On origin   $MYACCT_USERID/$OTHER_REPO, create a Pull/Merge Request."
 echo_f "7.2 On upstream $OTHER_CCT/$OTHER_REPO, Squash and merge."
-echo_f "7.3 In upstream $OTHER_ACCT/$OTHER_REPO, Add file."
+echo_f "7.3 In upstream $OTHER_ACCT/$OTHER_REPO, Ask maintainter to make a change (add file)."
          read -rsp $'Press any key after creating a new file in that repo ...\n' -n 1 key
          # See https://unix.stackexchange.com/questions/134437/press-space-to-continue
          # See https://stackoverflow.com/questions/92802/what-is-the-linux-equivalent-to-dos-pause
@@ -478,7 +492,7 @@ echo_f "9.4 git merge origin/master -m\"9.4 thank you\" --no-edit"
 echo_f "9.5 git diff master..origin/master  # again to verify"
                 git diff master..origin/master
 
-FREE_DISKBLOCKS_END=$(df | sed -n -e '2{p;q}' | cut -d' ' -f 6) 
+FREE_DISKBLOCKS_END="$(df -P | awk '{print $4}' | sed -n 2p)"
 DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
 # 380691344 / 182G = 2091710.681318681318681 blocks per GB
 # 182*1024=186368 MB
@@ -486,6 +500,6 @@ DIFF=$(((FREE_DISKBLOCKS_START-FREE_DISKBLOCKS_END)/2048))
 
 TIME_END=$(date -u +%s);
 DIFF=$((TIME_END-TIME_START))
-MSG="End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed."
+MSG="End of script after $((DIFF/60))m $((DIFF%60))s seconds elapsed"
 echo_f "$MSG and $DIFF MB disk space consumed."
 #say "script ended."  # through speaker
