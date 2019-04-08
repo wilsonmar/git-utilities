@@ -148,11 +148,7 @@ function echo_c() {  # echo command
 
 ### References
 
-# themoderncoder.com/a-better-git-workflow-with-rebase
-
 # https://stackoverflow.com/questions/3816040/git-apply-changes-introduced-by-commit-in-one-repo-to-another-repo/3816292#3816292
-
-# https://coderwall.com/p/sgpksw/git-cherry-pick-from-another-repository
 # https://stackoverflow.com/questions/5120038/is-it-possible-to-cherry-pick-a-commit-from-another-git-repository/9507417#9507417
 
 
