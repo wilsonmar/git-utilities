@@ -1,8 +1,10 @@
 #!/bin/bash
-# git-patch.sh
-#
-# Here is how to create a patch file from one repository to add to another repository.
+# git-patch.sh from https://github.com/wilsonmar/git-utilities
+# This creates a patch file from one repository and adds it to another repository.
 # Note: Creating a patch provides a log of exactly what is inserted into the target repo. 
+# customized based on specification in file secrets.sh within the same repo.
+# TODO: https://wilsonmar.github.io/git-patch.md
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/wilsonmar/git-utilities/master/git-patch.sh)"
 
 # 1. Define variables containing the origin's repos. For example:
 
@@ -123,7 +125,10 @@ function echo_c() {  # echo command
    cd "$REPO_NAME_TO"
    echo_f "Now at PWD=$PWD"
 
-# 8. Apply patch:   
+# 8. Patch hooks
+   # NOTE: In .git/hooks there can be applypatch-msg, pre-applypath, and post-applypatch.
+
+# 9. Apply patch:   
 
    echo_f "Patching from $URL_FROM/0*.patch"
    ls -l $URL_FROM/0*.patch
