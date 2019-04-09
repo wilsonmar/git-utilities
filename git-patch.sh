@@ -23,16 +23,16 @@
      SHA_TO="6e6d819"  # least recent 6e6d819
    SHA_FROM="b0de12f"  # most  recent
 
+   PATCH_FILE="0new-feature.patch"
+
    # Feature flags:
    RELOAD_GITHUB_FROM="1"  # 1=YES (remove folder from previous run), 0=No
    RELOAD_GITHUB_TO="1"    # 1=YES, 0=No
    
    PAUSE_FOR_SHA="0"  # 1=YES, 0=No ()
 
-   PATCH_FILE="0new-feature.patch"
-
-   REMOVE_REPO_FROM_WHEN_DONE="1" # 0=No (default), "1"=Yes
-     REMOVE_REPO_TO_WHEN_DONE="1" # 0=No (default), "1"=Yes
+   REMOVE_REPO_FROM_WHEN_DONE="0" # 0=No (default), "1"=Yes
+     REMOVE_REPO_TO_WHEN_DONE="0" # 0=No (default), "1"=Yes
 
 # 2. Define utility functions:
 
@@ -110,13 +110,15 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
       # NOTE: --stdout > 0new-feature.patch creates a single file from several patch files output.
          # See https://thoughtbot.com/blog/send-a-patch-to-someone-using-git-format-patch
       #git format-patch -1  # for just the lastest commit. See https://thoughtbot.com/blog/send-a-patch-to-someone-using-git-format-patch
-   ls -al *.patch
-      # 0001-reset-for-secret-new-Gemfile.patch
-
       # -1 for a single commit SHA or
       # "$SHA_FROM^..$SHA_TO" for a range of commits.
-
-   # Exit if file created not found:
+      # 0001-<commit msg>.patch
+   if [ ! -f "$PATCH_FILE" ]; then
+      echo_f "File $PATCH_FILE not found. Aborting!"
+      exit
+   else
+      ls -al *.patch
+   fi
 
 # 7. Navigate to the target repo:
 
@@ -184,15 +186,14 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
    if [ "$REMOVE_REPO_FROM_WHEN_DONE" -eq "1" ]; then  # 0=No (default), "1"=Yes
       echo_f "Removing $URL_FROM/$PATCH_FILE as REMOVE_REPO_FROM_WHEN_DONE=$REMOVE_REPO_FROM_WHEN_DONE"
       rm -rf  "$REPO_TO_CONTAINER/$REPO_NAME_FROM"
-      # Verify:
       if [ -d "$REPO_FROM_CONTAINER/$REPO_NAME_FROM" ]; then
-         FOLDER_DISK_SPACE="$(du -hs)"
+         FOLDER_DISK_SPACE="$(du -hs | tr -d '\040\011\012\015\056')"
          echo_f "WARNING: $FOLDER_DISK_SPACE folder still at $REPO_FROM_CONTAINER/$REPO_NAME_FROM."
          ls -al
       fi
    else
       if [ -d "$REPO_FROM_CONTAINER/$REPO_NAME_FROM" ]; then
-         FOLDER_DISK_SPACE="$(du -hs)"
+         FOLDER_DISK_SPACE="$(du -hs | tr -d '\040\011\012\015\056')"
          echo_f "WARNING: $FOLDER_DISK_SPACE folder remains at $REPO_FROM_CONTAINER/$REPO_NAME_FROM."
       else
          echo_f "Folder no longer at $REPO_FROM_CONTAINER/$REPO_NAME_FROM."
@@ -203,13 +204,13 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
       echo_f "Removing $REPO_TO_CONTAINER/$REPO_NAME_TO as REMOVE_REPO_TO_WHEN_DONE=$REMOVE_REPO_TO_WHEN_DONE"
       rm -rf  "$REPO_TO_CONTAINER/$REPO_NAME_TO"
       if [ -d "$REPO_TO_CONTAINER/$REPO_NAME_TO" ]; then
-         FOLDER_DISK_SPACE="$(du -hs)"
+         FOLDER_DISK_SPACE="$(du -hs | tr -d '\040\011\012\015\056')"
          echo_f "WARNING: $FOLDER_DISK_SPACE folder still at $REPO_TO_CONTAINER/$REPO_NAME_TO."
          ls -al
       fi
    else
       if [ -d "$REPO_TO_CONTAINER/$REPO_NAME_TO" ]; then
-         FOLDER_DISK_SPACE="$(du -hs)"
+         FOLDER_DISK_SPACE="$(du -hs | tr -d '\040\011\012\015\056')"
          echo_f "WARNING: $FOLDER_DISK_SPACE folder remains at $REPO_TO_CONTAINER/$REPO_NAME_TO."
       else
          echo_f "Folder no longer at $REPO_TO_CONTAINER/$REPO_NAME_TO."
