@@ -25,6 +25,8 @@
 
    PATCH_FILE="0new-feature.patch"
 
+   NEW_BRANCH_NAME="add from patch"
+
    # Feature flags:
    RELOAD_GITHUB_FROM="1"  # 1=YES (remove folder from previous run), 0=No
    RELOAD_GITHUB_TO="1"    # 1=YES, 0=No
@@ -134,7 +136,8 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
    fi
    cd "$REPO_NAME_TO"
    echo_f "Now at PWD=$PWD"
-# 8. Verify .git/hooks actions for 
+
+# 8. Verify .git/hooks actions listening: 
 
    # See https://wilsonmar.github.io/git-hooks
    # applypatch-msg, pre-applypatch, and post-applypatch.   
@@ -153,7 +156,15 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
       cat .git/hooks/post-applypatch
    fi
 
-# 9. Apply patch:
+# 9. Create a branch:
+
+   # if NEW_BRANCH_NAME is not blank:
+      CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+      echo_f "At branch $CURRENT_BRANCH to create branch $NEW_BRANCH_NAME:"
+      git checkout -b "$NEW_BRANCH_NAME"
+      git branch  # list branches
+
+# 10. Apply patch:
 
    # TODO: Move patch files to TO repo folder?
 
@@ -176,12 +187,16 @@ echo_c "at $LOG_PREFIX with $FREE_DISKBLOCKS_START blocks free ..."
          # Note: the SHA of the patch that you merge with git am will not be the same SHA. 
          # However, the commit message text will be intact.
 
-# 10. TODO: Create pull request in GitHub
+# 11. TODO: Create pull request in GitHub
    # Using hub: https://www.skcript.com/svr/cli-pr-pull-request-command-line-github/
    # Using GitHub API: See https://gist.github.com/devongovett/10399980
    # Using GitHub API: See https://github.com/wjmelements/scripts#cpr
+   # See https://www.skcript.com/svr/cli-pr-pull-request-command-line-github/
 
-# 11. Remove folders
+   # Check to see if hub is installed:
+   # https://andrewlock.net/creating-github-pull-requests-from-the-command-line-with-hub/
+
+# 12. Remove folders
 
    if [ "$REMOVE_REPO_FROM_WHEN_DONE" -eq "1" ]; then  # 0=No (default), "1"=Yes
       echo_f "Removing $URL_FROM/$PATCH_FILE as REMOVE_REPO_FROM_WHEN_DONE=$REMOVE_REPO_FROM_WHEN_DONE"
