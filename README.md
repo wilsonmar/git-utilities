@@ -523,6 +523,7 @@ The files are downloaded into <a target="_blank" href="https://support.apple.com
 <a target="_blank" href="http://sourabhbajaj.com/mac-setup/iTerm/README.html">ITerm2 can make use of these font files</a>.
 
 ## Other lists of Mac programs 
+ 
 
    * https://github.com/paulirish/dotfiles/blob/master/brew-cask.sh
    (one of the earliest ones by a legend at Google)
