@@ -23,8 +23,6 @@ alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
 alias ramfree="top -l 1 -s 0 | grep PhysMem"
 
 alias ga='git add .'  # --patch
-function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
-function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
 alias gb='git branch -avv'
 alias gbs='git status -s -b;git add . -A;git commit -m"Update";git push'
 alias get='git fetch;' # git pull
