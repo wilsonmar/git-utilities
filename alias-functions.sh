@@ -17,3 +17,5 @@ export PS1="\n  \w\[\033[33m\] \$(parse_git_branch)\[\033[00m\]\n$ "
 # instead of:
 #export PS1="\n\n  \w\[\033[33m\] \n$ "
 
+# On Mac only:
+# alias ss="/System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine -background &"
