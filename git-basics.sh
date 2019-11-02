@@ -151,6 +151,7 @@ echo_c "source git-basics.env"
    echo "OTHER_ACCT=$OTHER_ACCT"   # hotwilson"
    echo "OTHER_REPO=$OTHER_REPO"   # some-repo"
    echo "NEW_BRANCH=$NEW_BRANCH"   # feat1"
+exit
 
   # Assign userid to be GitHub ID if not changed:
   MAC_USERID=$(id -un 2>/dev/null || true)  # example: wilsonmar

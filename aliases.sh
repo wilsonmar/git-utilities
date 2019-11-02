@@ -1,20 +1,28 @@
-# aliases.txt in https://github.com/wilsonmar/git-utilities
-# For concatenating/pasting into ~/.bash_profile 
+# aliases.sh in https://github.com/wilsonmar/git-utilities
+# NOTE: Functions are in functions.sh for Mac only.
+# Both called from ~/.bash_profile for Bash or ~/.zshrc for zsh
+# on both MacOS and git bash on Windows.
 
-EDITOR="subl"
+EDITOR="code"  # subl = Sublime Text
 alias sbe="$EDITOR ~/.bash_profile"
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
-alias c="clear"
-alias p="pwd"
+alias c="clear"  # screen
 alias x='exit'
-alias dir='ls -alr'  # for windows habits
-alias ll='ls -FalhG'
+alias p="pwd"
+alias cf="find . -print | wc -l"  # count files in folder.
+alias dir='ls -alrT'  # for windows habits
+alias l='ls -FalhGT'  # T for year
 alias last20='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -20 | cut -f2-'
 alias myip="ifconfig en0 | grep inet | grep -v inet6 | cut -d ' ' -f2"  # https://www.whatismyip.com/
 alias pubip="curl ifconfig.me"  # public IP
-alias ga='git add .'
+alias pubip="curl http://canhazip.com"  # public IP also from slower "curl -s ifconfig.me" or curl https://checkip.amazonaws.com
+alias wanip4='dig @resolver1.opendns.com ANY myip.opendns.com +short'
+alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
+alias ramfree="top -l 1 -s 0 | grep PhysMem"
+
+alias ga='git add .'  # --patch
 function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
 function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
 alias gb='git branch -avv'
@@ -39,3 +47,11 @@ alias grv='git remote -v'
 alias gsl='git status -s -b; git stash list'
 alias gss='git stash show'
 alias hb="hub browse"
+
+alias tf="terraform $1"
+alias tfa="terraform apply"
+alias tfd="terraform destroy"
+alias tfs="terraform show"
+
+alias dockx="docker stop $(docker ps -a -q);docker rm -f $(docker ps -a -q)"
+alias ports="sudo netstat -tulpn"  # mac
