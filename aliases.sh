@@ -21,20 +21,18 @@ alias now='date +"%T %d-%m-%Y"'
 alias epoch='date -u +%s'
 
 # Only on MacOS, not git bash on Windows MINGW64:
-if [ "$(uname)" == "Darwin" ]; then  # it's on a Mac:
-   alias vers="sw_vers"
-   function gd() { # get dirty
-	[[ $(git status 2> /dev/null | tail -n1) != *"working directory clean"* ]] && echo "*"
-   }
-   function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
-   function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
-   function parse_git_branch() {
-	   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(gd)/"
-   }
-fi
+#if [ "$(uname)" == "Darwin" ]; then  # it's on a Mac:
+#   alias vers="sw_vers"
+#   function gd() { # get dirty
+#	[[ $(git status 2> /dev/null | tail -n1) != *"working directory clean"* ]] && echo "*"
+#   }
+#  function gas() { git status ;  git add . -A ; git commit -m "$1" ; git push; }
+#   function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
+#fi
 
 alias dir='ls -alrT'  # for windows habits
 alias l='ls -FalhGT'  # T for year
+alias lt="ls -ltaT"     # list by date
 alias lf="ls -p"      # list folders only
 alias cf="find . -print | wc -l"  # count files in folder.
 # Last 30 files updated anywhere:
