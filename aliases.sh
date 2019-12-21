@@ -76,10 +76,13 @@ alias gsl='git status -s -b; git stash list'
 alias gss='git stash show'
 alias hb="hub browse"
 
-alias tf="terraform $1"
+alias tf="terraform $1"  # provide a parameter
 alias tfa="terraform apply"
 alias tfd="terraform destroy"
 alias tfs="terraform show"
+
+alias ven="virtualenv venv"
+alias vbc="source venv/bin/activate"
 
 #if command -v docker >/dev/null; then  # installed in /usr/local/bin/docker
 #   echo "Docker installed, so ..."
