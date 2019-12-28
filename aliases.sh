@@ -4,6 +4,7 @@
 # on both MacOS and git bash on Windows.
 
 EDITOR="code"  # code = Visual Studio Code; subl = Sublime Text
+alias edit="code"
 alias sbe="$EDITOR ~/.bash_profile"
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
@@ -51,6 +52,12 @@ alias en0="ipconfig getifaddr en0"  # like 192.168.1.253
 alias wanip4='dig @resolver1.opendns.com ANY myip.opendns.com +short'
 alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
 alias ramfree="top -l 1 -s 0 | grep PhysMem"
+
+alias kad="killall com.docker.osx.hyperkit.linux"   # docker restart
+alias dps="docker ps"                               # docker processes list
+alias dcp="docker container prune --force"          # Remove all stopped containers
+alias dal="docker container ls -aq"                 # docker active container list
+alias das="docker stop $(docker container ls -aq )" # docker stop currrent container
 
 alias ga='git add .'  # --patch
 alias gb='git branch -avv'
