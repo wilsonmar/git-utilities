@@ -51,7 +51,7 @@ alias en0="ipconfig getifaddr en0"  # like 192.168.1.253
 
 alias wanip4='dig @resolver1.opendns.com ANY myip.opendns.com +short'
 alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
-alias ramfree="top -l 1 -s 0 | grep PhysMem"
+alias ramfree="top -l 1 -s 0 | grep PhysMem"  # PhysMem: 30G used (3693M wired), 1993M unused.
 
 alias kad="killall com.docker.osx.hyperkit.linux"   # docker restart
 alias dps="docker ps"                               # docker processes list
@@ -62,7 +62,7 @@ alias dpa="docker container prune --force"          # Remove all stopped contain
 alias ga='git add .'  # --patch
 alias gb='git branch -avv'
 alias gbs='git status -s -b;git add . -A;git commit -m"Update";git push'
-alias get='git fetch;' # git pull
+alias get='git fetch;' # git pull + merge
 alias gf='git fetch origin master;git diff master..origin/master'
 alias gfu='git fetch upstream;git diff HEAD @{u} --name-only'
 alias gc='git commit -m' # requires you to type a commit message
