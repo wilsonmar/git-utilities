@@ -55,9 +55,9 @@ alias ramfree="top -l 1 -s 0 | grep PhysMem"
 
 alias kad="killall com.docker.osx.hyperkit.linux"   # docker restart
 alias dps="docker ps"                               # docker processes list
-alias dcp="docker container prune --force"          # Remove all stopped containers
-alias dal="docker container ls -aq"                 # docker active container list
-alias das="docker stop $(docker container ls -aq )" # docker stop currrent container
+alias dla="docker container ls -aq"                 # docker list active container
+alias dsa="docker stop $(docker container ls -aq )" # docker stop active container
+alias dpa="docker container prune --force"          # Remove all stopped containers
 
 alias ga='git add .'  # --patch
 alias gb='git branch -avv'
