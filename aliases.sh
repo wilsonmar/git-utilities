@@ -49,13 +49,15 @@ alias en0="ipconfig getifaddr en0"  # like 192.168.1.253
 #alias pubip="curl https://checkip.amazonaws.com"  # public IP
 #alias mac="curl http://canhazip.com"  # public IP 
 
+alias aam='open -a "/Applications/Utilities/Activity Monitor.app"'  # See CPU usage by app
+
 alias wanip4='dig @resolver1.opendns.com ANY myip.opendns.com +short'
 alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
 alias ramfree="top -l 1 -s 0 | grep PhysMem"  # PhysMem: 30G used (3693M wired), 1993M unused.
 
 alias kad="killall com.docker.osx.hyperkit.linux"   # docker restart
 alias dps="docker ps"                               # docker processes list
-alias dla="docker container ls -aq"                 # docker list active container
+alias dcl="docker container ls -aq"                 # docker list active container
 alias dsa="docker stop $(docker container ls -aq )" # docker stop active container
 alias dpa="docker container prune --force"          # Remove all stopped containers
 
@@ -71,6 +73,7 @@ alias gl='git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=rela
 alias l1="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
 alias l2="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 alias gmo='git merge origin/master'
+alias gmf='git merge --no-ff'
 alias gp='git push'
 alias gpom='git push -u origin master'
 alias grm='git rm $(git ls-files --deleted)'
@@ -82,6 +85,7 @@ alias grv='git remote -v'
 alias gsl='git status -s -b; git stash list'
 alias gss='git stash show'
 alias hb="hub browse"
+alias grx="rm .git/merge"  # Remove merge
 
 alias tf="terraform $1"  # provide a parameter
 alias tfa="terraform apply"
