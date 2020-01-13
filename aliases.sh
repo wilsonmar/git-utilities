@@ -39,13 +39,14 @@ alias cf="find . -print | wc -l"  # count files in folder.
 # Last 30 files updated anywhere:
 alias f30='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -30 | cut -f2- 2>/dev/null'
 
-# wireless en0, wired en1:
-alias en0="ipconfig getifaddr en0"  # like 192.168.1.253
+# wireless en0, wired en1: PRIVATE_IP address:
+alias en0="ipconfig getifaddr en0"  # like 172.20.1.91 or 192.168.1.253
    #alias myip="ifconfig en0 | grep inet | grep -v inet6 | cut -d ' ' -f2" 
+   # ip route get 1 | awk '{print $NF;exit}'
 
 # These all return the public ip like https://www.whatismyip.com/:
- alias ipinfo="curl ipinfo.io"  # returns JSON
  alias pubip="curl -s ifconfig.me"  # public IP
+ alias ipinfo="curl ipinfo.io"  # returns JSON containing country and zip of IP
 #alias pubip="curl https://checkip.amazonaws.com"  # public IP
 #alias mac="curl http://canhazip.com"  # public IP 
 
@@ -94,6 +95,7 @@ alias tfs="terraform show"
 
 alias ven="virtualenv venv"
 alias vbc="source venv/bin/activate"
+alias vde="deactivate"
 
 #if command -v docker >/dev/null; then  # installed in /usr/local/bin/docker
 #   echo "Docker installed, so ..."
