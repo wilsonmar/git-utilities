@@ -4,8 +4,8 @@
 # on both MacOS and git bash on Windows.
 
 EDITOR="code"  # code = Visual Studio Code; subl = Sublime Text
-alias edit="code"
-alias sbe="$EDITOR ~/.bash_profile"
+alias edit="code"   # change this, not your habitual editor name
+alias sbe="$EDITOR ~/.bash_profile && source ~/.bash_profile"
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
@@ -18,7 +18,7 @@ alias p="pwd"
 alias kp="ps auxwww"  # the "kp" alias ("que pasa")
 alias j='jobs -l'
 
-alias now='date +"%T %d-%m-%Y"'
+alias now='date +"%m-%d-%Y %T"'
 alias epoch='date -u +%s'
 
 # Only on MacOS, not git bash on Windows MINGW64:
@@ -39,36 +39,40 @@ alias cf="find . -print | wc -l"  # count files in folder.
 # Last 30 files updated anywhere:
 alias f30='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -30 | cut -f2- 2>/dev/null'
 
+#     catn filename to show text file without comment (#) lines:
+alias catn="grep -Ev '''^(#|$)'''"
+
 # wireless en0, wired en1: PRIVATE_IP address:
 alias en0="ipconfig getifaddr en0"  # like 172.20.1.91 or 192.168.1.253
    #alias myip="ifconfig en0 | grep inet | grep -v inet6 | cut -d ' ' -f2" 
    # ip route get 1 | awk '{print $NF;exit}'
 
 # These all return the public ip like https://www.whatismyip.com/:
- alias pubip="curl -s ifconfig.me"  # public IP
- alias ipinfo="curl ipinfo.io"  # returns JSON containing country and zip of IP
+alias pubip="curl -s ifconfig.me"  # public IP
+alias ipinfo="curl ipinfo.io"  # returns JSON containing country and zip of IP
 #alias pubip="curl https://checkip.amazonaws.com"  # public IP
 #alias mac="curl http://canhazip.com"  # public IP 
 
 alias aam='open -a "/Applications/Utilities/Activity Monitor.app"'  # See CPU usage by app
-
+alias ramfree="top -l 1 -s 0 | grep PhysMem"  # PhysMem: 30G used (3693M wired), 1993M unused.
+alias spacefree="du -h | awk 'END{print $1}'"
 alias wanip4='dig @resolver1.opendns.com ANY myip.opendns.com +short'
 alias wanip6='dig @resolver1.opendns.com AAAA myip.opendns.com +short -6'
-alias ramfree="top -l 1 -s 0 | grep PhysMem"  # PhysMem: 30G used (3693M wired), 1993M unused.
 
-alias kad="killall com.docker.osx.hyperkit.linux"   # docker restart
+alias ddk="killall com.docker.osx.hyperkit.linux"   # docker restart
 alias dps="docker ps"                               # docker processes list
 alias dcl="docker container ls -aq"                 # docker list active container
 alias dsa="docker stop $(docker container ls -aq )" # docker stop active container
 alias dpa="docker container prune --force"          # Remove all stopped containers
+alias dpx="docker rm -v $(docker ps -aq -f status=exited)"  # Remove stopped containers
 
 alias ga='git add .'  # --patch
 alias gb='git branch -avv'
-alias gbs='git status -s -b;git add . -A;git commit -m"Update";git push'
+alias gbs='git status -s -b;git add . -A;git commit --quiet -m"Update";git push'
 alias get='git fetch;' # git pull + merge
 alias gf='git fetch origin master;git diff master..origin/master'
 alias gfu='git fetch upstream;git diff HEAD @{u} --name-only'
-alias gc='git commit -m' # requires you to type a commit message
+alias gc='git commit -m --quiet' # requires you to type a commit message
 alias gcm='git checkout master'
 alias gl='git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=relative;git log --show-signature -n 1'
 alias l1="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
