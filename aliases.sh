@@ -66,7 +66,7 @@ alias dsa="docker stop $(docker container ls -aq )" # docker stop active contain
 alias dpa="docker container prune --force"          # Remove all stopped containers
 alias dpx="docker rm -v $(docker ps -aq -f status=exited)"  # Remove stopped containers
 
-alias ga='git add .'  # --patch
+alias ga='git add . -A'  # --patch
 alias gb='git branch -avv'
 alias gbs='git status -s -b;git add . -A;git commit --quiet -m"Update";git push'
 alias get='git fetch;' # git pull + merge
@@ -75,8 +75,8 @@ alias gfu='git fetch upstream;git diff HEAD @{u} --name-only'
 alias gc='git commit -m --quiet' # requires you to type a commit message
 alias gcm='git checkout master'
 alias gl='git log --pretty=format:"%h %s %ad" --graph --since=1.days --date=relative;git log --show-signature -n 1'
-alias l1="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
-alias l2="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+alias gl1="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+alias gl2="git log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 alias gmo='git merge origin/master'
 alias gmf='git merge --no-ff'
 alias gp='git push'
