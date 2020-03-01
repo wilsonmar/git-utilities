@@ -92,6 +92,7 @@ alias gss='git stash show'
 alias hb="hub browse"
 alias grx="rm .git/merge"  # Remove merge
 alias gsk="gpg --list-secret-keys --keyid-format LONG"
+alias gst="gpg show-ref --tags"
 
 alias tf="terraform $1"  # provide a parameter
 alias tfa="terraform apply"
