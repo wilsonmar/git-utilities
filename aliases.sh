@@ -107,5 +107,5 @@ alias vde="deactivate"
 #   echo "Docker installed, so ..."
 #   alias dockx="docker stop $(docker ps -a -q);docker rm -f $(docker ps -a -q)"
 #fi
-
+# See https://github.com/ysmike/dotfiles/blob/master/bash/.aliases
 # More: https://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
