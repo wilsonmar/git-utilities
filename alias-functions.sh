@@ -36,9 +36,9 @@ function parse_git_branch() {
 	git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(gd)/"
 }
 # This enables:
-export PS1="\n  \w\[\033[33m\] \$(parse_git_branch)\[\033[00m\]\n$ "
+#export PS1="\n  \w\[\033[33m\] \$(parse_git_branch)\[\033[00m\]\n$ "
 # instead of:
-#export PS1="\n\n  \w\[\033[33m\] \n$ "
+export PS1="\n\n  \w\[\033[33m\] \n$ "
 
 # On Mac only:
 # alias ss="/System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine -background &"

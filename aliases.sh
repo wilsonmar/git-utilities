@@ -5,7 +5,7 @@
 
 EDITOR="code"  # code = Visual Studio Code; subl = Sublime Text
 alias edit="code"   # change this, not your habitual editor name
-alias sbe="$EDITOR ~/.bash_profile && source ~/.bash_profile"
+alias ebp="$EDITOR ~/.bash_profile && source ~/.bash_profile"
 alias sbp='source ~/.bash_profile'
 alias rs='exec -l $SHELL'
 
@@ -13,7 +13,7 @@ alias ..='cd ..'
 alias c="clear"  # screen
 alias h='history'
 alias x='exit'
-alias p="pwd"
+alias p="pwd"   # present working directory
 
 alias kp="ps auxwww"  # the "kp" alias ("que pasa")
 alias j='jobs -l'
@@ -33,7 +33,7 @@ alias epoch='date -u +%s'
 
 alias dir='ls -alrT'  # for windows habits
 alias l='ls -FalhGT'  # T for year
-alias lt="ls -ltaT"     # list by date
+alias lt="ls -ltaT"   # list by date
 alias lf="ls -p"      # list folders only
 alias cf="find . -print | wc -l"  # count files in folder.
 # Last 30 files updated anywhere:
@@ -109,3 +109,7 @@ alias vde="deactivate"
 #fi
 # See https://github.com/ysmike/dotfiles/blob/master/bash/.aliases
 # More: https://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+
+alias wmg='cd $HOME/gits/wilsonmar/wilsonmar.github.io/_posts'
+alias wmb='cd $HOME/gits/wilsonmar/DevSecOps/bash'
+alias wmp='cd $HOME/gits/wilsonmar/python-samples'
