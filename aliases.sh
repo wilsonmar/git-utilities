@@ -87,7 +87,7 @@ alias grl='git reflog -n 7'
 alias grh='git reset --hard'
 alias grl='git reflog -n 7'
 alias grv='git remote -v'
-alias gsl='git status -s -b; git stash list'
+alias gsl='git config user.email;git status -s -b; git stash list'
 alias gss='git stash show'
 alias hb="hub browse"
 alias grx="rm .git/merge"  # Remove merge
@@ -110,6 +110,7 @@ alias vde="deactivate"
 # See https://github.com/ysmike/dotfiles/blob/master/bash/.aliases
 # More: https://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
 
+alias wmf='cd $HOME/gits/wilsonmar/futures'
 alias wmg='cd $HOME/gits/wilsonmar/wilsonmar.github.io/_posts'
 alias wmb='cd $HOME/gits/wilsonmar/DevSecOps/bash'
 alias wmp='cd $HOME/gits/wilsonmar/python-samples'
