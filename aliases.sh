@@ -18,8 +18,7 @@ alias p="pwd"   # present working directory
 alias kp="ps auxwww"  # the "kp" alias ("que pasa")
 alias j='jobs -l'
 
-alias now='date +"%m-%d-%Y %T"'
-alias epoch='date -u +%s'
+alias now='date +"%Y-%m-%d %T +%s"'
 
 # Only on MacOS, not git bash on Windows MINGW64:
 #if [ "$(uname)" == "Darwin" ]; then  # it's on a Mac:
@@ -31,13 +30,14 @@ alias epoch='date -u +%s'
 #   function gsa() { git stash save "$1" -a; git stash list; }  # -a = all (untracked, ignored)
 #fi
 
+alias cf="find . -print | wc -l"  # count files in folder.
+alias lf="ls -p"      # list folders only
 alias dir='ls -alrT'  # for windows habits
 alias l='ls -FalhGT'  # T for year
+alias ll='ls -FalhGT'  # T for year
 alias lt="ls -ltaT"   # list by date
-alias lf="ls -p"      # list folders only
-alias cf="find . -print | wc -l"  # count files in folder.
 # Last 30 files updated anywhere:
-alias f30='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -30 | cut -f2- 2>/dev/null'
+alias f50='stat -f "%m%t%Sm %N" /tmp/* | sort -rn | head -50 | cut -f2- 2>/dev/null'
 
 #     catn filename to show text file without comment (#) lines:
 alias catn="grep -Ev '''^(#|$)'''"
@@ -110,7 +110,9 @@ alias vde="deactivate"
 # See https://github.com/ysmike/dotfiles/blob/master/bash/.aliases
 # More: https://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
 
+alias wmx='cd $HOME/gits/wilsonmar'
 alias wmf='cd $HOME/gits/wilsonmar/futures'
-alias wmg='cd $HOME/gits/wilsonmar/wilsonmar.github.io/_posts'
+alias wmo='cd $HOME/gits/wilsonmar/wilsonmar.github.io/_posts'
 alias wmb='cd $HOME/gits/wilsonmar/DevSecOps/bash'
 alias wmp='cd $HOME/gits/wilsonmar/python-samples'
+alias wmg='cd $HOME/gits/wilsonmar/golang-samples'
