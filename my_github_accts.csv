@@ -1,0 +1,5 @@
+_folder,      _Name,    _acct,    _email,            _note
+gmail_acct,   John Doe, johndoe,  johndoe@gmail.com, Personal GitHub account created using personal Gmail or other email
+client1_acct, John Doe, john-doe, john_doe@mck.com,  Customer/client organization account
+job1_acct,    John Doe, john-doe, john_doe@mck.com,  Employer organization account
+vendor1_acct, John Doe, johndoe1, john-doe@soft.ai,  vendor organization account
